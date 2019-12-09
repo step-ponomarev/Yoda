@@ -36,6 +36,8 @@ public class TaskContainer {
     taskList.add(task);
   }
 
+  public void remove(Task task) {taskList.remove(task);}
+
   public void sort() {
     Collections.sort(taskList, sortStrategy);
   }
