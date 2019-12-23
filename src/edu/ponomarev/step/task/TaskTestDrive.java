@@ -8,7 +8,7 @@ public class TaskTestDrive {
       tc.add(new Task(i.toString()));
     }
 
-    tc.print();
+    tc.show();
 
     tc.setSortStrategy(TaskContainer.Strategy.STATEMENT);
 
@@ -16,6 +16,6 @@ public class TaskTestDrive {
 
     System.out.println("After sorting");
 
-    tc.print();
+    tc.show();
   }
 }

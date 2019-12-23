@@ -32,17 +32,26 @@ public class TaskContainer {
     sortStrategy = new DateCompare();
   }
 
+  public Task get(final int index) throws ArrayIndexOutOfBoundsException {
+    if (index >= taskList.size()) {
+      throw new ArrayIndexOutOfBoundsException("Invalid task index");
+    }
+    return taskList.get(index);
+  }
+
   public void add(Task task) {
     taskList.add(task);
   }
 
-  public void remove(Task task) {taskList.remove(task);}
+  public void remove(Task task) {
+    taskList.remove(task);
+  }
 
   public void sort() {
     Collections.sort(taskList, sortStrategy);
   }
 
-  public void print() {
+  public void show() {
     taskList.forEach(System.out::println);
   }
 

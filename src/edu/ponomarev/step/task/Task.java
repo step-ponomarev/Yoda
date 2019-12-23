@@ -1,41 +1,19 @@
 package edu.ponomarev.step.task;
 
-import edu.ponomarev.step.observer.Observer;
-import edu.ponomarev.step.observer.Subject;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Objects;
 
-public class Task implements Comparable<Task>, Subject {
+public class Task implements Comparable<Task> {
   String statement;
   Calendar date_of_creation;
 
-  private ArrayList<Observer> owners;
 
   public Task(String statement) {
     this.statement = statement;
     this.date_of_creation = Calendar.getInstance();
-    this.owners = new ArrayList<Observer>();
-  }
-
-  @Override
-  public void addObserver(Observer obs) {
-    owners.add(obs);
-  }
-
-  @Override
-  public void removeObserver(Observer obs) {
-    owners.remove(obs);
-  }
-
-  @Override
-  public void noticeAll() {
-    for (Observer obs : owners) {
-      obs.uptate(this);
-    }
   }
 
   @Override
