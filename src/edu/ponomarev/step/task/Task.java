@@ -19,7 +19,7 @@ public class Task implements Comparable<Task> {
   @Override
   public String toString() {
     DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-    return (statement + " " + dateFormat.format(date_of_creation.getTime()));
+    return (statement);
   }
 
   @Override

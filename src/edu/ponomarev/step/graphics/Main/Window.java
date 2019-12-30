@@ -1,4 +1,5 @@
-package edu.ponomarev.step.graphics;
+package edu.ponomarev.step.graphics.Main;
+import edu.ponomarev.step.graphics.Edit.EditPanel;
 import edu.ponomarev.step.manager.TaskHandler;
 import edu.ponomarev.step.task.Task;
 
@@ -9,7 +10,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
-
 
 public class Window extends JFrame {
   //TODO Сделать смену контейнера(раз)
@@ -28,7 +28,7 @@ public class Window extends JFrame {
     }
   }
 
-  private class WeeekButtonListener implements ActionListener {
+  private class WeekButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
       taskP.setList(new ArrayList<Task>());
@@ -50,7 +50,7 @@ public class Window extends JFrame {
       //TODO Добавить добавление задачи в зависимости
       // от выбранного бокса!
       if (e.getKeyCode() == ENTER) {
-        System.out.println("Энтер нажат!");
+        buttonPanel.addButton.doClick();
       }
     }
 
@@ -65,33 +65,56 @@ public class Window extends JFrame {
     }
   }
 
-  private TaskHandler manager; // TODO Эта штука должна связывать графику и
+  private class AddButtonListener implements ActionListener {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      String task = textP.field.getText().strip();
+      if (!task.isEmpty()) {
+        taskP.addTask(task);
+        textP.field.selectAll();
+      }
+    }
+  }
+
+  private class EditButtonListener implements ActionListener {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      editP = new EditPanel(taskP.getSelected());
+      content.add(editP, BorderLayout.CENTER);
+      setUpEditPanel();
+    }
+  }
+
+  //private TaskHandler manager; // TODO Эта штука должна связывать графику и
   // задачи, проекты и пр!
+  private Container content;
 
   private TextPanel textP;
   private TaskPanel taskP;
   private BoxPanel boxP;
-  private JPanel optionsP;
+  private ButtonPanel buttonPanel;
+  private EditPanel editP;
 
   public static void main(String[] args) {
-
     Window window = new Window(new TaskHandler());
     window.run();
   }
 
   public Window(TaskHandler handler) {
     super("Yoda");
-    manager = handler;
+    //manager = handler;
+    content = this.getContentPane();
     taskP = new TaskPanel();
     boxP = new BoxPanel();
     textP = new TextPanel();
+    buttonPanel = new ButtonPanel();
   }
 
   public void run() {
     setUpBoxPanel();
     setUpTaskPanel();
     setUpTextPanel();
-
+    setUpButtonPanel();
 
     this.setSize(500, 500);
     this.getContentPane().setBackground(new Color(255, 255, 255));
@@ -104,14 +127,14 @@ public class Window extends JFrame {
 
     boxP.run();
 
-    boxP.box[0].addActionListener( new InboxButtonListener());
+    boxP.box[0].addActionListener(new InboxButtonListener());
     boxP.box[1].addActionListener(new TodayButtonListener());
-    boxP.box[2].addActionListener(new WeeekButtonListener());
+    boxP.box[2].addActionListener(new WeekButtonListener());
     boxP.box[3].addActionListener(new LateButtonListener());
   }
 
   private void setUpTaskPanel() {
-    this.getContentPane().add(taskP, BorderLayout.CENTER);
+    content.add(taskP, BorderLayout.CENTER);
 
     taskP.run();
 
@@ -119,7 +142,7 @@ public class Window extends JFrame {
   }
 
   private void setUpTextPanel() {
-    this.getContentPane().add(textP, BorderLayout.NORTH);
+    content.add(textP, BorderLayout.NORTH);
     textP.field.addKeyListener(new AddTaskListener());
 
     for (JButton button : boxP.box) {
@@ -127,5 +150,20 @@ public class Window extends JFrame {
     }
 
     textP.run();
+  }
+
+  private void setUpButtonPanel() {
+    content.add(buttonPanel, BorderLayout.SOUTH);
+
+    buttonPanel.addButton.addActionListener(new AddButtonListener());
+    buttonPanel.editButton.addActionListener(new EditButtonListener());
+
+    buttonPanel.run();
+  }
+
+  private void setUpEditPanel() {
+    editP.run();
+    editP.revalidate();
+    editP.repaint();
   }
 }

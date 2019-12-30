@@ -1,4 +1,4 @@
-package edu.ponomarev.step.graphics;
+package edu.ponomarev.step.graphics.Main;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,7 +17,6 @@ public class TextPanel extends JPanel {
     this.setLayout(new FlowLayout());
     this.add(field, BorderLayout.CENTER);
     this.add(boxList, BorderLayout.EAST);
-
 
     this.setBackground(new Color(255, 255, 255));
     this.setVisible(true);

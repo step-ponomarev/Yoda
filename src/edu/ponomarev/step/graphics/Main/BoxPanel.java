@@ -1,4 +1,4 @@
-package edu.ponomarev.step.graphics;
+package edu.ponomarev.step.graphics.Main;
 
 import javax.swing.*;
 import java.awt.*;
