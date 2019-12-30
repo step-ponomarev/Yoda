@@ -4,9 +4,10 @@ import edu.ponomarev.step.task.Task;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 
 public class EditPanel extends JPanel {
-  JButton saveButton;
+  private JButton saveButton;
 
   private TextField taskNameField;
   private Task currentTask;
@@ -20,12 +21,15 @@ public class EditPanel extends JPanel {
   }
 
   public void run() {
-    this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+    taskNameField.setText(currentTask.toString());
+    this.add(saveButton, BorderLayout.SOUTH);
+    this.add(taskNameField, BorderLayout.NORTH);
 
-    this.add(saveButton);
-    this.add(taskNameField);
-
-
+    this.setBackground(Color.WHITE);
     this.setVisible(true);
+  }
+
+  public void setSaveButtonListener(ActionListener listener) {
+    saveButton.addActionListener(listener);
   }
 }

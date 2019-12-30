@@ -17,6 +17,7 @@ public class Window extends JFrame {
   private class InboxButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
+      TaskPanel taskP = (TaskPanel) centerPanel;
       taskP.setList(new ArrayList<Task>());
     }
   }
@@ -24,6 +25,7 @@ public class Window extends JFrame {
   private class TodayButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
+      TaskPanel taskP = (TaskPanel) centerPanel;
       taskP.setList(new ArrayList<Task>());
     }
   }
@@ -31,6 +33,7 @@ public class Window extends JFrame {
   private class WeekButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
+      TaskPanel taskP = (TaskPanel) centerPanel;
       taskP.setList(new ArrayList<Task>());
     }
   }
@@ -38,6 +41,7 @@ public class Window extends JFrame {
   private class LateButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
+      TaskPanel taskP = (TaskPanel) centerPanel;
       taskP.setList(new ArrayList<Task>());
     }
   }
@@ -70,30 +74,61 @@ public class Window extends JFrame {
     public void actionPerformed(ActionEvent e) {
       String task = textP.field.getText().strip();
       if (!task.isEmpty()) {
+        TaskPanel taskP = (TaskPanel) centerPanel;
         taskP.addTask(task);
         textP.field.selectAll();
       }
     }
   }
 
-  private class EditButtonListener implements ActionListener {
+  private class EditMakePanelButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
-      editP = new EditPanel(taskP.getSelected());
-      content.add(editP, BorderLayout.CENTER);
+      if (taskP.getList().isSelectionEmpty()) {
+        return;
+      }
+
+      content.removeAll();
+
+      centerPanel =  new EditPanel(taskP.getSelected());
+      content.add(centerPanel, BorderLayout.CENTER);
       setUpEditPanel();
+
+      content.revalidate();
+      content.repaint();
+    }
+  }
+
+  private class EditSaveButtonListener implements ActionListener {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      //EditPanel editP = (EditPanel) centerPanel;
+      //TODO Сохранить изменения в таске
+      centerPanel =  taskP;
+
+      content.removeAll();
+
+      setUpBoxPanel();
+      setUpTaskPanel();
+      setUpTextPanel();
+      setUpButtonPanel();
+
+      content.revalidate();
+      content.repaint();
     }
   }
 
   //private TaskHandler manager; // TODO Эта штука должна связывать графику и
   // задачи, проекты и пр!
+  private JPanel centerPanel;
   private Container content;
 
   private TextPanel textP;
-  private TaskPanel taskP;
   private BoxPanel boxP;
   private ButtonPanel buttonPanel;
-  private EditPanel editP;
+  private TaskPanel taskP;
+
+
 
   public static void main(String[] args) {
     Window window = new Window(new TaskHandler());
@@ -103,8 +138,10 @@ public class Window extends JFrame {
   public Window(TaskHandler handler) {
     super("Yoda");
     //manager = handler;
+    taskP = new TaskPanel(new ArrayList<Task>());
+    centerPanel = taskP;
+
     content = this.getContentPane();
-    taskP = new TaskPanel();
     boxP = new BoxPanel();
     textP = new TextPanel();
     buttonPanel = new ButtonPanel();
@@ -123,7 +160,7 @@ public class Window extends JFrame {
   }
 
   private void setUpBoxPanel() {
-    this.getContentPane().add(boxP, BorderLayout.EAST);
+    content.add(boxP, BorderLayout.EAST);
 
     boxP.run();
 
@@ -134,11 +171,13 @@ public class Window extends JFrame {
   }
 
   private void setUpTaskPanel() {
-    content.add(taskP, BorderLayout.CENTER);
+    content.add(centerPanel, BorderLayout.CENTER);
 
     taskP.run();
 
-    taskP.setList(new ArrayList<Task>()); // TODO коробка сегодня по умолчанию
+    //taskP.setList(); // TODO коробка сегодня по умолчанию
+    centerPanel.revalidate();
+    centerPanel.repaint();
   }
 
   private void setUpTextPanel() {
@@ -150,20 +189,24 @@ public class Window extends JFrame {
     }
 
     textP.run();
+    textP.revalidate();
+    textP.repaint();
   }
 
   private void setUpButtonPanel() {
     content.add(buttonPanel, BorderLayout.SOUTH);
 
     buttonPanel.addButton.addActionListener(new AddButtonListener());
-    buttonPanel.editButton.addActionListener(new EditButtonListener());
+    buttonPanel.editButton.addActionListener(new EditMakePanelButtonListener());
 
     buttonPanel.run();
+    buttonPanel.revalidate();
+    buttonPanel.repaint();
   }
 
   private void setUpEditPanel() {
+    EditPanel editP = (EditPanel) centerPanel;
+    editP.setSaveButtonListener(new EditSaveButtonListener());
     editP.run();
-    editP.revalidate();
-    editP.repaint();
   }
 }
