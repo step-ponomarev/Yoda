@@ -6,31 +6,58 @@ import edu.ponomarev.step.task.TaskContainer;
 // TODO: Нарисовать ЮМЛ обслуживателя задач
 
 public class TaskHandler {
-  private TaskContainer tasks;
+  private TaskContainer inbox;
+  private TaskContainer todayBox;
+  private TaskContainer weekBox;
+  private  TaskContainer lateBox;
 
-  /*enum BoxType {
+  public enum BoxType {
     DAY,
     WEEK,
     LATE
-  }*/
+  }
 
   public TaskHandler() {
-    this.tasks = new TaskContainer();
+    this.inbox = new TaskContainer();
+    this.todayBox = new TaskContainer();
+    this.weekBox = new TaskContainer();
+    this.lateBox = new TaskContainer();
   }
 
-  public void addTask(Task task) {
-    tasks.add(task);
+  public void addTask(BoxType type, Task task) {
+    switch (type) {
+      case DAY:
+        todayBox.add(task);
+        return;
+      case WEEK:
+        weekBox.add(task);
+        return;
+      case LATE:
+        lateBox.add(task);
+        return;
+      default:
+        inbox.add(task);
+        return;
+    }
   }
 
-  public void removeTask(final int index) {
-    tasks.remove(tasks.get(index));
+  public TaskContainer getInbox() {
+    return inbox;
+  }
+
+  public TaskContainer getTodayBox() {
+    return todayBox;
+  }
+
+  public TaskContainer getWeekBox() {
+    return weekBox;
+  }
+
+  public TaskContainer getLateBox() {
+    return lateBox;
   }
 
   /*public void move(TaskHandler.BoxType from, TaskHandler.BoxType to, Task task) {
 
   }*/
-
-  public void show() {
-    tasks.show();
-  }
 };

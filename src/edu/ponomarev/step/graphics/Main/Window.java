@@ -1,7 +1,6 @@
 package edu.ponomarev.step.graphics.Main;
 import edu.ponomarev.step.graphics.Edit.EditPanel;
 import edu.ponomarev.step.manager.TaskHandler;
-import edu.ponomarev.step.task.Task;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
 
 public class Window extends JFrame {
   //TODO Сделать смену контейнера(раз)
@@ -18,7 +16,7 @@ public class Window extends JFrame {
     @Override
     public void actionPerformed(ActionEvent e) {
       TaskPanel taskP = (TaskPanel) centerPanel;
-      taskP.setList(new ArrayList<Task>());
+      taskP.setList(manager.getInbox());
     }
   }
 
@@ -26,7 +24,7 @@ public class Window extends JFrame {
     @Override
     public void actionPerformed(ActionEvent e) {
       TaskPanel taskP = (TaskPanel) centerPanel;
-      taskP.setList(new ArrayList<Task>());
+      taskP.setList(manager.getTodayBox());
     }
   }
 
@@ -34,7 +32,7 @@ public class Window extends JFrame {
     @Override
     public void actionPerformed(ActionEvent e) {
       TaskPanel taskP = (TaskPanel) centerPanel;
-      taskP.setList(new ArrayList<Task>());
+      taskP.setList(manager.getWeekBox());
     }
   }
 
@@ -42,7 +40,7 @@ public class Window extends JFrame {
     @Override
     public void actionPerformed(ActionEvent e) {
       TaskPanel taskP = (TaskPanel) centerPanel;
-      taskP.setList(new ArrayList<Task>());
+      taskP.setList(manager.getLateBox());
     }
   }
 
@@ -88,11 +86,15 @@ public class Window extends JFrame {
         return;
       }
 
+      repaintEditWindow();
+    }
+
+    private void repaintEditWindow() {
       content.removeAll();
 
       centerPanel =  new EditPanel(taskP.getSelected());
       content.add(centerPanel, BorderLayout.CENTER);
-      setUpEditPanel();
+      setUpEditPanel((EditPanel) centerPanel);
 
       content.revalidate();
       content.repaint();
@@ -102,25 +104,19 @@ public class Window extends JFrame {
   private class EditSaveButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
-      //EditPanel editP = (EditPanel) centerPanel;
+      EditPanel editP = (EditPanel) centerPanel;
       //TODO Сохранить изменения в таске
-      centerPanel =  taskP;
-
-      content.removeAll();
-
-      setUpBoxPanel();
-      setUpTaskPanel();
-      setUpTextPanel();
-      setUpButtonPanel();
-
-      content.revalidate();
-      content.repaint();
+      repaintMainWindow();
     }
   }
 
-  //private TaskHandler manager; // TODO Эта штука должна связывать графику и
-  // задачи, проекты и пр!
+  private TaskHandler manager;
+
+  private JPanel northPanel;
   private JPanel centerPanel;
+  private JPanel eastPanel;
+  private  JPanel southPanel;
+
   private Container content;
 
   private TextPanel textP;
@@ -128,23 +124,23 @@ public class Window extends JFrame {
   private ButtonPanel buttonPanel;
   private TaskPanel taskP;
 
-
-
-  public static void main(String[] args) {
-    Window window = new Window(new TaskHandler());
-    window.run();
-  }
-
   public Window(TaskHandler handler) {
     super("Yoda");
-    //manager = handler;
-    taskP = new TaskPanel(new ArrayList<Task>());
-    centerPanel = taskP;
+    manager = handler;
 
     content = this.getContentPane();
-    boxP = new BoxPanel();
+
     textP = new TextPanel();
+    northPanel = textP;
+
+    taskP = new TaskPanel(handler.getTodayBox());
+    centerPanel = taskP;
+
+    boxP = new BoxPanel();
+    eastPanel = boxP;
+
     buttonPanel = new ButtonPanel();
+    southPanel = buttonPanel;
   }
 
   public void run() {
@@ -153,6 +149,8 @@ public class Window extends JFrame {
     setUpTextPanel();
     setUpButtonPanel();
 
+    repaintMainWindow();
+
     this.setSize(500, 500);
     this.getContentPane().setBackground(new Color(255, 255, 255));
     this.setVisible(true);
@@ -160,8 +158,6 @@ public class Window extends JFrame {
   }
 
   private void setUpBoxPanel() {
-    content.add(boxP, BorderLayout.EAST);
-
     boxP.run();
 
     boxP.box[0].addActionListener(new InboxButtonListener());
@@ -171,17 +167,13 @@ public class Window extends JFrame {
   }
 
   private void setUpTaskPanel() {
-    content.add(centerPanel, BorderLayout.CENTER);
-
     taskP.run();
 
-    //taskP.setList(); // TODO коробка сегодня по умолчанию
     centerPanel.revalidate();
     centerPanel.repaint();
   }
 
   private void setUpTextPanel() {
-    content.add(textP, BorderLayout.NORTH);
     textP.field.addKeyListener(new AddTaskListener());
 
     for (JButton button : boxP.box) {
@@ -194,8 +186,6 @@ public class Window extends JFrame {
   }
 
   private void setUpButtonPanel() {
-    content.add(buttonPanel, BorderLayout.SOUTH);
-
     buttonPanel.addButton.addActionListener(new AddButtonListener());
     buttonPanel.editButton.addActionListener(new EditMakePanelButtonListener());
 
@@ -204,9 +194,26 @@ public class Window extends JFrame {
     buttonPanel.repaint();
   }
 
-  private void setUpEditPanel() {
-    EditPanel editP = (EditPanel) centerPanel;
+  private void setUpEditPanel(EditPanel editP) {
     editP.setSaveButtonListener(new EditSaveButtonListener());
     editP.run();
+  }
+
+  private void repaintMainWindow() {
+    content.removeAll();
+
+    northPanel = boxP;
+    centerPanel = taskP;
+    northPanel = textP;
+    eastPanel = boxP;
+    southPanel = buttonPanel;
+
+    content.add(northPanel, BorderLayout.NORTH);
+    content.add(centerPanel, BorderLayout.CENTER);
+    content.add(eastPanel, BorderLayout.EAST);
+    content.add(southPanel, BorderLayout.SOUTH);
+
+    content.revalidate();
+    content.repaint();
   }
 }

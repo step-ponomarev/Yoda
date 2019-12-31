@@ -1,17 +1,18 @@
 package edu.ponomarev.step.graphics.Main;
 
 import edu.ponomarev.step.task.Task;
+import edu.ponomarev.step.task.TaskContainer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
 public class TaskPanel extends JPanel {
-  private ArrayList<Task> tasks;
+  private TaskContainer tasks;
   private JList list;
   private JScrollPane scrollPane;
 
-  public TaskPanel(ArrayList<Task> tasks) {
+  public TaskPanel(TaskContainer tasks) {
     super();
     this.tasks = tasks;
     list = new JList<Task>();
@@ -21,7 +22,6 @@ public class TaskPanel extends JPanel {
     list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
     scrollPane = new JScrollPane(list);
-    scrollPane.setSize(400, 800);
     scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
     scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
@@ -31,7 +31,6 @@ public class TaskPanel extends JPanel {
 
     this.setBackground(new Color(255, 255, 255));
     this.setVisible(true);
-
   }
 
   public void addTask(String task) {
@@ -43,6 +42,7 @@ public class TaskPanel extends JPanel {
     return (Task)list.getSelectedValue();
   }
 
+  //todo
   public void reemoveTask() {
     Task removed = (Task) list.getSelectedValue();
     tasks.remove(removed);
@@ -50,8 +50,9 @@ public class TaskPanel extends JPanel {
     refreshList();
   }
 
-  public void setList(ArrayList<Task> tasks) {
+  public void setList(TaskContainer tasks) {
     this.tasks = tasks;
+    refreshList();
   }
 
   public JList getList() {

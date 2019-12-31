@@ -66,6 +66,10 @@ public class TaskContainer {
     }
   }
 
+  public Object[] toArray() {
+    return taskList.toArray();
+  }
+
   @Override
   public String toString() {
     if (taskList.isEmpty()) {
