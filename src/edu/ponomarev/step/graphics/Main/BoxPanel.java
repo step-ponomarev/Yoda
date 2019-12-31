@@ -10,10 +10,9 @@ public class BoxPanel extends JPanel {
     super();
     box = new JButton[] {
         new JButton("Inbox"),
-        new JButton("TD"),
-        new JButton("W"),
-        new JButton("L")};
-
+        new JButton("Today"),
+        new JButton("Week"),
+        new JButton("Late")};
   }
 
   public void run() {

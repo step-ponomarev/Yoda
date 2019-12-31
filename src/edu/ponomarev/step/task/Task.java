@@ -4,6 +4,7 @@ package edu.ponomarev.step.task;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Objects;
 
 public class Task implements Comparable<Task> {
@@ -14,6 +15,14 @@ public class Task implements Comparable<Task> {
   public Task(String statement) {
     this.statement = statement;
     this.date_of_creation = Calendar.getInstance();
+  }
+
+  public String getStatement() {
+    return statement;
+  }
+
+  public Date getDate() {
+    return date_of_creation.getTime();
   }
 
   @Override

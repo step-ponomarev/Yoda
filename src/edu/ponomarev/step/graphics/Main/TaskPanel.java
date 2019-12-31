@@ -5,61 +5,71 @@ import edu.ponomarev.step.task.TaskContainer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 
 public class TaskPanel extends JPanel {
   private TaskContainer tasks;
   private JList list;
   private JScrollPane scrollPane;
+  private JLabel boxLabel;
 
   public TaskPanel(TaskContainer tasks) {
     super();
     this.tasks = tasks;
+    this.boxLabel = new JLabel();
     list = new JList<Task>();
   }
 
   public void run() {
+    this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
     list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+    boxLabel.setBackground(Color.WHITE);
 
     scrollPane = new JScrollPane(list);
     scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
     scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-    this.add(scrollPane, BorderLayout.CENTER);
+    this.add(boxLabel);
+    boxLabel.setHorizontalAlignment(JLabel.CENTER);
+    this.add(scrollPane);
 
-    refreshList();
+    refresh();
 
     this.setBackground(new Color(255, 255, 255));
     this.setVisible(true);
   }
 
+  public void setLabel(String label) {
+    boxLabel.setText(label);
+  }
+
+  public String getLabel() {
+    return boxLabel.getText();
+  }
+
   public void addTask(String task) {
     tasks.add(new Task(task));
-    refreshList();
   }
 
   public Task getSelected() {
-    return (Task)list.getSelectedValue();
+    return (Task) list.getSelectedValue();
   }
 
-  //todo
-  public void reemoveTask() {
-    Task removed = (Task) list.getSelectedValue();
-    tasks.remove(removed);
-    list.setListData(tasks.toArray());
-    refreshList();
+  public void changeTaskList(TaskContainer tasks) {
+    setList(tasks);
+    refresh();
   }
 
   public void setList(TaskContainer tasks) {
     this.tasks = tasks;
-    refreshList();
   }
 
   public JList getList() {
     return list;
   }
 
-  private void refreshList() {
+  public void refresh() {
     list.removeAll();
     list.setListData(tasks.toArray());
     list.revalidate();

@@ -4,10 +4,7 @@ import edu.ponomarev.step.manager.TaskHandler;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 
 public class Window extends JFrame {
   //TODO Сделать смену контейнера(раз)
@@ -16,7 +13,9 @@ public class Window extends JFrame {
     @Override
     public void actionPerformed(ActionEvent e) {
       TaskPanel taskP = (TaskPanel) centerPanel;
-      taskP.setList(manager.getInbox());
+      taskP.changeTaskList(manager.getInbox());
+      taskP.setLabel("Inbox");
+      taskP.refresh();
     }
   }
 
@@ -24,7 +23,9 @@ public class Window extends JFrame {
     @Override
     public void actionPerformed(ActionEvent e) {
       TaskPanel taskP = (TaskPanel) centerPanel;
-      taskP.setList(manager.getTodayBox());
+      taskP.changeTaskList(manager.getTodayBox());
+      taskP.setLabel("Today");
+      taskP.refresh();
     }
   }
 
@@ -32,7 +33,9 @@ public class Window extends JFrame {
     @Override
     public void actionPerformed(ActionEvent e) {
       TaskPanel taskP = (TaskPanel) centerPanel;
-      taskP.setList(manager.getWeekBox());
+      taskP.changeTaskList(manager.getWeekBox());
+      taskP.setLabel("Week");
+      taskP.refresh();
     }
   }
 
@@ -40,7 +43,9 @@ public class Window extends JFrame {
     @Override
     public void actionPerformed(ActionEvent e) {
       TaskPanel taskP = (TaskPanel) centerPanel;
-      taskP.setList(manager.getLateBox());
+      taskP.changeTaskList(manager.getLateBox());
+      taskP.setLabel("Late");
+      taskP.refresh();
     }
   }
 
@@ -49,17 +54,13 @@ public class Window extends JFrame {
 
     @Override
     public void keyPressed(KeyEvent e) {
-      //TODO Добавить добавление задачи в зависимости
-      // от выбранного бокса!
       if (e.getKeyCode() == ENTER) {
         buttonPanel.addButton.doClick();
       }
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {
-
-    }
+    public void keyReleased(KeyEvent e) { return; }
 
     @Override
     public void keyTyped(KeyEvent e) {
@@ -70,11 +71,32 @@ public class Window extends JFrame {
   private class AddButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
+      TextPanel.BoxItem item = (TextPanel.BoxItem) textP.boxList.getSelectedItem();
+
+      switch (item.type) {
+        case DAY:
+          taskP.setList(manager.getTodayBox());
+          break;
+        case WEEK:
+          taskP.setList(manager.getWeekBox());
+          break;
+        case LATE:
+          taskP.setList(manager.getLateBox());
+          break;
+        default:
+          taskP.setList(manager.getInbox());
+          break;
+      }
+
       String task = textP.field.getText().strip();
       if (!task.isEmpty()) {
         TaskPanel taskP = (TaskPanel) centerPanel;
         taskP.addTask(task);
         textP.field.selectAll();
+
+        if (item.getName().strip().equals(taskP.getLabel().strip())) {
+          taskP.refresh();
+        }
       }
     }
   }
@@ -143,7 +165,7 @@ public class Window extends JFrame {
     southPanel = buttonPanel;
   }
 
-  public void run() {
+  public void run() throws Exception {
     setUpBoxPanel();
     setUpTaskPanel();
     setUpTextPanel();
@@ -169,6 +191,8 @@ public class Window extends JFrame {
   private void setUpTaskPanel() {
     taskP.run();
 
+    taskP.setLabel("Today");
+
     centerPanel.revalidate();
     centerPanel.repaint();
   }
@@ -176,9 +200,11 @@ public class Window extends JFrame {
   private void setUpTextPanel() {
     textP.field.addKeyListener(new AddTaskListener());
 
-    for (JButton button : boxP.box) {
-      textP.boxList.addItem(button.getText());
+    for (int i = 0; i < 4; ++i) {
+      textP.boxList.addItem(new TextPanel.BoxItem(boxP.box[i].getText(), TaskHandler.BoxType.values()[i]));
     }
+
+    textP.field.selectAll();
 
     textP.run();
     textP.revalidate();

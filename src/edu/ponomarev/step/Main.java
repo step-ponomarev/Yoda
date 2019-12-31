@@ -2,28 +2,30 @@ package edu.ponomarev.step;
 
 import edu.ponomarev.step.graphics.Main.Window;
 import edu.ponomarev.step.manager.DBWorker;
-import edu.ponomarev.step.manager.GraphicsWorker;
 import edu.ponomarev.step.manager.TaskHandler;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class Main {
-  public static void main(String [] args) {
-    TaskHandler handler = new TaskHandler();
-    BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+  private static final String userName = "root";
+  private static final String password = "sql12345";
+  private static final String connectionUrl = "jdbc:mysql://localhost:3306/mysql?useUnicode=true&serverTimezone=UTC";
 
-    Integer command;
+  public static void main(String [] args) {
     try {
-      TaskHandler handler1 = new TaskHandler();
+      Class.forName("com.mysql.jdbc.Driver");
+      Connection connection = DriverManager.getConnection(connectionUrl, userName, password);
+
+      DBWorker dbWorker = new DBWorker(connection);
+
+      TaskHandler handler1 = new TaskHandler(dbWorker);
       Window window = new Window(handler1);
 
-      Thread taskHandleThread = new Thread(new DBWorker(handler));
-      Thread graphicsThread = new Thread(new GraphicsWorker(window));
-
-      graphicsThread.run();
-      taskHandleThread.run();
+      window.run();
+    } catch (SQLException e) {
+      System.err.println(e.getMessage());
     } catch (Exception e) {
       System.err.println(e.getMessage());
     }
