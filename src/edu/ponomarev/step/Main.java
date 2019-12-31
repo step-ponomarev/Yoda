@@ -13,7 +13,7 @@ public class Main {
   private static final String password = "sql12345";
   private static final String connectionUrl = "jdbc:mysql://localhost:3306/mysql?useUnicode=true&serverTimezone=UTC";
 
-  public static void main(String [] args) {
+  public static void main(String[] args) {
     try {
       Class.forName("com.mysql.jdbc.Driver");
       Connection connection = DriverManager.getConnection(connectionUrl, userName, password);

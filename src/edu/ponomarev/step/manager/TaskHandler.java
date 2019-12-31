@@ -13,7 +13,7 @@ public class TaskHandler {
   private TaskContainer inbox;
   private TaskContainer todayBox;
   private TaskContainer weekBox;
-  private  TaskContainer lateBox;
+  private TaskContainer lateBox;
 
   public enum BoxType {
     INBOX,

@@ -1,4 +1,5 @@
 package edu.ponomarev.step.graphics.Main;
+
 import edu.ponomarev.step.graphics.Edit.EditPanel;
 import edu.ponomarev.step.manager.TaskHandler;
 
@@ -60,7 +61,9 @@ public class Window extends JFrame {
     }
 
     @Override
-    public void keyReleased(KeyEvent e) { return; }
+    public void keyReleased(KeyEvent e) {
+      return;
+    }
 
     @Override
     public void keyTyped(KeyEvent e) {
@@ -114,7 +117,7 @@ public class Window extends JFrame {
     private void repaintEditWindow() {
       content.removeAll();
 
-      centerPanel =  new EditPanel(taskP.getSelected());
+      centerPanel = new EditPanel(taskP.getSelected());
       content.add(centerPanel, BorderLayout.CENTER);
       setUpEditPanel((EditPanel) centerPanel);
 
@@ -137,7 +140,7 @@ public class Window extends JFrame {
   private JPanel northPanel;
   private JPanel centerPanel;
   private JPanel eastPanel;
-  private  JPanel southPanel;
+  private JPanel southPanel;
 
   private Container content;
 
