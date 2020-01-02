@@ -3,11 +3,14 @@ package edu.ponomarev.step.task;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 
-public class Task implements Comparable<Task> {
+import java.io.Serializable;
+
+public class Task implements Comparable<Task>, Serializable {
   String statement;
   Calendar date_of_creation;
 

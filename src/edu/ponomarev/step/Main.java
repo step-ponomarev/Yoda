@@ -35,12 +35,6 @@ public class Main {
     Window window = new Window(handler1);
     window.run();
   }
-
-  public static void printOptions() {
-    System.out.println("1) Список задач ");
-    System.out.println("2) Добавить задачи ");
-    System.out.println("3) Удалить задачи ");
-  }
 }
 
 
