@@ -2,10 +2,12 @@ package edu.ponomarev.step.graphics.Main;
 
 import edu.ponomarev.step.graphics.Edit.EditPanel;
 import edu.ponomarev.step.manager.TaskHandler;
+import edu.ponomarev.step.task.Task;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.SQLException;
 
 public class Window extends JFrame {
   //TODO Сделать смену контейнера(раз)
@@ -61,9 +63,7 @@ public class Window extends JFrame {
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {
-      return;
-    }
+    public void keyReleased(KeyEvent e) { return; }
 
     @Override
     public void keyTyped(KeyEvent e) {
@@ -80,12 +80,15 @@ public class Window extends JFrame {
         case DAY:
           taskP.setList(manager.getTodayBox());
           break;
+
         case WEEK:
           taskP.setList(manager.getWeekBox());
           break;
+
         case LATE:
           taskP.setList(manager.getLateBox());
           break;
+
         default:
           taskP.setList(manager.getInbox());
           break;
@@ -93,9 +96,13 @@ public class Window extends JFrame {
 
       String task = textP.field.getText().strip();
       if (!task.isEmpty()) {
-        TaskPanel taskP = (TaskPanel) centerPanel;
-        taskP.addTask(task);
-        textP.field.selectAll();
+        try {
+          TaskPanel taskP = (TaskPanel) centerPanel;
+          manager.addTask(item.type, new Task(task));
+          textP.field.selectAll();
+        } catch (SQLException ex) {
+          System.err.println(ex.getMessage());
+        }
 
         if (item.getName().strip().equals(taskP.getLabel().strip())) {
           taskP.refresh();

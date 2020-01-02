@@ -35,18 +35,22 @@ public class TaskHandler {
     switch (type) {
       case DAY:
         todayBox.add(task);
-        dbWorker.insertTask(type, task);
-        return;
+        break;
+
       case WEEK:
         weekBox.add(task);
-        return;
+        break;
+
       case LATE:
         lateBox.add(task);
-        return;
+        break;
+
       default:
         inbox.add(task);
-        return;
+        break;
     }
+
+    dbWorker.insertTask(type, task);
   }
 
   public TaskContainer getInbox() {

@@ -3,6 +3,9 @@ package edu.ponomarev.step.manager;
 import edu.ponomarev.step.task.Task;
 
 import java.sql.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class DBWorker {
   private Connection connection;
@@ -14,28 +17,33 @@ public class DBWorker {
   }
 
   public void insertTask(TaskHandler.BoxType type, Task task) throws SQLException {
-    String sqlRequest;
+    String sqlRequest = "INSERT INTO";
     String taskStatement = task.getStatement();
-    String date = task.getDate().toString();
+
+    DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-DD");
+    String date = dateFormat.format(task.getDate());
 
     switch (type) {
       case DAY:
-        sqlRequest = "INSERT INTO box_today (statement) VALUES (\'" + taskStatement + "\');";
-        statement.executeUpdate(sqlRequest);
-        return;
+        sqlRequest += " box_today (date_of_creation, statement)";
+        break;
+
       case WEEK:
-        sqlRequest = "INSERT INTO box_week (statement) VALUES ('" + taskStatement + "');";
-        statement.executeUpdate(sqlRequest);
-        return;
+        sqlRequest += " box_week (date_of_creation, statement)";
+        break;
+
       case LATE:
-        sqlRequest = "INSERT INTO box_late (statement) VALUES ('" + taskStatement + "');";
-        statement.executeUpdate(sqlRequest);
-        return;
+        sqlRequest += " box_late (date_of_creation, statement)";
+        break;
+
       default:
-        sqlRequest = "INSERT INTO box_inbox (statement) VALUES ('" + taskStatement + "');";
-        statement.executeUpdate(sqlRequest);
-        return;
+        sqlRequest += " box_inbox (date_of_creation, statement)";
+        break;
     }
+
+    sqlRequest += " VALUES ('"  + date + "', '" + taskStatement + "');";
+
+    statement.executeUpdate(sqlRequest);
   }
 
 
