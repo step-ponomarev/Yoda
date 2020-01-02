@@ -40,8 +40,8 @@ public class TaskContainer {
     return taskList.get(index);
   }
 
-  public void setTaskList(ArrayList<Task> list) {
-    taskList = list;
+  public void setTaskList(List<Task> list) {
+    taskList.addAll(list);
   }
 
   public void add(Task task) {

@@ -52,7 +52,7 @@ public class JDBSWorker implements DBWorker {
     statement.executeUpdate(sqlRequest);
   }
 
-  public List<Task> selectTask(TaskHandler.BoxType type) throws SQLException, ParseException {
+  public List selectTask(TaskHandler.BoxType type) throws SQLException, ParseException {
     String sqlRequest = "SELECT date_of_creation, statement FROM";
 
     switch (type) {

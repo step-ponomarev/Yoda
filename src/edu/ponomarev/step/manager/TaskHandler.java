@@ -32,10 +32,10 @@ public class TaskHandler {
     this.lateBox = new TaskContainer();
 
     try {
-      this.inbox.setTaskList((ArrayList<Task>) dbWorker.selectTask(BoxType.INBOX));
-      this.todayBox.setTaskList((ArrayList<Task>) dbWorker.selectTask(BoxType.DAY));
-      this.weekBox.setTaskList((ArrayList<Task>) dbWorker.selectTask(BoxType.WEEK));
-      this.lateBox.setTaskList((ArrayList<Task>) dbWorker.selectTask(BoxType.LATE));
+      this.inbox.setTaskList(dbWorker.selectTask(BoxType.INBOX));
+      this.todayBox.setTaskList(dbWorker.selectTask(BoxType.DAY));
+      this.weekBox.setTaskList(dbWorker.selectTask(BoxType.WEEK));
+      this.lateBox.setTaskList(dbWorker.selectTask(BoxType.LATE));
     } catch (Exception e) {
       System.err.println(e.getMessage());
     }
