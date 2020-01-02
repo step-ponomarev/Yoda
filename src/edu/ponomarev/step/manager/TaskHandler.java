@@ -29,14 +29,7 @@ public class TaskHandler {
     this.weekBox = new TaskContainer();
     this.lateBox = new TaskContainer();
 
-    try {
-      this.inbox.setTaskList(dataWorker.pull(BoxType.INBOX));
-      this.todayBox.setTaskList(dataWorker.pull(BoxType.DAY));
-      this.weekBox.setTaskList(dataWorker.pull(BoxType.WEEK));
-      this.lateBox.setTaskList(dataWorker.pull(BoxType.LATE));
-    } catch (Exception e) {
-      System.err.println(e.getMessage());
-    }
+    pullData();
   }
 
   public void addTask(BoxType type, Task task) {
@@ -65,6 +58,28 @@ public class TaskHandler {
     }
   }
 
+  public void pushDate() {
+    try {
+      dataWorker.putAll(BoxType.INBOX, inbox.getList());
+      dataWorker.putAll(BoxType.DAY, todayBox.getList());
+      dataWorker.putAll(BoxType.WEEK, weekBox.getList());
+      dataWorker.putAll(BoxType.LATE, lateBox.getList());
+    } catch (Exception e) {
+      System.err.println(e.getMessage());
+    }
+  }
+
+  public void pullData() {
+    try {
+      this.inbox.setTaskList(dataWorker.pull(BoxType.INBOX));
+      this.todayBox.setTaskList(dataWorker.pull(BoxType.DAY));
+      this.weekBox.setTaskList(dataWorker.pull(BoxType.WEEK));
+      this.lateBox.setTaskList(dataWorker.pull(BoxType.LATE));
+    } catch (Exception e) {
+      System.err.println(e.getMessage());
+    }
+  }
+
   public TaskContainer getInbox() {
     return inbox;
   }
@@ -81,7 +96,7 @@ public class TaskHandler {
     return lateBox;
   }
 
-  /*public void move(TaskHandler.BoxType from, TaskHandler.BoxType to, Task task) {
-
-  }*/
+  public void setDataWorker(DataWorker dataWorker) {
+    this.dataWorker = dataWorker;
+  }
 };

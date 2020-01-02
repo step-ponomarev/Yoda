@@ -31,17 +31,20 @@ public class TextPanel extends JPanel {
 
   JTextField field;
   JComboBox<TextPanel.BoxItem> boxList;
+  JButton synchButton;
 
   public TextPanel() {
     super();
     field = new JTextField("Новая задача...");
     boxList = new JComboBox<TextPanel.BoxItem>();
+    synchButton = new JButton("Synch");
   }
 
   public void run() {
     this.setLayout(new BorderLayout());
     this.add(field, BorderLayout.CENTER);
     this.add(boxList, BorderLayout.WEST);
+    this.add(synchButton, BorderLayout.EAST);
 
     this.setBackground(new Color(255, 255, 255));
     this.setVisible(true);

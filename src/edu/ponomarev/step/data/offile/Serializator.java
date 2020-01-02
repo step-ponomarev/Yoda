@@ -46,7 +46,6 @@ public class Serializator implements DataWorker {
 
     ArrayList<Task> tasks;
 
-    System.out.println(dir);
     file = new File(dir);
     if (!file.exists()) {
       file.createNewFile();
@@ -66,11 +65,13 @@ public class Serializator implements DataWorker {
 
     osObj.writeObject(tasks);
 
+
+    osObj.close();
     os.close();
   }
 
   @Override
-  public List pull(TaskHandler.BoxType type) throws Exception {
+  public void putAll(TaskHandler.BoxType type, List<Task> task) throws Exception {
     String dir = directory;
 
     File file = new File(directory);
@@ -96,7 +97,49 @@ public class Serializator implements DataWorker {
         break;
     }
 
-    System.out.println(dir);
+    ArrayList<Task> tasks;
+
+    file = new File(dir);
+    if (!file.exists()) {
+      file.createNewFile();
+    }
+
+    FileOutputStream os = new FileOutputStream(file);
+    ObjectOutputStream osObj = new ObjectOutputStream(os);
+
+    osObj.writeObject(task);
+
+    osObj.close();
+    os.close();
+  }
+
+  @Override
+  public List pull(TaskHandler.BoxType type) throws Exception {
+    String dir = directory;
+
+    File file = new File(directory);
+    if (!file.exists()) {
+      return (new ArrayList<Task>());
+    }
+
+    switch (type) {
+      case DAY:
+        dir += "\\box_today.ser";
+        break;
+
+      case WEEK:
+        dir += "\\box_week.ser";
+        break;
+
+      case LATE:
+        dir += "\\box_late.ser";
+        break;
+
+      default:
+        dir += "\\box_inbox.ser";
+        break;
+    }
+
     file = new File(dir);
     if (!file.exists()) {
       return (new ArrayList<Task>());
@@ -106,6 +149,9 @@ public class Serializator implements DataWorker {
     ObjectInputStream isObj = new ObjectInputStream(is);
 
     ArrayList<Task> tasks = (ArrayList<Task>) isObj.readObject();
+
+    isObj.close();
+    is.close();
 
     return tasks;
   }

@@ -52,6 +52,13 @@ public class JDBSWorker implements DataWorker {
   }
 
   @Override
+  public void putAll(TaskHandler.BoxType type, List<Task> task) throws Exception {
+    //TODO Пушить все таски, которых нет в БД
+    System.out.println("Это не работает еще!!!");
+    return;
+  }
+
+  @Override
   public List pull(TaskHandler.BoxType type) throws SQLException, ParseException {
     String sqlRequest = "SELECT date_of_creation, statement FROM";
 

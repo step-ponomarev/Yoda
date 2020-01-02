@@ -1,7 +1,5 @@
 package edu.ponomarev.step.task;
 
-import java.io.Serializable;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -16,7 +14,7 @@ public class TaskContainer {
     STATEMENT
   }
 
-  class DateCompare implements Comparator<Task>, Serializable {
+  class DateCompare implements Comparator<Task> {
     @Override
     public int compare(Task o1, Task o2) {
       return o1.date_of_creation.compareTo(o2.date_of_creation);
@@ -45,6 +43,8 @@ public class TaskContainer {
   public void setTaskList(List<Task> list) {
     taskList.addAll(list);
   }
+
+  public List getList() { return taskList; }
 
   public void add(Task task) {
     taskList.add(task);

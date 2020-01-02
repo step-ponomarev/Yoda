@@ -1,13 +1,13 @@
 package edu.ponomarev.step.graphics.Main;
 
 import edu.ponomarev.step.graphics.Edit.EditPanel;
+import edu.ponomarev.step.manager.DataBaseManager;
 import edu.ponomarev.step.manager.TaskHandler;
 import edu.ponomarev.step.task.Task;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.sql.SQLException;
 
 public class Window extends JFrame {
   //TODO Сделать смену контейнера(раз)
@@ -138,7 +138,18 @@ public class Window extends JFrame {
     }
   }
 
+  private class SynchButtonListener implements ActionListener {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      manager.setDataWorker(dataBaseManager.getWorker());
+      manager.pushDate();
+
+      taskP.refresh();
+    }
+  }
+
   private TaskHandler manager;
+  private  DataBaseManager dataBaseManager;
 
   private JPanel northPanel;
   private JPanel centerPanel;
@@ -152,23 +163,24 @@ public class Window extends JFrame {
   private ButtonPanel buttonPanel;
   private TaskPanel taskP;
 
-  public Window(TaskHandler handler) {
+  public Window(TaskHandler handler, DataBaseManager dataBaseManager) {
     super("Yoda");
-    manager = handler;
+    this.manager = handler;
+    this.dataBaseManager = dataBaseManager;
 
-    content = this.getContentPane();
+    this.content = this.getContentPane();
 
-    textP = new TextPanel();
-    northPanel = textP;
+    this.textP = new TextPanel();
+    this.northPanel = textP;
 
-    taskP = new TaskPanel(handler.getTodayBox());
-    centerPanel = taskP;
+    this.taskP = new TaskPanel(handler.getTodayBox());
+    this.centerPanel = taskP;
 
-    boxP = new BoxPanel();
-    eastPanel = boxP;
+    this.boxP = new BoxPanel();
+    this.eastPanel = boxP;
 
-    buttonPanel = new ButtonPanel();
-    southPanel = buttonPanel;
+    this.buttonPanel = new ButtonPanel();
+    this.southPanel = buttonPanel;
   }
 
   public void run() {
@@ -205,6 +217,8 @@ public class Window extends JFrame {
 
   private void setUpTextPanel() {
     textP.field.addKeyListener(new AddTaskListener());
+
+    textP.synchButton.addActionListener(new SynchButtonListener());
 
     for (int i = 0; i < 4; ++i) {
       textP.boxList.addItem(new TextPanel.BoxItem(boxP.box[i].getText(), TaskHandler.BoxType.values()[i]));
