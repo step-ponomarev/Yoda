@@ -3,10 +3,7 @@ package edu.ponomarev.step.data_base;
 import edu.ponomarev.step.manager.TaskHandler;
 import edu.ponomarev.step.task.Task;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -15,11 +12,9 @@ import java.util.List;
 
 public class JDBSWorker implements DBWorker {
   private Connection connection;
-  private Statement statement;;
 
   public JDBSWorker(Connection connection) throws SQLException {
     this.connection = connection;
-    this.statement = connection.createStatement();
   }
 
   public void insertTask(TaskHandler.BoxType type, Task task) throws SQLException {
@@ -49,7 +44,9 @@ public class JDBSWorker implements DBWorker {
 
     sqlRequest += " VALUES ('"  + date + "', '" + taskStatement + "');";
 
-    statement.executeUpdate(sqlRequest);
+    PreparedStatement statement = connection.prepareStatement(sqlRequest);
+
+    statement.execute();
   }
 
   public List selectTask(TaskHandler.BoxType type) throws SQLException, ParseException {
@@ -73,6 +70,7 @@ public class JDBSWorker implements DBWorker {
         break;
     }
 
+    PreparedStatement statement = connection.prepareStatement(sqlRequest);
     ResultSet rs = statement.executeQuery(sqlRequest);
 
     ArrayList<Task> list = new ArrayList<Task>();
