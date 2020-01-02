@@ -1,15 +1,13 @@
 package edu.ponomarev.step.manager;
 
-import edu.ponomarev.step.data_base.DBWorker;
+import edu.ponomarev.step.data.DataWorker;
 import edu.ponomarev.step.task.Task;
 import edu.ponomarev.step.task.TaskContainer;
-
-import java.util.ArrayList;
 
 // TODO: Нарисовать ЮМЛ обслуживателя задач
 
 public class TaskHandler {
-  private DBWorker dbWorker;
+  private DataWorker dataWorker;
 
   private TaskContainer inbox;
   private TaskContainer todayBox;
@@ -23,8 +21,8 @@ public class TaskHandler {
     LATE
   }
 
-  public TaskHandler(DBWorker db) {
-    this.dbWorker = db;
+  public TaskHandler(DataWorker db) {
+    this.dataWorker = db;
 
     this.inbox = new TaskContainer();
     this.todayBox = new TaskContainer();
@@ -32,10 +30,10 @@ public class TaskHandler {
     this.lateBox = new TaskContainer();
 
     try {
-      this.inbox.setTaskList(dbWorker.selectTask(BoxType.INBOX));
-      this.todayBox.setTaskList(dbWorker.selectTask(BoxType.DAY));
-      this.weekBox.setTaskList(dbWorker.selectTask(BoxType.WEEK));
-      this.lateBox.setTaskList(dbWorker.selectTask(BoxType.LATE));
+      this.inbox.setTaskList(dataWorker.pull(BoxType.INBOX));
+      this.todayBox.setTaskList(dataWorker.pull(BoxType.DAY));
+      this.weekBox.setTaskList(dataWorker.pull(BoxType.WEEK));
+      this.lateBox.setTaskList(dataWorker.pull(BoxType.LATE));
     } catch (Exception e) {
       System.err.println(e.getMessage());
     }
@@ -61,7 +59,7 @@ public class TaskHandler {
     }
 
     try {
-      dbWorker.insertTask(type, task);
+      dataWorker.put(type, task);
     } catch (Exception e) {
       System.err.println(e.getMessage());
     }

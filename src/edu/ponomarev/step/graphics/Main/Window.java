@@ -171,7 +171,7 @@ public class Window extends JFrame {
     southPanel = buttonPanel;
   }
 
-  public void run() throws Exception {
+  public void run() {
     setUpBoxPanel();
     setUpTaskPanel();
     setUpTextPanel();

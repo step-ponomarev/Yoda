@@ -1,5 +1,6 @@
-package edu.ponomarev.step.data_base;
+package edu.ponomarev.step.data.data_base;
 
+import edu.ponomarev.step.data.DataWorker;
 import edu.ponomarev.step.manager.TaskHandler;
 import edu.ponomarev.step.task.Task;
 
@@ -10,14 +11,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JDBSWorker implements DBWorker {
+public class JDBSWorker implements DataWorker {
   private Connection connection;
 
   public JDBSWorker(Connection connection) throws SQLException {
     this.connection = connection;
   }
 
-  public void insertTask(TaskHandler.BoxType type, Task task) throws SQLException {
+  @Override
+  public void put(TaskHandler.BoxType type, Task task) throws SQLException {
     String sqlRequest = "INSERT INTO";
     String taskStatement = task.getStatement();
 
@@ -49,7 +51,8 @@ public class JDBSWorker implements DBWorker {
     statement.execute();
   }
 
-  public List selectTask(TaskHandler.BoxType type) throws SQLException, ParseException {
+  @Override
+  public List pull(TaskHandler.BoxType type) throws SQLException, ParseException {
     String sqlRequest = "SELECT date_of_creation, statement FROM";
 
     switch (type) {
