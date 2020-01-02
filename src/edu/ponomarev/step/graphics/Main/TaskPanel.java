@@ -48,10 +48,6 @@ public class TaskPanel extends JPanel {
     return boxLabel.getText();
   }
 
-  public void addTask(String task) {
-    tasks.add(new Task(task));
-  }
-
   public Task getSelected() {
     return (Task) list.getSelectedValue();
   }

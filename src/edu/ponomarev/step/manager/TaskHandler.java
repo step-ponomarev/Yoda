@@ -29,9 +29,18 @@ public class TaskHandler {
     this.todayBox = new TaskContainer();
     this.weekBox = new TaskContainer();
     this.lateBox = new TaskContainer();
+
+    try {
+      dbWorker.selectTask(BoxType.INBOX, inbox);
+      dbWorker.selectTask(BoxType.DAY, todayBox);
+      dbWorker.selectTask(BoxType.WEEK, weekBox);
+      dbWorker.selectTask(BoxType.LATE, lateBox);
+    } catch (Exception e) {
+      System.err.println(e.getMessage());
+    }
   }
 
-  public void addTask(BoxType type, Task task) throws SQLException {
+  public void addTask(BoxType type, Task task) {
     switch (type) {
       case DAY:
         todayBox.add(task);
@@ -50,7 +59,11 @@ public class TaskHandler {
         break;
     }
 
-    dbWorker.insertTask(type, task);
+    try {
+      dbWorker.insertTask(type, task);
+    } catch (Exception e) {
+      System.err.println(e.getMessage());
+    }
   }
 
   public TaskContainer getInbox() {

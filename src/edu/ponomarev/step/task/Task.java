@@ -11,10 +11,16 @@ public class Task implements Comparable<Task> {
   String statement;
   Calendar date_of_creation;
 
-
   public Task(String statement) {
     this.statement = statement;
     this.date_of_creation = Calendar.getInstance();
+  }
+
+  public Task(String statement, Date date) {
+    this.date_of_creation = Calendar.getInstance();
+    date_of_creation.setTime(date);
+
+    this.statement = statement;
   }
 
   public String getStatement() {

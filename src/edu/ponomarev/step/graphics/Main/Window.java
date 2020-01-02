@@ -96,13 +96,9 @@ public class Window extends JFrame {
 
       String task = textP.field.getText().strip();
       if (!task.isEmpty()) {
-        try {
-          TaskPanel taskP = (TaskPanel) centerPanel;
-          manager.addTask(item.type, new Task(task));
-          textP.field.selectAll();
-        } catch (SQLException ex) {
-          System.err.println(ex.getMessage());
-        }
+        TaskPanel taskP = (TaskPanel) centerPanel;
+        manager.addTask(item.type, new Task(task));
+        textP.field.selectAll();
 
         if (item.getName().strip().equals(taskP.getLabel().strip())) {
           taskP.refresh();
