@@ -3,6 +3,7 @@ package edu.ponomarev.step.task;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 public class TaskContainer {
   private ArrayList<Task> taskList;
@@ -37,6 +38,10 @@ public class TaskContainer {
       throw new ArrayIndexOutOfBoundsException("Invalid task index");
     }
     return taskList.get(index);
+  }
+
+  public void setTaskList(ArrayList<Task> list) {
+    taskList = list;
   }
 
   public void add(Task task) {

@@ -1,9 +1,10 @@
 package edu.ponomarev.step.manager;
 
+import edu.ponomarev.step.data_base.DBWorker;
 import edu.ponomarev.step.task.Task;
 import edu.ponomarev.step.task.TaskContainer;
 
-import java.sql.SQLException;
+import java.util.ArrayList;
 
 // TODO: Нарисовать ЮМЛ обслуживателя задач
 
@@ -31,10 +32,10 @@ public class TaskHandler {
     this.lateBox = new TaskContainer();
 
     try {
-      dbWorker.selectTask(BoxType.INBOX, inbox);
-      dbWorker.selectTask(BoxType.DAY, todayBox);
-      dbWorker.selectTask(BoxType.WEEK, weekBox);
-      dbWorker.selectTask(BoxType.LATE, lateBox);
+      this.inbox.setTaskList((ArrayList<Task>) dbWorker.selectTask(BoxType.INBOX));
+      this.todayBox.setTaskList((ArrayList<Task>) dbWorker.selectTask(BoxType.DAY));
+      this.weekBox.setTaskList((ArrayList<Task>) dbWorker.selectTask(BoxType.WEEK));
+      this.lateBox.setTaskList((ArrayList<Task>) dbWorker.selectTask(BoxType.LATE));
     } catch (Exception e) {
       System.err.println(e.getMessage());
     }

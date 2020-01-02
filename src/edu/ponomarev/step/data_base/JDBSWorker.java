@@ -1,20 +1,23 @@
-package edu.ponomarev.step.manager;
+package edu.ponomarev.step.data_base;
 
-import edu.ponomarev.step.Main;
+import edu.ponomarev.step.manager.TaskHandler;
 import edu.ponomarev.step.task.Task;
-import edu.ponomarev.step.task.TaskContainer;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
-public class DBWorker {
+public class JDBSWorker implements DBWorker {
   private Connection connection;
-  private Statement statement;
+  private Statement statement;;
 
-  public DBWorker(Connection connection) throws SQLException {
+  public JDBSWorker(Connection connection) throws SQLException {
     this.connection = connection;
     this.statement = connection.createStatement();
   }
@@ -49,7 +52,7 @@ public class DBWorker {
     statement.executeUpdate(sqlRequest);
   }
 
-  public void selectTask(TaskHandler.BoxType type, TaskContainer taskList) throws SQLException, ParseException {
+  public List<Task> selectTask(TaskHandler.BoxType type) throws SQLException, ParseException {
     String sqlRequest = "SELECT date_of_creation, statement FROM";
 
     switch (type) {
@@ -72,14 +75,17 @@ public class DBWorker {
 
     ResultSet rs = statement.executeQuery(sqlRequest);
 
+    ArrayList<Task> list = new ArrayList<Task>();
     DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-DD");
-    Date date;
     while (rs.next()) {
-      date = rs.getDate("date_of_creation");
-
-      taskList.add(new Task(rs.getString("statement"), date));
+      list.add(new Task(
+          rs.getString("statement"),
+          rs.getDate("date_of_creation"))
+      );
     }
 
     rs.close();
+
+    return list;
   }
 }

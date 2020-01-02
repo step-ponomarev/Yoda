@@ -1,8 +1,9 @@
 package edu.ponomarev.step;
 
 import edu.ponomarev.step.graphics.Main.Window;
-import edu.ponomarev.step.manager.DBWorker;
+import edu.ponomarev.step.data_base.DBWorker;
 import edu.ponomarev.step.manager.TaskHandler;
+import edu.ponomarev.step.data_base.JDBSWorker;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -18,7 +19,7 @@ public class Main {
       Class.forName("com.mysql.jdbc.Driver");
       Connection connection = DriverManager.getConnection(connectionUrl, userName, password);
 
-      DBWorker dbWorker = new DBWorker(connection);
+      DBWorker dbWorker = new JDBSWorker(connection);
 
       TaskHandler handler1 = new TaskHandler(dbWorker);
       Window window = new Window(handler1);
