@@ -2,6 +2,7 @@ package edu.ponomarev.step.view.main;
 
 import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.component.task.TaskContainer;
+import edu.ponomarev.step.manager.DataHandler;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,10 +12,12 @@ public class TaskPanel extends JPanel {
   private JScrollPane scrollPane;
   private JLabel boxLabel;
 
+  private DataHandler.BoxType currentBoxType;
+
   public TaskPanel() {
     super();
     this.boxLabel = new JLabel();
-    list = new JList<Task>();
+    this.list = new JList<Task>();
   }
 
   public void run() {
@@ -32,10 +35,16 @@ public class TaskPanel extends JPanel {
     boxLabel.setHorizontalAlignment(JLabel.CENTER);
     this.add(scrollPane);
 
-    refresh();
-
     this.setBackground(new Color(255, 255, 255));
     this.setVisible(true);
+  }
+
+  public DataHandler.BoxType getCurrentBoxType() {
+    return currentBoxType;
+  }
+
+  public void setCurrentBoxType(DataHandler.BoxType currentBoxType) {
+    this.currentBoxType = currentBoxType;
   }
 
   public void setList(JList list) {
@@ -64,12 +73,5 @@ public class TaskPanel extends JPanel {
 
   public Task getSelected() {
     return (Task) list.getSelectedValue();
-  }
-
-  public void refresh() {
-    //list.removeAll();
-   // list.setListData(tasks.toArray());
-    list.revalidate();
-    list.repaint();
   }
 }

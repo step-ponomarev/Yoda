@@ -2,8 +2,6 @@ package edu.ponomarev.step.controller;
 
 import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.view.edit.EditPanel;
-import edu.ponomarev.step.view.main.TaskPanel;
-import edu.ponomarev.step.view.main.TextPanel;
 import edu.ponomarev.step.view.main.Window;
 import edu.ponomarev.step.manager.DataHandler;
 
@@ -16,42 +14,78 @@ import java.awt.event.KeyListener;
 import java.util.function.Consumer;
 
 public class Controller {
+  private class BoxRequestWrap {
+    public DataHandler.BoxType type;
+    public String boxName;
+
+    public BoxRequestWrap(DataHandler.BoxType type, String boxName) {
+      this.type = type;
+      this.boxName = boxName;
+    }
+
+    @Override
+    public String toString() {
+      return boxName;
+    }
+  }
+
   private Window window;
   private DataHandler handler;
+  private BoxRequestWrap [] boxVariables;
 
   public Controller(Window window, DataHandler handler) {
     this.handler = handler;
     this.window = window;
+    this.boxVariables = new BoxRequestWrap [] {
+        new BoxRequestWrap(DataHandler.BoxType.INBOX, "Inbox"),
+        new BoxRequestWrap(DataHandler.BoxType.DAY, "Today"),
+        new BoxRequestWrap(DataHandler.BoxType.WEEK, "Week"),
+        new BoxRequestWrap(DataHandler.BoxType.LATE, "Late")
+    };
+
   }
 
   public void initView() {
     window.run();
     initTaskPanel();
-    initTextPanel();
     initBoxButtons();
+    initTextPanel();
     initButtonPanel();
   }
 
   private void initTaskPanel() {
-    window.getTaskPanel().getList().setListData(handler.getTodayBox().toArray());
+    window.getTaskPanel().getList().setListData(handler.getBox(DataHandler.BoxType.DAY).toArray());
+    window.getTaskPanel().setCurrentBoxType(DataHandler.BoxType.DAY);
     window.getTaskPanel().getBoxLabel().setText("Today");
   }
 
   private void initBoxButtons() {
     for (JButton button : window.getBoxButtonsPanel().getBox()) {
       button.addActionListener(e -> {
-        window.getTaskPanel().getList().setListData(handler.getBox(button.getText().strip()).toArray());
-        window.getTaskPanel().getBoxLabel().setText(button.getText().strip());
+        for (BoxRequestWrap boxWrap : boxVariables) {
+          if (boxWrap.boxName.equals(button.getText())) {
+            window.getTaskPanel().setCurrentBoxType(boxWrap.type);
+            window.getTaskPanel().getList().setListData(handler.getBox(boxWrap.type).toArray());
+            window.getTaskPanel().getBoxLabel().setText(boxWrap.boxName);
+            break;
+          }
+        }
       });
     }
   }
 
   private void initTextPanel() {
     final int ENTER = 10;
+
+    for (BoxRequestWrap item : boxVariables) {
+      window.getTextPanel().getBoxList().addItem(item);
+    }
+    window.getTextPanel().getBoxList().setSelectedIndex(0);
+
     window.getTextPanel().getTextField().addKeyListener( new KeyListener() {
       @Override
       public void keyTyped(KeyEvent e) {
-        if (e.getKeyCode() == ENTER) {
+        if (e.getKeyChar() == ENTER) {
           window.getButtonPanel().getAddButton().doClick();
         }
       }
@@ -66,20 +100,13 @@ public class Controller {
     window.getTextPanel().getSynchButton().addActionListener(e -> {
       handler.setDataWorker();
       handler.pushDate();
-
-      window.getTaskPanel().refresh();
     });
-
-    for (int i = 0; i < 4; ++i) {
-      window.getTextPanel().getBoxList().addItem(new TextPanel.BoxItem(window.getBoxButtonsPanel().getBox()[i].getText(), DataHandler.BoxType.values()[i]));
-    }
   }
 
   private void initButtonPanel() {
     final Consumer<EditPanel> repaintEditWindow =  panel -> {
 
       window.getContentPane().removeAll();
-
       window.getContentPane().add(panel, BorderLayout.CENTER);
 
       panel.getSaveButton().addActionListener(e2 -> {
@@ -94,25 +121,7 @@ public class Controller {
     };
 
     window.getButtonPanel().getAddButton().addActionListener(e -> {
-      TextPanel.BoxItem item = (TextPanel.BoxItem) window.getTextPanel().getBoxList().getSelectedItem();
-
-      switch (item.type) {
-        case DAY:
-          window.getTaskPanel().getList().setListData(handler.getTodayBox().toArray());
-          break;
-
-        case WEEK:
-          window.getTaskPanel().getList().setListData(handler.getWeekBox().toArray());
-          break;
-
-        case LATE:
-          window.getTaskPanel().getList().setListData(handler.getLateBox().toArray());
-          break;
-
-        default:
-          window.getTaskPanel().getList().setListData(handler.getInbox().toArray());
-          break;
-      }
+      final BoxRequestWrap item = (BoxRequestWrap) window.getTextPanel().getBoxList().getSelectedItem();
 
       String task = window.getTextPanel().getTextField().getText().strip();
       if (!task.isEmpty()) {
@@ -120,8 +129,9 @@ public class Controller {
 
         window.getTextPanel().getTextField().selectAll();
 
-        if (item.getName().strip().equals(window.getTaskPanel().getBoxLabel().getText().strip())) {
-          //window.getTaskPanel().refresh();
+        if (item.type.equals(window.getTaskPanel().getCurrentBoxType())) {
+          window.getTaskPanel().getList().setListData(handler.getBox(item.type).toArray());
+          window.getTaskPanel().getList().repaint();
         }
       }
     });

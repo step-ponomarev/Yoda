@@ -1,18 +1,9 @@
 package edu.ponomarev.step.view.main;
-import edu.ponomarev.step.manager.DataHandler;
 
 import javax.swing.*;
 import java.awt.*;
 
-
 public class Window extends JFrame {
-  private JPanel northPanel;
-  private JPanel centerPanel;
-  private JPanel eastPanel;
-  private JPanel southPanel;
-
-  private Container content;
-
   private TextPanel textPanel;
   private BoxButtonsPanel boxButtonsPanel;
   private ButtonPanel buttonPanel;
@@ -20,8 +11,6 @@ public class Window extends JFrame {
 
   public Window(String applicationName) {
     super(applicationName);
-
-    this.content = this.getContentPane();
 
     this.textPanel = new TextPanel();
     this.taskPanel = new TaskPanel();
@@ -43,17 +32,19 @@ public class Window extends JFrame {
     this.setDefaultCloseOperation(EXIT_ON_CLOSE);
   }
 
-  public Container getContent() {
-    return content;
+  public void repaintMainWindow() {
+    this.getContentPane().removeAll();
+
+    this.getContentPane().add(textPanel, BorderLayout.NORTH);
+    this.getContentPane().add(taskPanel, BorderLayout.CENTER);
+    this.getContentPane().add(boxButtonsPanel, BorderLayout.EAST);
+    this.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+
+    this.getContentPane().revalidate();
+    this.getContentPane().repaint();
   }
 
-  public void setContent(Container content) {
-    this.content = content;
-  }
-
-  public TextPanel getTextPanel() {
-    return textPanel;
-  }
+  public TextPanel getTextPanel() { return textPanel; }
 
   public void setTextPanel(TextPanel textPanel) {
     this.textPanel = textPanel;
@@ -79,20 +70,5 @@ public class Window extends JFrame {
     return taskPanel;
   }
 
-  public void setTaskPanel(TaskPanel taskPanel) {
-    this.taskPanel = taskPanel;
-  }
-
-  public void repaintMainWindow() {
-    content.removeAll();
-
-    content.add(textPanel, BorderLayout.NORTH);
-    content.add(taskPanel, BorderLayout.CENTER);
-    content.add(boxButtonsPanel, BorderLayout.EAST);
-    content.add(buttonPanel, BorderLayout.SOUTH);
-
-    content.revalidate();
-    content.repaint();
-  }
-
+  public void setTaskPanel(TaskPanel taskPanel) { this.taskPanel = taskPanel; }
 }

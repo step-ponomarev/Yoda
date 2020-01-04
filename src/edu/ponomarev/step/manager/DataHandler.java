@@ -83,36 +83,20 @@ public class DataHandler {
     }
   }
 
-  public TaskContainer getBox(String name) {
-    TaskContainer returned = new TaskContainer();
+  public TaskContainer getBox(BoxType type) {
+    switch (type) {
+      case DAY:
+        return this.todayBox;
 
-    if (name.equals("Inbox")) {
-      returned = this.inbox;
-    } else if (name.equals("Today")) {
-      returned = this.todayBox;
-    } else if (name.equals("Week")) {
-      returned = this.weekBox;
-    } else if (name.equals("Late")) {
-      returned = this.lateBox;
+      case WEEK:
+        return this.weekBox;
+
+      case LATE:
+        return this.lateBox;
+
+      default:
+        return this.inbox;
     }
-
-    return returned;
-  }
-
-  public TaskContainer getInbox() {
-    return this.inbox;
-  }
-
-  public TaskContainer getTodayBox() {
-    return this.todayBox;
-  }
-
-  public TaskContainer getWeekBox() {
-    return this.weekBox;
-  }
-
-  public TaskContainer getLateBox() {
-    return this.lateBox;
   }
 
   public void setDataWorker() {
