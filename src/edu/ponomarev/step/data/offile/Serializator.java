@@ -110,19 +110,19 @@ public class Serializator implements DataWorker {
   private String addFileToPath(DataHandler.BoxType type, String path) {
     switch (type) {
       case DAY:
-        path = Paths.get(directory + "\\box_today.ser").toString();
+        path = Paths.get(directory + "\\box_today.ser").toAbsolutePath().toString();
         break;
 
       case WEEK:
-        path = Paths.get(directory + "\\box_week.ser").toString();
+        path = Paths.get(directory + "\\box_week.ser").toAbsolutePath().toString();
         break;
 
       case LATE:
-        path = Paths.get(directory + "\\box_late.ser").toString();
+        path = Paths.get(directory + "\\box_late.ser").toAbsolutePath().toString();
         break;
 
       default:
-        path = Paths.get(directory + "\\box_inbox.ser").toString();
+        path = Paths.get(directory + "\\box_inbox.ser").toAbsolutePath().toString();
         break;
     }
 
