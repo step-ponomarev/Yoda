@@ -1,4 +1,4 @@
-package edu.ponomarev.step.view.Edit;
+package edu.ponomarev.step.view.edit;
 
 import edu.ponomarev.step.component.task.Task;
 
@@ -29,7 +29,27 @@ public class EditPanel extends JPanel {
     this.setVisible(true);
   }
 
-  public void setSaveButtonListener(ActionListener listener) {
-    saveButton.addActionListener(listener);
+  public JButton getSaveButton() {
+    return saveButton;
+  }
+
+  public void setSaveButton(JButton saveButton) {
+    this.saveButton = saveButton;
+  }
+
+  public TextField getTaskNameField() {
+    return taskNameField;
+  }
+
+  public void setTaskNameField(TextField taskNameField) {
+    this.taskNameField = taskNameField;
+  }
+
+  public Task getCurrentTask() {
+    return currentTask;
+  }
+
+  public void setCurrentTask(Task currentTask) {
+    this.currentTask = currentTask;
   }
 }

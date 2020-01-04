@@ -1,4 +1,4 @@
-package edu.ponomarev.step.view.Main;
+package edu.ponomarev.step.view.main;
 
 import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.component.task.TaskContainer;
@@ -7,14 +7,12 @@ import javax.swing.*;
 import java.awt.*;
 
 public class TaskPanel extends JPanel {
-  private TaskContainer tasks;
   private JList list;
   private JScrollPane scrollPane;
   private JLabel boxLabel;
 
-  public TaskPanel(TaskContainer tasks) {
+  public TaskPanel() {
     super();
-    this.tasks = tasks;
     this.boxLabel = new JLabel();
     list = new JList<Task>();
   }
@@ -44,6 +42,10 @@ public class TaskPanel extends JPanel {
     this.list = list;
   }
 
+  public JList getList() {
+    return list;
+  }
+
   public JScrollPane getScrollPane() {
     return scrollPane;
   }
@@ -64,22 +66,9 @@ public class TaskPanel extends JPanel {
     return (Task) list.getSelectedValue();
   }
 
-  public void changeTaskList(TaskContainer tasks) {
-    setList(tasks);
-    refresh();
-  }
-
-  public void setList(TaskContainer tasks) {
-    this.tasks = tasks;
-  }
-
-  public JList getList() {
-    return list;
-  }
-
   public void refresh() {
-    list.removeAll();
-    list.setListData(tasks.toArray());
+    //list.removeAll();
+   // list.setListData(tasks.toArray());
     list.revalidate();
     list.repaint();
   }

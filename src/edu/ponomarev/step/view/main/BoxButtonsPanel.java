@@ -1,12 +1,12 @@
-package edu.ponomarev.step.view.Main;
+package edu.ponomarev.step.view.main;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class BoxPanel extends JPanel {
+public class BoxButtonsPanel extends JPanel {
   JButton[] box;
 
-  public BoxPanel() {
+  public BoxButtonsPanel() {
     super();
     box = new JButton[] {
         new JButton("Inbox"),

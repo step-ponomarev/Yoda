@@ -1,4 +1,4 @@
-package edu.ponomarev.step.view.Main;
+package edu.ponomarev.step.view.main;
 
 import edu.ponomarev.step.manager.DataHandler;
 
@@ -6,11 +6,11 @@ import javax.swing.*;
 import java.awt.*;
 
 public class TextPanel extends JPanel {
-  static class BoxItem {
-    DataHandler.BoxType type;
-    String name;
+  public static class BoxItem {
+    public DataHandler.BoxType type;
+    public String name;
 
-    BoxItem(String name, DataHandler.BoxType type) {
+    public BoxItem(String name, DataHandler.BoxType type) {
       this.name = name;
       this.type = type;
     }

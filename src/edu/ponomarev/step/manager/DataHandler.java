@@ -74,10 +74,10 @@ public class DataHandler {
 
   public void pullData() {
     try {
-      this.inbox.setTaskList(dataWorker.pull(BoxType.INBOX));
-      this.todayBox.setTaskList(dataWorker.pull(BoxType.DAY));
-      this.weekBox.setTaskList(dataWorker.pull(BoxType.WEEK));
-      this.lateBox.setTaskList(dataWorker.pull(BoxType.LATE));
+      this.inbox.setList(dataWorker.pull(BoxType.INBOX));
+      this.todayBox.setList(dataWorker.pull(BoxType.DAY));
+      this.weekBox.setList(dataWorker.pull(BoxType.WEEK));
+      this.lateBox.setList(dataWorker.pull(BoxType.LATE));
     } catch (Exception e) {
       System.err.println(e.getMessage());
     }
