@@ -20,31 +20,31 @@ public class JDBSWorker implements DataWorker {
 
   @Override
   public void put(DataHandler.BoxType type, Task task) throws SQLException {
-    String sqlRequest = "INSERT INTO";
+    String sqlRequest = "INSERT INTO box (date_of_creation, statement, type)";
     String taskStatement = task.getStatement();
 
     DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-DD");
     String date = dateFormat.format(task.getDate());
 
+    sqlRequest += " VALUES ('"  + date + "', '" + taskStatement + "',";
+
     switch (type) {
       case DAY:
-        sqlRequest += " box_today (date_of_creation, statement)";
+        sqlRequest += " 'TODAY');";
         break;
 
       case WEEK:
-        sqlRequest += " box_week (date_of_creation, statement)";
+        sqlRequest += " 'WEEK');";
         break;
 
       case LATE:
-        sqlRequest += " box_late (date_of_creation, statement)";
+        sqlRequest += " 'LATE');";
         break;
 
       default:
-        sqlRequest += " box_inbox (date_of_creation, statement)";
+        sqlRequest += " 'INBOX');";
         break;
     }
-
-    sqlRequest += " VALUES ('"  + date + "', '" + taskStatement + "');";
 
     PreparedStatement statement = connection.prepareStatement(sqlRequest);
 
@@ -60,23 +60,23 @@ public class JDBSWorker implements DataWorker {
 
   @Override
   public List pull(DataHandler.BoxType type) throws SQLException, ParseException {
-    String sqlRequest = "SELECT date_of_creation, statement FROM";
+    String sqlRequest = "SELECT * FROM box where type =  ";
 
     switch (type) {
       case DAY:
-        sqlRequest += " box_today";
+        sqlRequest += "'TODAY'";
         break;
 
       case WEEK:
-        sqlRequest += " box_week";
+        sqlRequest += "'WEEK'";
         break;
 
       case LATE:
-        sqlRequest += " box_late";
+        sqlRequest += "'LATE'";
         break;
 
       default:
-        sqlRequest += " box_inbox";
+        sqlRequest += "'INBOX'";
         break;
     }
 
