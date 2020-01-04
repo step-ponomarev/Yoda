@@ -4,7 +4,6 @@ import edu.ponomarev.step.component.task.Task;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
 
 public class EditPanel extends JPanel {
   private JButton saveButton;

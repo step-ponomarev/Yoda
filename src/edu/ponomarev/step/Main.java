@@ -4,6 +4,8 @@ import edu.ponomarev.step.controller.Controller;
 import edu.ponomarev.step.view.main.Window;
 import edu.ponomarev.step.manager.DataHandler;
 
+import java.nio.file.Paths;
+
 public class Main {
   public static void main(String[] args) {
     try {

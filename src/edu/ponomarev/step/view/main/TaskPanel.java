@@ -1,7 +1,6 @@
 package edu.ponomarev.step.view.main;
 
 import edu.ponomarev.step.component.task.Task;
-import edu.ponomarev.step.component.task.TaskContainer;
 import edu.ponomarev.step.manager.DataHandler;
 
 import javax.swing.*;

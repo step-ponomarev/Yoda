@@ -14,7 +14,7 @@ public class Serializator implements DataWorker {
   private String directory;
 
   public Serializator() {
-    this.directory = Paths.get("").toAbsolutePath().toString() + "\\data";
+    this.directory = Paths.get("data").toAbsolutePath().toString();
   }
 
   @Override
@@ -26,26 +26,9 @@ public class Serializator implements DataWorker {
       file.mkdir();
     }
 
-    switch (type) {
-      case DAY:
-        dir += "\\box_today.ser";
-        break;
-
-      case WEEK:
-        dir += "\\box_week.ser";
-        break;
-
-      case LATE:
-        dir += "\\box_late.ser";
-        break;
-
-      default:
-        dir += "\\box_inbox.ser";
-        break;
-    }
+    dir = addFileToPath(type, dir);
 
     ArrayList<Task> tasks;
-
     file = new File(dir);
     if (!file.exists()) {
       file.createNewFile();
@@ -79,23 +62,7 @@ public class Serializator implements DataWorker {
       file.mkdir();
     }
 
-    switch (type) {
-      case DAY:
-        dir += "\\box_today.ser";
-        break;
-
-      case WEEK:
-        dir += "\\box_week.ser";
-        break;
-
-      case LATE:
-        dir += "\\box_late.ser";
-        break;
-
-      default:
-        dir += "\\box_inbox.ser";
-        break;
-    }
+    dir = addFileToPath(type, dir);
 
     ArrayList<Task> tasks;
 
@@ -122,23 +89,7 @@ public class Serializator implements DataWorker {
       return (new ArrayList<Task>());
     }
 
-    switch (type) {
-      case DAY:
-        dir += "\\box_today.ser";
-        break;
-
-      case WEEK:
-        dir += "\\box_week.ser";
-        break;
-
-      case LATE:
-        dir += "\\box_late.ser";
-        break;
-
-      default:
-        dir += "\\box_inbox.ser";
-        break;
-    }
+    dir = addFileToPath(type, dir);
 
     file = new File(dir);
     if (!file.exists()) {
@@ -154,5 +105,27 @@ public class Serializator implements DataWorker {
     is.close();
 
     return tasks;
+  }
+
+  private String addFileToPath(DataHandler.BoxType type, String path) {
+    switch (type) {
+      case DAY:
+        path = Paths.get(directory + "\\box_today.ser").toString();
+        break;
+
+      case WEEK:
+        path = Paths.get(directory + "\\box_week.ser").toString();
+        break;
+
+      case LATE:
+        path = Paths.get(directory + "\\box_late.ser").toString();
+        break;
+
+      default:
+        path = Paths.get(directory + "\\box_inbox.ser").toString();
+        break;
+    }
+
+    return path;
   }
 }
