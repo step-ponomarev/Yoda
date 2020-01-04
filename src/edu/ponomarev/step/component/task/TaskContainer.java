@@ -1,4 +1,4 @@
-package edu.ponomarev.step.task;
+package edu.ponomarev.step.component.task;
 
 import java.util.ArrayList;
 import java.util.Collections;

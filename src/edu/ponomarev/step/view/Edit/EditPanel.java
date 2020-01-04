@@ -1,6 +1,6 @@
-package edu.ponomarev.step.graphics.Edit;
+package edu.ponomarev.step.view.Edit;
 
-import edu.ponomarev.step.task.Task;
+import edu.ponomarev.step.component.task.Task;
 
 import javax.swing.*;
 import java.awt.*;

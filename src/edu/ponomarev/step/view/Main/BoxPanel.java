@@ -1,4 +1,4 @@
-package edu.ponomarev.step.graphics.Main;
+package edu.ponomarev.step.view.Main;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,5 +23,13 @@ public class BoxPanel extends JPanel {
     this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     this.setBackground(new Color(255, 255, 255));
     this.setVisible(true);
+  }
+
+  public JButton[] getBox() {
+    return box;
+  }
+
+  public void setBox(JButton[] box) {
+    this.box = box;
   }
 }

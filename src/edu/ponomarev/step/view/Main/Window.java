@@ -1,9 +1,9 @@
-package edu.ponomarev.step.graphics.Main;
+package edu.ponomarev.step.view.Main;
 
-import edu.ponomarev.step.graphics.Edit.EditPanel;
+import edu.ponomarev.step.view.Edit.EditPanel;
 import edu.ponomarev.step.manager.DataBaseManager;
-import edu.ponomarev.step.manager.TaskHandler;
-import edu.ponomarev.step.task.Task;
+import edu.ponomarev.step.manager.DataHandler;
+import edu.ponomarev.step.component.task.Task;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,22 +12,14 @@ import java.awt.event.*;
 public class Window extends JFrame {
   //TODO Сделать смену контейнера(раз)
   // Придумать как обойтись одним классом листенером.
-  private class InboxButtonListener implements ActionListener {
-    @Override
-    public void actionPerformed(ActionEvent e) {
-      TaskPanel taskP = (TaskPanel) centerPanel;
-      taskP.changeTaskList(manager.getInbox());
-      taskP.setLabel("Inbox");
-      taskP.refresh();
-    }
-  }
+
 
   private class TodayButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
       TaskPanel taskP = (TaskPanel) centerPanel;
-      taskP.changeTaskList(manager.getTodayBox());
-      taskP.setLabel("Today");
+      taskP.changeTaskList(handler.getTodayBox());
+      taskP.setBoxLabel("Today");
       taskP.refresh();
     }
   }
@@ -36,8 +28,8 @@ public class Window extends JFrame {
     @Override
     public void actionPerformed(ActionEvent e) {
       TaskPanel taskP = (TaskPanel) centerPanel;
-      taskP.changeTaskList(manager.getWeekBox());
-      taskP.setLabel("Week");
+      taskP.changeTaskList(handler.getWeekBox());
+      taskP.setBoxLabel("Week");
       taskP.refresh();
     }
   }
@@ -46,8 +38,8 @@ public class Window extends JFrame {
     @Override
     public void actionPerformed(ActionEvent e) {
       TaskPanel taskP = (TaskPanel) centerPanel;
-      taskP.changeTaskList(manager.getLateBox());
-      taskP.setLabel("Late");
+      taskP.changeTaskList(handler.getLateBox());
+      taskP.setBoxLabel("Late");
       taskP.refresh();
     }
   }
@@ -74,33 +66,33 @@ public class Window extends JFrame {
   private class AddButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
-      TextPanel.BoxItem item = (TextPanel.BoxItem) textP.boxList.getSelectedItem();
+      TextPanel.BoxItem item = (TextPanel.BoxItem) textPanel.boxList.getSelectedItem();
 
       switch (item.type) {
         case DAY:
-          taskP.setList(manager.getTodayBox());
+          taskPanel.setList(handler.getTodayBox());
           break;
 
         case WEEK:
-          taskP.setList(manager.getWeekBox());
+          taskPanel.setList(handler.getWeekBox());
           break;
 
         case LATE:
-          taskP.setList(manager.getLateBox());
+          taskPanel.setList(handler.getLateBox());
           break;
 
         default:
-          taskP.setList(manager.getInbox());
+          taskPanel.setList(handler.getInbox());
           break;
       }
 
-      String task = textP.field.getText().strip();
+      String task = textPanel.textField.getText().strip();
       if (!task.isEmpty()) {
         TaskPanel taskP = (TaskPanel) centerPanel;
-        manager.addTask(item.type, new Task(task));
-        textP.field.selectAll();
+        handler.addTask(item.type, new Task(task));
+        textPanel.textField.selectAll();
 
-        if (item.getName().strip().equals(taskP.getLabel().strip())) {
+        if (item.getName().strip().equals(taskP.getBoxLabel().getText().strip())) {
           taskP.refresh();
         }
       }
@@ -110,7 +102,7 @@ public class Window extends JFrame {
   private class EditMakePanelButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
-      if (taskP.getList().isSelectionEmpty()) {
+      if (taskPanel.getList().isSelectionEmpty()) {
         return;
       }
 
@@ -120,7 +112,7 @@ public class Window extends JFrame {
     private void repaintEditWindow() {
       content.removeAll();
 
-      centerPanel = new EditPanel(taskP.getSelected());
+      centerPanel = new EditPanel(taskPanel.getSelected());
       content.add(centerPanel, BorderLayout.CENTER);
       setUpEditPanel((EditPanel) centerPanel);
 
@@ -139,17 +131,18 @@ public class Window extends JFrame {
   }
 
   private class SynchButtonListener implements ActionListener {
+
+    //TODO Синхронизация в отдельном потоке (???)
     @Override
     public void actionPerformed(ActionEvent e) {
-      manager.setDataWorker(dataBaseManager.getWorker());
-      manager.pushDate();
+      handler.setDataWorker();
+      handler.pushDate();
 
-      taskP.refresh();
+      taskPanel.refresh();
     }
   }
 
-  private TaskHandler manager;
-  private  DataBaseManager dataBaseManager;
+  private DataHandler handler;
 
   private JPanel northPanel;
   private JPanel centerPanel;
@@ -158,26 +151,25 @@ public class Window extends JFrame {
 
   private Container content;
 
-  private TextPanel textP;
-  private BoxPanel boxP;
+  private TextPanel textPanel;
+  private BoxPanel boxPanel;
   private ButtonPanel buttonPanel;
-  private TaskPanel taskP;
+  private TaskPanel taskPanel;
 
-  public Window(TaskHandler handler, DataBaseManager dataBaseManager) {
+  public Window(DataHandler handler) {
     super("Yoda");
-    this.manager = handler;
-    this.dataBaseManager = dataBaseManager;
+    this.handler = handler;
 
     this.content = this.getContentPane();
 
-    this.textP = new TextPanel();
-    this.northPanel = textP;
+    this.textPanel = new TextPanel();
+    this.northPanel = textPanel;
 
-    this.taskP = new TaskPanel(handler.getTodayBox());
-    this.centerPanel = taskP;
+    this.taskPanel = new TaskPanel(handler.getTodayBox());
+    this.centerPanel = taskPanel;
 
-    this.boxP = new BoxPanel();
-    this.eastPanel = boxP;
+    this.boxPanel = new BoxPanel();
+    this.eastPanel = boxPanel;
 
     this.buttonPanel = new ButtonPanel();
     this.southPanel = buttonPanel;
@@ -197,41 +189,76 @@ public class Window extends JFrame {
     this.setDefaultCloseOperation(EXIT_ON_CLOSE);
   }
 
-  private void setUpBoxPanel() {
-    boxP.run();
+  public TextPanel getTextPanel() {
+    return textPanel;
+  }
 
-    boxP.box[0].addActionListener(new InboxButtonListener());
-    boxP.box[1].addActionListener(new TodayButtonListener());
-    boxP.box[2].addActionListener(new WeekButtonListener());
-    boxP.box[3].addActionListener(new LateButtonListener());
+  public void setTextPanel(TextPanel textPanel) {
+    this.textPanel = textPanel;
+  }
+
+  public BoxPanel getBoxPanel() {
+    return boxPanel;
+  }
+
+  public void setBoxPanel(BoxPanel boxPanel) {
+    this.boxPanel = boxPanel;
+  }
+
+  public ButtonPanel getButtonPanel() {
+    return buttonPanel;
+  }
+
+  public void setButtonPanel(ButtonPanel buttonPanel) {
+    this.buttonPanel = buttonPanel;
+  }
+
+  public TaskPanel getTaskPanel() {
+    return taskPanel;
+  }
+
+  public void setTaskPanel(TaskPanel taskPanel) {
+    this.taskPanel = taskPanel;
+  }
+
+  private void setUpBoxPanel() {
+    boxPanel.run();
+
+    //TODO Вынести это все в контроллер
+
   }
 
   private void setUpTaskPanel() {
-    taskP.run();
+    taskPanel.run();
 
-    taskP.setLabel("Today");
+    taskPanel.setBoxLabel("Today");
 
     centerPanel.revalidate();
     centerPanel.repaint();
   }
 
   private void setUpTextPanel() {
-    textP.field.addKeyListener(new AddTaskListener());
+    // TODO ОТ СИХ
+    textPanel.textField.addKeyListener(new AddTaskListener());
 
-    textP.synchButton.addActionListener(new SynchButtonListener());
+    textPanel.synchButton.addActionListener(new SynchButtonListener());
 
     for (int i = 0; i < 4; ++i) {
-      textP.boxList.addItem(new TextPanel.BoxItem(boxP.box[i].getText(), TaskHandler.BoxType.values()[i]));
+      textPanel.boxList.addItem(new TextPanel.BoxItem(boxPanel.box[i].getText(), DataHandler.BoxType.values()[i]));
     }
 
-    textP.field.selectAll();
+    // TODO ДО СИХ
+    //  ВЫНЕСТИ ЭТО ВСЕ В КОНТРОЛЛЕР
 
-    textP.run();
-    textP.revalidate();
-    textP.repaint();
+    textPanel.textField.selectAll();
+
+    textPanel.run();
+    textPanel.revalidate();
+    textPanel.repaint();
   }
 
   private void setUpButtonPanel() {
+    //TODO ВЫНЕСТИ ЭТО ВСЕ В КОНТРОЛЛЕР
     buttonPanel.addButton.addActionListener(new AddButtonListener());
     buttonPanel.editButton.addActionListener(new EditMakePanelButtonListener());
 
@@ -241,17 +268,18 @@ public class Window extends JFrame {
   }
 
   private void setUpEditPanel(EditPanel editP) {
+    // TODO ВЫНЕСТИ В КОНТРОЛЛЕР
     editP.setSaveButtonListener(new EditSaveButtonListener());
     editP.run();
   }
 
-  private void repaintMainWindow() {
+  public void repaintMainWindow() {
     content.removeAll();
 
-    northPanel = boxP;
-    centerPanel = taskP;
-    northPanel = textP;
-    eastPanel = boxP;
+    northPanel = boxPanel;
+    centerPanel = taskPanel;
+    northPanel = textPanel;
+    eastPanel = boxPanel;
     southPanel = buttonPanel;
 
     content.add(northPanel, BorderLayout.NORTH);
@@ -262,4 +290,5 @@ public class Window extends JFrame {
     content.revalidate();
     content.repaint();
   }
+
 }

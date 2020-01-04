@@ -1,7 +1,7 @@
-package edu.ponomarev.step.graphics.Main;
+package edu.ponomarev.step.view.Main;
 
-import edu.ponomarev.step.task.Task;
-import edu.ponomarev.step.task.TaskContainer;
+import edu.ponomarev.step.component.task.Task;
+import edu.ponomarev.step.component.task.TaskContainer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -40,12 +40,24 @@ public class TaskPanel extends JPanel {
     this.setVisible(true);
   }
 
-  public void setLabel(String label) {
+  public void setList(JList list) {
+    this.list = list;
+  }
+
+  public JScrollPane getScrollPane() {
+    return scrollPane;
+  }
+
+  public void setScrollPane(JScrollPane scrollPane) {
+    this.scrollPane = scrollPane;
+  }
+
+  public void setBoxLabel(String label) {
     boxLabel.setText(label);
   }
 
-  public String getLabel() {
-    return boxLabel.getText();
+  public JLabel getBoxLabel() {
+    return boxLabel;
   }
 
   public Task getSelected() {

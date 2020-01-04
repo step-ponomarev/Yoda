@@ -1,16 +1,15 @@
 package edu.ponomarev.step;
 
-import edu.ponomarev.step.graphics.Main.Window;
+import edu.ponomarev.step.view.Main.Window;
 import edu.ponomarev.step.manager.DataBaseManager;
-import edu.ponomarev.step.manager.TaskHandler;
+import edu.ponomarev.step.manager.DataHandler;
 
 public class Main {
   public static void main(String[] args) {
     try {
-      DataBaseManager dataBaseManager = new DataBaseManager();
-      TaskHandler handler1 = new TaskHandler(dataBaseManager.getWorker());
+      DataHandler handler1 = new DataHandler();
 
-      Window window = new Window(handler1, dataBaseManager);
+      Window window = new Window(handler1);
       window.run();
     } catch (Exception e) {
       System.err.println(e.getMessage());

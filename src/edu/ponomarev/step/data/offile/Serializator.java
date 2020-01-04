@@ -1,8 +1,8 @@
 package edu.ponomarev.step.data.offile;
 
 import edu.ponomarev.step.data.DataWorker;
-import edu.ponomarev.step.manager.TaskHandler;
-import edu.ponomarev.step.task.Task;
+import edu.ponomarev.step.manager.DataHandler;
+import edu.ponomarev.step.component.task.Task;
 
 import java.io.*;
 
@@ -18,7 +18,7 @@ public class Serializator implements DataWorker {
   }
 
   @Override
-  public void put(TaskHandler.BoxType type, Task task) throws Exception {
+  public void put(DataHandler.BoxType type, Task task) throws Exception {
     String dir = directory;
 
     File file = new File(directory);
@@ -71,7 +71,7 @@ public class Serializator implements DataWorker {
   }
 
   @Override
-  public void putAll(TaskHandler.BoxType type, List<Task> task) throws Exception {
+  public void putAll(DataHandler.BoxType type, List<Task> task) throws Exception {
     String dir = directory;
 
     File file = new File(directory);
@@ -114,7 +114,7 @@ public class Serializator implements DataWorker {
   }
 
   @Override
-  public List pull(TaskHandler.BoxType type) throws Exception {
+  public List pull(DataHandler.BoxType type) throws Exception {
     String dir = directory;
 
     File file = new File(directory);

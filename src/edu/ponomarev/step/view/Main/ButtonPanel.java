@@ -1,4 +1,4 @@
-package edu.ponomarev.step.graphics.Main;
+package edu.ponomarev.step.view.Main;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,5 +20,21 @@ public class ButtonPanel extends JPanel {
 
     this.setBackground(new Color(255, 255, 255));
     this.setVisible(true);
+  }
+
+  public JButton getAddButton() {
+    return addButton;
+  }
+
+  public void setAddButton(JButton addButton) {
+    this.addButton = addButton;
+  }
+
+  public JButton getEditButton() {
+    return editButton;
+  }
+
+  public void setEditButton(JButton editButton) {
+    this.editButton = editButton;
   }
 }

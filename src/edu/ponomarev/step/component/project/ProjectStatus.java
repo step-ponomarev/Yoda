@@ -1,4 +1,4 @@
-package edu.ponomarev.step.project;
+package edu.ponomarev.step.component.project;
 
 public enum ProjectStatus {
   PLANNING,

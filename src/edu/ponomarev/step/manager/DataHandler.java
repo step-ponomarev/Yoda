@@ -1,12 +1,13 @@
 package edu.ponomarev.step.manager;
 
 import edu.ponomarev.step.data.DataWorker;
-import edu.ponomarev.step.task.Task;
-import edu.ponomarev.step.task.TaskContainer;
+import edu.ponomarev.step.component.task.Task;
+import edu.ponomarev.step.component.task.TaskContainer;
 
 // TODO: Нарисовать ЮМЛ обслуживателя задач
 
-public class TaskHandler {
+public class DataHandler {
+  private DataBaseManager DBmanager;
   private DataWorker dataWorker;
 
   private TaskContainer inbox;
@@ -21,8 +22,10 @@ public class TaskHandler {
     LATE
   }
 
-  public TaskHandler(DataWorker db) {
-    this.dataWorker = db;
+  public DataHandler() {
+    this.DBmanager = new DataBaseManager();
+
+    this.dataWorker = this.DBmanager.getWorker();
 
     this.inbox = new TaskContainer();
     this.todayBox = new TaskContainer();
@@ -80,23 +83,39 @@ public class TaskHandler {
     }
   }
 
+  public TaskContainer getBox(String name) {
+    TaskContainer returned = new TaskContainer();
+
+    if (name.equals("Inbox")) {
+      returned = this.inbox;
+    } else if (name.equals("Today")) {
+      returned = this.todayBox;
+    } else if (name.equals("Week")) {
+      returned = this.weekBox;
+    } else if (name.equals("Late")) {
+      returned = this.lateBox;
+    }
+
+    return returned;
+  }
+
   public TaskContainer getInbox() {
-    return inbox;
+    return this.inbox;
   }
 
   public TaskContainer getTodayBox() {
-    return todayBox;
+    return this.todayBox;
   }
 
   public TaskContainer getWeekBox() {
-    return weekBox;
+    return this.weekBox;
   }
 
   public TaskContainer getLateBox() {
-    return lateBox;
+    return this.lateBox;
   }
 
-  public void setDataWorker(DataWorker dataWorker) {
-    this.dataWorker = dataWorker;
+  public void setDataWorker() {
+    this.dataWorker = this.DBmanager.getWorker();
   }
 };

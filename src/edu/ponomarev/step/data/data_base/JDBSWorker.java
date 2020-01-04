@@ -1,8 +1,8 @@
 package edu.ponomarev.step.data.data_base;
 
 import edu.ponomarev.step.data.DataWorker;
-import edu.ponomarev.step.manager.TaskHandler;
-import edu.ponomarev.step.task.Task;
+import edu.ponomarev.step.manager.DataHandler;
+import edu.ponomarev.step.component.task.Task;
 
 import java.sql.*;
 import java.text.DateFormat;
@@ -19,7 +19,7 @@ public class JDBSWorker implements DataWorker {
   }
 
   @Override
-  public void put(TaskHandler.BoxType type, Task task) throws SQLException {
+  public void put(DataHandler.BoxType type, Task task) throws SQLException {
     String sqlRequest = "INSERT INTO";
     String taskStatement = task.getStatement();
 
@@ -52,14 +52,14 @@ public class JDBSWorker implements DataWorker {
   }
 
   @Override
-  public void putAll(TaskHandler.BoxType type, List<Task> task) throws Exception {
+  public void putAll(DataHandler.BoxType type, List<Task> task) throws Exception {
     //TODO Пушить все таски, которых нет в БД
     System.out.println("Это не работает еще!!!");
     return;
   }
 
   @Override
-  public List pull(TaskHandler.BoxType type) throws SQLException, ParseException {
+  public List pull(DataHandler.BoxType type) throws SQLException, ParseException {
     String sqlRequest = "SELECT date_of_creation, statement FROM";
 
     switch (type) {
