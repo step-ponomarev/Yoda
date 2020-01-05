@@ -4,8 +4,6 @@ import edu.ponomarev.step.data.DataWorker;
 import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.component.task.TaskContainer;
 
-// TODO: Нарисовать ЮМЛ обслуживателя задач
-
 public class DataHandler {
   private DataBaseManager DBmanager;
   private DataWorker dataWorker;
@@ -55,7 +53,7 @@ public class DataHandler {
     }
 
     try {
-      dataWorker.put(type, task);
+      dataWorker.push(type, task);
     } catch (Exception e) {
       System.err.println(e.getMessage());
     }
@@ -63,10 +61,10 @@ public class DataHandler {
 
   public void pushDate() {
     try {
-      dataWorker.putAll(BoxType.INBOX, inbox.getList());
-      dataWorker.putAll(BoxType.DAY, todayBox.getList());
-      dataWorker.putAll(BoxType.WEEK, weekBox.getList());
-      dataWorker.putAll(BoxType.LATE, lateBox.getList());
+      dataWorker.pushAll(inbox.getList(), BoxType.INBOX);
+      dataWorker.pushAll(todayBox.getList(), BoxType.DAY);
+      dataWorker.pushAll(weekBox.getList(), BoxType.WEEK);
+      dataWorker.pushAll(lateBox.getList(), BoxType.LATE);
     } catch (Exception e) {
       System.err.println(e.getMessage());
     }
@@ -74,10 +72,10 @@ public class DataHandler {
 
   public void pullData() {
     try {
-      this.inbox.setList(dataWorker.pull(BoxType.INBOX));
-      this.todayBox.setList(dataWorker.pull(BoxType.DAY));
-      this.weekBox.setList(dataWorker.pull(BoxType.WEEK));
-      this.lateBox.setList(dataWorker.pull(BoxType.LATE));
+      this.inbox.setList(dataWorker.pullAll(BoxType.INBOX));
+      this.todayBox.setList(dataWorker.pullAll(BoxType.DAY));
+      this.weekBox.setList(dataWorker.pullAll(BoxType.WEEK));
+      this.lateBox.setList(dataWorker.pullAll(BoxType.LATE));
     } catch (Exception e) {
       System.err.println(e.getMessage());
     }

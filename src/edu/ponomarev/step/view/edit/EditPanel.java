@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class EditPanel extends JPanel {
-  private JButton saveButton;
+  private  ButtonPanel buttonPanel;
 
   private TextField taskNameField;
   private Task currentTask;
@@ -14,26 +14,28 @@ public class EditPanel extends JPanel {
 
   public EditPanel(Task task) {
     super();
-    currentTask = task;
-    taskNameField = new TextField(currentTask.toString());
-    saveButton = new JButton("Save");
+    this.currentTask = task;
+    this.buttonPanel = new ButtonPanel();
+    this.taskNameField = new TextField(currentTask.toString());
   }
 
   public void run() {
     taskNameField.setText(currentTask.toString());
-    this.add(saveButton, BorderLayout.SOUTH);
     this.add(taskNameField, BorderLayout.NORTH);
+    this.add(buttonPanel, BorderLayout.SOUTH);
+
+    buttonPanel.run();
 
     this.setBackground(Color.WHITE);
     this.setVisible(true);
   }
 
-  public JButton getSaveButton() {
-    return saveButton;
+  public ButtonPanel getButtonPanel() {
+    return buttonPanel;
   }
 
-  public void setSaveButton(JButton saveButton) {
-    this.saveButton = saveButton;
+  public void setButtonPanel(ButtonPanel buttonPanel) {
+    this.buttonPanel = buttonPanel;
   }
 
   public TextField getTaskNameField() {

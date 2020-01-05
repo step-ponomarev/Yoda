@@ -104,22 +104,6 @@ public class Controller {
   }
 
   private void initButtonPanel() {
-    final Consumer<EditPanel> repaintEditWindow =  panel -> {
-
-      window.getContentPane().removeAll();
-      window.getContentPane().add(panel, BorderLayout.CENTER);
-
-      panel.getSaveButton().addActionListener(e2 -> {
-        // TODO Сохранить измененный таск и т д
-        window.repaintMainWindow();
-      });
-
-      panel.run();
-
-      window.getContentPane().revalidate();
-      window.getContentPane().repaint();
-    };
-
     window.getButtonPanel().getAddButton().addActionListener(e -> {
       final BoxRequestWrap item = (BoxRequestWrap) window.getTextPanel().getBoxList().getSelectedItem();
 
@@ -135,6 +119,26 @@ public class Controller {
         }
       }
     });
+
+    final Consumer<EditPanel> repaintEditWindow =  panel -> {
+      window.getContentPane().removeAll();
+      window.getContentPane().add(panel, BorderLayout.CENTER);
+
+      panel.getButtonPanel().getSaveButton().addActionListener(e2 -> {
+        String taskName = panel.getTaskNameField().getText().strip();
+        if (taskName.isEmpty()) {
+          // TODO Запустить диалог ошибки.
+        } else {
+          panel.getCurrentTask().setStatement(taskName);
+          window.repaintMainWindow();
+        }
+      });
+
+      panel.run();
+
+      window.getContentPane().revalidate();
+      window.getContentPane().repaint();
+    };
 
     window.getButtonPanel().getEditButton().addActionListener(e -> {
       if (!window.getTaskPanel().getList().isSelectionEmpty()) {

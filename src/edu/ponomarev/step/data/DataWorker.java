@@ -6,7 +6,7 @@ import edu.ponomarev.step.component.task.Task;
 import java.util.List;
 
 public interface DataWorker {
-  void put(DataHandler.BoxType type, Task task) throws Exception;
-  void putAll(DataHandler.BoxType type, List<Task> task) throws Exception;
-  List pull(DataHandler.BoxType type) throws Exception;
+  void push(DataHandler.BoxType type, Task task) throws Exception;
+  void pushAll(List<Task> task, DataHandler.BoxType type) throws Exception;
+  List pullAll(DataHandler.BoxType type) throws Exception;
 }

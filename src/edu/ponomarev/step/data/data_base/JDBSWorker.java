@@ -19,81 +19,148 @@ public class JDBSWorker implements DataWorker {
   }
 
   @Override
-  public void put(DataHandler.BoxType type, Task task) throws SQLException {
-    String sqlRequest = "INSERT INTO box (date_of_creation, statement, type)";
-    String taskStatement = task.getStatement();
+  public void push(DataHandler.BoxType type, Task task) throws SQLException {
+    String boxType;
+    switch (type) {
+      case DAY:
+        boxType = "TODAY";
+        break;
 
+      case WEEK:
+        boxType = "WEEK";
+        break;
+
+      case LATE:
+        boxType = "LATE";
+        break;
+
+      default:
+        boxType = "INBOX";
+        break;
+    }
+
+    final String selectRequest = "SELECT * FROM box where type = ?";
+    PreparedStatement statement = connection.prepareStatement(selectRequest);
+    statement.setString(1, boxType);
+
+    int id = 1;
+    ResultSet resultSet = statement.executeQuery();
+    if (resultSet.last()) {
+      id = resultSet.getInt("id") + 1;
+    }
+    resultSet.close();
+    task.setId(id);
+
+    final String insertRequest = "INSERT INTO box (id, date_of_creation, statement, type) VALUES  (?, ?, ?, ?);";
+    statement = connection.prepareStatement(insertRequest);
+
+    String taskStatement = task.getStatement();
     DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-DD");
     String date = dateFormat.format(task.getDate());
 
-    sqlRequest += " VALUES ('"  + date + "', '" + taskStatement + "',";
-
-    switch (type) {
-      case DAY:
-        sqlRequest += " 'TODAY');";
-        break;
-
-      case WEEK:
-        sqlRequest += " 'WEEK');";
-        break;
-
-      case LATE:
-        sqlRequest += " 'LATE');";
-        break;
-
-      default:
-        sqlRequest += " 'INBOX');";
-        break;
-    }
-
-    PreparedStatement statement = connection.prepareStatement(sqlRequest);
+    statement.setInt(1, task.getId());
+    statement.setString(2, date);
+    statement.setString(3, taskStatement);
+    statement.setString(4, boxType);
 
     statement.execute();
+    statement.close();
   }
 
   @Override
-  public void putAll(DataHandler.BoxType type, List<Task> task) throws Exception {
-    //TODO Пушить все таски, которых нет в БД
-    System.out.println("Это не работает еще!!!");
-    return;
-  }
+  public List pullAll(DataHandler.BoxType type) throws SQLException, ParseException {
+    final String sqlRequest = "SELECT * FROM box where type = ?";
 
-  @Override
-  public List pull(DataHandler.BoxType type) throws SQLException, ParseException {
-    String sqlRequest = "SELECT * FROM box where type =  ";
+    PreparedStatement statement = connection.prepareStatement(sqlRequest);
 
+    String boxType;
     switch (type) {
       case DAY:
-        sqlRequest += "'TODAY'";
+        boxType = "TODAY";
         break;
 
       case WEEK:
-        sqlRequest += "'WEEK'";
+        boxType = "WEEK";
         break;
 
       case LATE:
-        sqlRequest += "'LATE'";
+        boxType = "LATE";
         break;
 
       default:
-        sqlRequest += "'INBOX'";
+        boxType = "INBOX";
         break;
     }
-
-    PreparedStatement statement = connection.prepareStatement(sqlRequest);
-    ResultSet rs = statement.executeQuery(sqlRequest);
+    statement.setString(1, boxType);
 
     ArrayList<Task> list = new ArrayList<Task>();
-    DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-DD");
+
+    ResultSet rs = statement.executeQuery();
     while (rs.next()) {
       list.add(new Task(
           rs.getString("statement"),
-          rs.getDate("date_of_creation"))
+          rs.getDate("date_of_creation"),
+          rs.getInt("id"))
       );
     }
-
     rs.close();
+    statement.close();
 
     return list;
+  }
+
+  @Override
+  public void pushAll(List<Task> list, DataHandler.BoxType type) throws Exception {
+    String sqlRequest = "SELECT * FROM box where type = ?";
+
+    PreparedStatement statement = connection.prepareStatement(sqlRequest);
+
+    String boxType;
+    switch (type) {
+      case DAY:
+        boxType = "TODAY";
+        break;
+
+      case WEEK:
+        boxType = "WEEK";
+        break;
+
+      case LATE:
+        boxType = "LATE";
+        break;
+
+      default:
+        boxType = "INBOX";
+        break;
+    }
+    statement.setString(1, boxType);
+
+    ArrayList<Task> BDlist = new ArrayList<Task>();
+
+    ResultSet rs = statement.executeQuery();
+    while (rs.next()) {
+      BDlist.add(new Task(
+          rs.getString("statement"),
+          rs.getDate("date_of_creation"),
+          rs.getInt("id"))
+      );
+    }
+    rs.close();
+
+    sqlRequest = "INSERT INTO box (date_of_creation, statement, type) VALUES  (?, ?, ?);";
+    statement = connection.prepareStatement(sqlRequest);
+
+    statement.setString(3, boxType);
+
+    DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-DD");
+    for (Task task : list) {
+      if (!BDlist.contains(task)) {
+        statement.setString(1, dateFormat.format(task.getDate()));
+        statement.setString(2, task.getStatement());
+        statement.execute();
+      }
+    }
+
+    statement.close();
   }
 }

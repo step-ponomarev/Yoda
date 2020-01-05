@@ -17,14 +17,14 @@ public class TaskContainer {
   class DateCompare implements Comparator<Task> {
     @Override
     public int compare(Task o1, Task o2) {
-      return o1.date_of_creation.compareTo(o2.date_of_creation);
+      return o1.getDate().compareTo(o2.getDate());
     }
   }
 
   class StatmentCompare implements Comparator<Task> {
     @Override
     public int compare(Task o1, Task o2) {
-      return o1.statement.compareTo(o2.statement);
+      return o1.getStatement().compareTo(o2.getStatement());
     }
   }
 

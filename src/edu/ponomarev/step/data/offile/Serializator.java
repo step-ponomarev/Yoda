@@ -18,7 +18,7 @@ public class Serializator implements DataWorker {
   }
 
   @Override
-  public void put(DataHandler.BoxType type, Task task) throws Exception {
+  public void push(DataHandler.BoxType type, Task task) throws Exception {
     String dir = directory;
 
     File file = new File(directory);
@@ -54,7 +54,7 @@ public class Serializator implements DataWorker {
   }
 
   @Override
-  public void putAll(DataHandler.BoxType type, List<Task> task) throws Exception {
+  public void pushAll(List<Task> task, DataHandler.BoxType type) throws Exception {
     String dir = directory;
 
     File file = new File(directory);
@@ -81,7 +81,7 @@ public class Serializator implements DataWorker {
   }
 
   @Override
-  public List pull(DataHandler.BoxType type) throws Exception {
+  public List pullAll(DataHandler.BoxType type) throws Exception {
     String dir = directory;
 
     File file = new File(directory);
