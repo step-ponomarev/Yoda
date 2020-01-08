@@ -4,14 +4,14 @@ import edu.ponomarev.step.data.DataWorker;
 import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.component.task.TaskContainer;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class DataHandler {
   private DataBaseManager DBmanager;
   private DataWorker dataWorker;
 
-  private TaskContainer inbox;
-  private TaskContainer todayBox;
-  private TaskContainer weekBox;
-  private TaskContainer lateBox;
+  private HashMap<DataHandler.BoxType, TaskContainer> taskBox;
 
   public enum BoxType {
     INBOX,
@@ -25,32 +25,18 @@ public class DataHandler {
 
     this.dataWorker = this.DBmanager.getWorker();
 
-    this.inbox = new TaskContainer();
-    this.todayBox = new TaskContainer();
-    this.weekBox = new TaskContainer();
-    this.lateBox = new TaskContainer();
+    taskBox = new HashMap<DataHandler.BoxType, TaskContainer>() {{
+      put(BoxType.INBOX, new TaskContainer());
+      put(BoxType.DAY, new TaskContainer());
+      put(BoxType.WEEK, new TaskContainer());
+      put(BoxType.LATE, new TaskContainer());
+    }};
 
     pullData();
   }
 
   public void addTask(BoxType type, Task task) {
-    switch (type) {
-      case DAY:
-        todayBox.add(task);
-        break;
-
-      case WEEK:
-        weekBox.add(task);
-        break;
-
-      case LATE:
-        lateBox.add(task);
-        break;
-
-      default:
-        inbox.add(task);
-        break;
-    }
+    taskBox.get(type).add(task);
 
     try {
       dataWorker.push(type, task);
@@ -61,10 +47,9 @@ public class DataHandler {
 
   public void pushDate() {
     try {
-      dataWorker.pushAll(inbox.getList(), BoxType.INBOX);
-      dataWorker.pushAll(todayBox.getList(), BoxType.DAY);
-      dataWorker.pushAll(weekBox.getList(), BoxType.WEEK);
-      dataWorker.pushAll(lateBox.getList(), BoxType.LATE);
+      for (Map.Entry<DataHandler.BoxType, TaskContainer> box : taskBox.entrySet()) {
+        dataWorker.pushAll(box.getValue().getList(), box.getKey());
+      }
     } catch (Exception e) {
       System.err.println(e.getMessage());
     }
@@ -72,32 +57,25 @@ public class DataHandler {
 
   public void pullData() {
     try {
-      this.inbox.setList(dataWorker.pullAll(BoxType.INBOX));
-      this.todayBox.setList(dataWorker.pullAll(BoxType.DAY));
-      this.weekBox.setList(dataWorker.pullAll(BoxType.WEEK));
-      this.lateBox.setList(dataWorker.pullAll(BoxType.LATE));
+      for (Map.Entry<DataHandler.BoxType, TaskContainer> box : taskBox.entrySet()) {
+        box.getValue().setList(dataWorker.pullAll(box.getKey()));
+      }
     } catch (Exception e) {
       System.err.println(e.getMessage());
     }
   }
 
-  public TaskContainer getBox(BoxType type) {
-    switch (type) {
-      case DAY:
-        return this.todayBox;
+  public HashMap<DataHandler.BoxType, TaskContainer> getBox() { return taskBox; }
 
-      case WEEK:
-        return this.weekBox;
+  public DataBaseManager getDBmanager() { return DBmanager; }
 
-      case LATE:
-        return this.lateBox;
-
-      default:
-        return this.inbox;
-    }
+  public DataWorker getDataWorker() {
+    return dataWorker;
   }
 
-  public void setDataWorker() {
-    this.dataWorker = this.DBmanager.getWorker();
+  public void setDataWorkerAuto() { this.dataWorker = this.DBmanager.getWorker(); }
+
+  public void setOfflineDataWorker() {
+    this.dataWorker = this.DBmanager.getOfflineWorker();
   }
 };

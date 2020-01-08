@@ -11,6 +11,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.function.Consumer;
 
 public class Controller {
@@ -47,14 +49,54 @@ public class Controller {
 
   public void initView() {
     window.run();
+    initMainWindow();
     initTaskPanel();
     initBoxButtons();
     initTextPanel();
     initButtonPanel();
   }
 
+  private void initMainWindow() {
+    window.addWindowListener(new WindowListener() {
+      @Override
+      public void windowOpened(WindowEvent e) {
+
+      }
+
+      @Override
+      public void windowClosing(WindowEvent e) {
+
+      }
+
+      @Override
+      public void windowClosed(WindowEvent e) {
+        defaultSynch();
+      }
+
+      @Override
+      public void windowIconified(WindowEvent e) {
+
+      }
+
+      @Override
+      public void windowDeiconified(WindowEvent e) {
+
+      }
+
+      @Override
+      public void windowActivated(WindowEvent e) {
+
+      }
+
+      @Override
+      public void windowDeactivated(WindowEvent e) {
+
+      }
+    });
+  }
+
   private void initTaskPanel() {
-    window.getTaskPanel().getList().setListData(handler.getBox(DataHandler.BoxType.DAY).toArray());
+    window.getTaskPanel().getList().setListData(handler.getBox().get(DataHandler.BoxType.DAY).toArray());
     window.getTaskPanel().setCurrentBoxType(DataHandler.BoxType.DAY);
     window.getTaskPanel().getBoxLabel().setText("Today");
   }
@@ -62,11 +104,11 @@ public class Controller {
   private void initBoxButtons() {
     for (JButton button : window.getBoxButtonsPanel().getBox()) {
       button.addActionListener(e -> {
-        for (BoxRequestWrap boxWrap : boxVariables) {
-          if (boxWrap.boxName.equals(button.getText())) {
-            window.getTaskPanel().setCurrentBoxType(boxWrap.type);
-            window.getTaskPanel().getList().setListData(handler.getBox(boxWrap.type).toArray());
-            window.getTaskPanel().getBoxLabel().setText(boxWrap.boxName);
+        for (BoxRequestWrap boxRequest : boxVariables) {
+          if (boxRequest.boxName.equals(button.getText())) {
+            window.getTaskPanel().setCurrentBoxType(boxRequest.type);
+            window.getTaskPanel().getList().setListData(handler.getBox().get(boxRequest.type).toArray());
+            window.getTaskPanel().getBoxLabel().setText(boxRequest.boxName);
             break;
           }
         }
@@ -98,8 +140,7 @@ public class Controller {
     });
 
     window.getTextPanel().getSynchButton().addActionListener(e -> {
-      handler.setDataWorker();
-      handler.pushDate();
+      defaultSynch();
     });
   }
 
@@ -114,7 +155,7 @@ public class Controller {
         window.getTextPanel().getTextField().selectAll();
 
         if (item.type.equals(window.getTaskPanel().getCurrentBoxType())) {
-          window.getTaskPanel().getList().setListData(handler.getBox(item.type).toArray());
+          window.getTaskPanel().getList().setListData(handler.getBox().get(item.type).toArray());
           window.getTaskPanel().getList().repaint();
         }
       }
@@ -145,5 +186,14 @@ public class Controller {
         repaintEditWindow.accept(new EditPanel(window.getTaskPanel().getSelected()));
       }
     });
+  }
+
+  private void defaultSynch() {
+    handler.setOfflineDataWorker();
+    handler.pushDate();
+    handler.setDataWorkerAuto();
+    if (handler.getDBmanager().isONLINE()) {
+      handler.pushDate();
+    }
   }
 }
