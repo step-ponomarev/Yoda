@@ -9,6 +9,7 @@ import java.text.ParseException;
 
 import java.time.LocalDate;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,31 +22,23 @@ public class JDBSWorker implements DataWorker {
 
   @Override
   public void push(DataHandler.BoxType type, Task task) throws SQLException {
-    String boxType;
-    switch (type) {
-      case DAY:
-        boxType = "TODAY";
+    String boxType = new String();
+    for (DataHandler.BoxRequestWrap item : DataHandler.BOX_VARIABLES) {
+      if (type.equals(item.type)) {
+        boxType = item.boxName;
         break;
-
-      case WEEK:
-        boxType = "WEEK";
-        break;
-
-      case LATE:
-        boxType = "LATE";
-        break;
-
-      default:
-        boxType = "INBOX";
-        break;
+      }
     }
 
-    final String insertRequest = "INSERT INTO task_box (date_of_creation, statement, type) VALUES  (?, ?, ?);";
+    final String insertRequest = "INSERT INTO task_box (date_of_creation, time_of_last_change, statement, type) " +
+        "VALUES  " +
+        "(?, ?, ?, ?);";
     PreparedStatement statement = connection.prepareStatement(insertRequest);
 
     statement.setObject(1, task.getDateOfCreation());
-    statement.setString(2, task.getStatement());
-    statement.setString(3, boxType);
+    statement.setObject(2, task.getTimeOfLastChange());
+    statement.setString(3, task.getStatement());
+    statement.setString(4, boxType);
 
     statement.execute();
     statement.close();
@@ -57,23 +50,12 @@ public class JDBSWorker implements DataWorker {
 
     PreparedStatement statement = connection.prepareStatement(sqlRequest);
 
-    String boxType;
-    switch (type) {
-      case DAY:
-        boxType = "TODAY";
+    String boxType = new String();
+    for (DataHandler.BoxRequestWrap item : DataHandler.BOX_VARIABLES) {
+      if (type.equals(item.type)) {
+        boxType = item.boxName;
         break;
-
-      case WEEK:
-        boxType = "WEEK";
-        break;
-
-      case LATE:
-        boxType = "LATE";
-        break;
-
-      default:
-        boxType = "INBOX";
-        break;
+      }
     }
     statement.setString(1, boxType);
 
@@ -83,7 +65,8 @@ public class JDBSWorker implements DataWorker {
     while (rs.next()) {
       list.add(new Task(
           rs.getString("statement"),
-          rs.getObject("date_of_creation", LocalDate.class)
+          rs.getObject("date_of_creation", LocalDate.class),
+          rs.getObject("time_of_last_change", LocalDateTime.class)
       ));
     }
     rs.close();
@@ -98,24 +81,14 @@ public class JDBSWorker implements DataWorker {
 
     PreparedStatement statement = connection.prepareStatement(selectRequest);
 
-    String boxType;
-    switch (type) {
-      case DAY:
-        boxType = "TODAY";
+    String boxType = new String();
+    for (DataHandler.BoxRequestWrap item : DataHandler.BOX_VARIABLES) {
+      if (type.equals(item.type)) {
+        boxType = item.boxName;
         break;
-
-      case WEEK:
-        boxType = "WEEK";
-        break;
-
-      case LATE:
-        boxType = "LATE";
-        break;
-
-      default:
-        boxType = "INBOX";
-        break;
+      }
     }
+
     statement.setString(1, boxType);
 
     ArrayList<Task> BDlist = new ArrayList<Task>();
@@ -124,20 +97,23 @@ public class JDBSWorker implements DataWorker {
     while (rs.next()) {
       BDlist.add(new Task(
           rs.getString("statement"),
-          rs.getObject("date_of_creation", LocalDate.class)
+          rs.getObject("date_of_creation", LocalDate.class),
+          rs.getObject("time_of_last_change", LocalDateTime.class)
       ));
     }
     rs.close();
 
-    final String insertRequest = "INSERT INTO task_box (date_of_creation, statement, type) VALUES  (?, ?, ?);";
+    final String insertRequest = "INSERT INTO task_box (date_of_creation, time_of_last_change, statement, type) " +
+        "VALUES  (?, ?, ?, ?);";
     statement = connection.prepareStatement(insertRequest);
 
-    statement.setString(3, boxType);
+    statement.setString(4, boxType);
 
     for (Task task : list) {
       if (!BDlist.contains(task)) {
         statement.setObject(1, task.getDateOfCreation());
-        statement.setString(2, task.getStatement());
+        statement.setObject(1, task.getTimeOfLastChange());
+        statement.setString(3, task.getStatement());
         statement.execute();
       }
     }

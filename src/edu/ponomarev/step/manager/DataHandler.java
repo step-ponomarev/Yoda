@@ -8,6 +8,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DataHandler {
+  public static class BoxRequestWrap {
+    public DataHandler.BoxType type;
+    public String boxName;
+
+    public BoxRequestWrap(DataHandler.BoxType type, String boxName) {
+      this.type = type;
+      this.boxName = boxName;
+    }
+
+    @Override
+    public String toString() {
+      return boxName;
+    }
+  }
+
+  final public static BoxRequestWrap[] BOX_VARIABLES = new DataHandler.BoxRequestWrap[] {
+      new BoxRequestWrap(DataHandler.BoxType.INBOX, "Inbox"),
+      new BoxRequestWrap(DataHandler.BoxType.DAY, "Today"),
+      new BoxRequestWrap(DataHandler.BoxType.WEEK, "Week"),
+      new BoxRequestWrap(DataHandler.BoxType.LATE, "Late")
+  };
+
   private DataBaseManager DBmanager;
   private DataWorker dataWorker;
 

@@ -16,35 +16,12 @@ import java.awt.event.WindowListener;
 import java.util.function.Consumer;
 
 public class Controller {
-  private class BoxRequestWrap {
-    public DataHandler.BoxType type;
-    public String boxName;
-
-    public BoxRequestWrap(DataHandler.BoxType type, String boxName) {
-      this.type = type;
-      this.boxName = boxName;
-    }
-
-    @Override
-    public String toString() {
-      return boxName;
-    }
-  }
-
   private Window window;
   private DataHandler handler;
-  private BoxRequestWrap [] boxVariables;
 
   public Controller(Window window, DataHandler handler) {
     this.handler = handler;
     this.window = window;
-    this.boxVariables = new BoxRequestWrap [] {
-        new BoxRequestWrap(DataHandler.BoxType.INBOX, "Inbox"),
-        new BoxRequestWrap(DataHandler.BoxType.DAY, "Today"),
-        new BoxRequestWrap(DataHandler.BoxType.WEEK, "Week"),
-        new BoxRequestWrap(DataHandler.BoxType.LATE, "Late")
-    };
-
   }
 
   public void initView() {
@@ -104,7 +81,7 @@ public class Controller {
   private void initBoxButtons() {
     for (JButton button : window.getBoxButtonsPanel().getBox()) {
       button.addActionListener(e -> {
-        for (BoxRequestWrap boxRequest : boxVariables) {
+        for (DataHandler.BoxRequestWrap boxRequest : DataHandler.BOX_VARIABLES) {
           if (boxRequest.boxName.equals(button.getText())) {
             window.getTaskPanel().setCurrentBoxType(boxRequest.type);
             window.getTaskPanel().getList().setListData(handler.getBox().get(boxRequest.type).toArray());
@@ -119,7 +96,7 @@ public class Controller {
   private void initTextPanel() {
     final int ENTER = 10;
 
-    for (BoxRequestWrap item : boxVariables) {
+    for (DataHandler.BoxRequestWrap item : DataHandler.BOX_VARIABLES) {
       window.getTextPanel().getBoxList().addItem(item);
     }
     window.getTextPanel().getBoxList().setSelectedIndex(0);
@@ -146,7 +123,7 @@ public class Controller {
 
   private void initButtonPanel() {
     window.getButtonPanel().getAddButton().addActionListener(e -> {
-      final BoxRequestWrap item = (BoxRequestWrap) window.getTextPanel().getBoxList().getSelectedItem();
+      final DataHandler.BoxRequestWrap item = (DataHandler.BoxRequestWrap) window.getTextPanel().getBoxList().getSelectedItem();
 
       String task = window.getTextPanel().getTextField().getText().strip();
       if (!task.isEmpty()) {
