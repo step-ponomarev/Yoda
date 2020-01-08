@@ -5,9 +5,10 @@ import edu.ponomarev.step.manager.DataHandler;
 import edu.ponomarev.step.component.task.Task;
 
 import java.sql.*;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+
+import java.time.LocalDate;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,29 +40,12 @@ public class JDBSWorker implements DataWorker {
         break;
     }
 
-    final String selectRequest = "SELECT * FROM box where type = ?";
-    PreparedStatement statement = connection.prepareStatement(selectRequest);
-    statement.setString(1, boxType);
+    final String insertRequest = "INSERT INTO task_box (date_of_creation, statement, type) VALUES  (?, ?, ?);";
+    PreparedStatement statement = connection.prepareStatement(insertRequest);
 
-    int id = 1;
-    ResultSet resultSet = statement.executeQuery();
-    if (resultSet.last()) {
-      id = resultSet.getInt("id") + 1;
-    }
-    resultSet.close();
-    task.setId(id);
-
-    final String insertRequest = "INSERT INTO box (id, date_of_creation, statement, type) VALUES  (?, ?, ?, ?);";
-    statement = connection.prepareStatement(insertRequest);
-
-    String taskStatement = task.getStatement();
-    DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-DD");
-    String date = dateFormat.format(task.getDate());
-
-    statement.setInt(1, task.getId());
-    statement.setString(2, date);
-    statement.setString(3, taskStatement);
-    statement.setString(4, boxType);
+    statement.setObject(1, task.getDateOfCreation());
+    statement.setString(2, task.getStatement());
+    statement.setString(3, boxType);
 
     statement.execute();
     statement.close();
@@ -69,7 +53,7 @@ public class JDBSWorker implements DataWorker {
 
   @Override
   public List pullAll(DataHandler.BoxType type) throws SQLException, ParseException {
-    final String sqlRequest = "SELECT * FROM box where type = ?";
+    final String sqlRequest = "SELECT * FROM task_box where type = ?";
 
     PreparedStatement statement = connection.prepareStatement(sqlRequest);
 
@@ -99,9 +83,8 @@ public class JDBSWorker implements DataWorker {
     while (rs.next()) {
       list.add(new Task(
           rs.getString("statement"),
-          rs.getDate("date_of_creation"),
-          rs.getInt("id"))
-      );
+          rs.getObject("date_of_creation", LocalDate.class)
+      ));
     }
     rs.close();
     statement.close();
@@ -111,9 +94,9 @@ public class JDBSWorker implements DataWorker {
 
   @Override
   public void pushAll(List<Task> list, DataHandler.BoxType type) throws Exception {
-    String sqlRequest = "SELECT * FROM box where type = ?";
+    final String selectRequest = "SELECT * FROM task_box where type = ?";
 
-    PreparedStatement statement = connection.prepareStatement(sqlRequest);
+    PreparedStatement statement = connection.prepareStatement(selectRequest);
 
     String boxType;
     switch (type) {
@@ -141,21 +124,19 @@ public class JDBSWorker implements DataWorker {
     while (rs.next()) {
       BDlist.add(new Task(
           rs.getString("statement"),
-          rs.getDate("date_of_creation"),
-          rs.getInt("id"))
-      );
+          rs.getObject("date_of_creation", LocalDate.class)
+      ));
     }
     rs.close();
 
-    sqlRequest = "INSERT INTO box (date_of_creation, statement, type) VALUES  (?, ?, ?);";
-    statement = connection.prepareStatement(sqlRequest);
+    final String insertRequest = "INSERT INTO task_box (date_of_creation, statement, type) VALUES  (?, ?, ?);";
+    statement = connection.prepareStatement(insertRequest);
 
     statement.setString(3, boxType);
 
-    DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-DD");
     for (Task task : list) {
       if (!BDlist.contains(task)) {
-        statement.setString(1, dateFormat.format(task.getDate()));
+        statement.setObject(1, task.getDateOfCreation());
         statement.setString(2, task.getStatement());
         statement.execute();
       }

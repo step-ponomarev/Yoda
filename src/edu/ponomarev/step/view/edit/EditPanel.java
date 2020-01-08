@@ -21,6 +21,8 @@ public class EditPanel extends JPanel {
 
   public void run() {
     taskNameField.setText(currentTask.toString());
+    this.taskNameField.setBackground(Color.WHITE);
+
     this.add(taskNameField, BorderLayout.NORTH);
     this.add(buttonPanel, BorderLayout.SOUTH);
 

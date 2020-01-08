@@ -1,41 +1,31 @@
 package edu.ponomarev.step.component.task;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Objects;
 
 import java.io.Serializable;
 
 public class Task implements Comparable<Task>, Serializable {
   private String statement;
-  private Calendar date_of_creation;
-  private Integer id;
+  private LocalDate date_of_creation;
 
   public Task(String statement) {
     this.statement = statement;
-    this.date_of_creation = Calendar.getInstance();
-    this.id = 0;
+    this.date_of_creation = LocalDate.now();
   }
 
-  public Task(String statement, Date date, Integer id) {
-    this.date_of_creation = Calendar.getInstance();
-    date_of_creation.setTime(date);
-    this.id = id;
-
+  public Task(String statement, LocalDate date_of_creation) {
     this.statement = statement;
+    this.date_of_creation = date_of_creation;
   }
 
   public void setStatement(String statement) { this.statement = statement; }
+
   public String getStatement() {
-    return statement;
+    return this.statement;
   }
 
-  public Integer getId() { return this.id; }
-  public void setId(Integer id) { this.id = id; }
-
-  public Date getDate() {
-    return date_of_creation.getTime();
-  }
+  public LocalDate getDateOfCreation() { return this.date_of_creation; }
 
   @Override
   public String toString() { return this.statement; }
@@ -45,12 +35,12 @@ public class Task implements Comparable<Task>, Serializable {
     if (this == o) return true;
     if (!(o instanceof Task)) return false;
     Task task = (Task) o;
-    return ( this.statement.equals(task.statement) && (this.id.equals(task.getId())) );
+    return ( this.statement.equals(task.statement) && this.date_of_creation.equals(task.date_of_creation) );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(statement, id);
+    return Objects.hash(this.statement, this.date_of_creation);
   }
 
   @Override
