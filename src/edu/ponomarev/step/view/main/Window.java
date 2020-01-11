@@ -1,5 +1,7 @@
 package edu.ponomarev.step.view.main;
 
+import edu.ponomarev.step.view.edit.EditPanel;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -8,6 +10,7 @@ public class Window extends JFrame {
   private BoxButtonsPanel boxButtonsPanel;
   private ButtonPanel buttonPanel;
   private TaskPanel taskPanel;
+  private EditPanel editPanel;
 
   public Window(String applicationName) {
     super(applicationName);
@@ -16,13 +19,14 @@ public class Window extends JFrame {
     this.taskPanel = new TaskPanel();
     this.boxButtonsPanel = new BoxButtonsPanel();
     this.buttonPanel = new ButtonPanel();
+    this.editPanel = new EditPanel();
   }
 
   public void run() {
-    boxButtonsPanel.run();
-    taskPanel.run();
-    textPanel.run();
-    buttonPanel.run();
+    this.boxButtonsPanel.run();
+    this.taskPanel.run();
+    this.textPanel.run();
+    this.buttonPanel.run();
 
     repaintMainWindow();
 
@@ -71,4 +75,12 @@ public class Window extends JFrame {
   }
 
   public void setTaskPanel(TaskPanel taskPanel) { this.taskPanel = taskPanel; }
+
+  public EditPanel getEditPanel() {
+    return editPanel;
+  }
+
+  public void setEditPanel(EditPanel editPanel) {
+    this.editPanel = editPanel;
+  }
 }

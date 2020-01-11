@@ -9,24 +9,26 @@ public class EditPanel extends JPanel {
   private  ButtonPanel buttonPanel;
 
   private TextField taskNameField;
+
   private Task currentTask;
+  private TaskState taskStateBeforeChanges;
 
 
-  public EditPanel(Task task) {
+  public EditPanel() {
     super();
-    this.currentTask = task;
     this.buttonPanel = new ButtonPanel();
-    this.taskNameField = new TextField(currentTask.toString());
+    this.taskNameField = new TextField();
   }
 
   public void run() {
-    taskNameField.setText(currentTask.toString());
+    this.taskNameField.setText(currentTask.toString());
     this.taskNameField.setBackground(Color.WHITE);
+    this.taskNameField.setSize(new Dimension(200, 24));
 
     this.add(taskNameField, BorderLayout.NORTH);
     this.add(buttonPanel, BorderLayout.SOUTH);
 
-    buttonPanel.run();
+    this.buttonPanel.run();
 
     this.setBackground(Color.WHITE);
     this.setVisible(true);
@@ -55,4 +57,8 @@ public class EditPanel extends JPanel {
   public void setCurrentTask(Task currentTask) {
     this.currentTask = currentTask;
   }
+
+  public TaskState getTaskStateBeforeChanges() { return taskStateBeforeChanges; }
+
+  public void setTaskStateBeforeChanges(TaskState taskStateBeforeChanges) { this.taskStateBeforeChanges = taskStateBeforeChanges; }
 }

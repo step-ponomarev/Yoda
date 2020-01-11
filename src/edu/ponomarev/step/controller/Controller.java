@@ -1,7 +1,7 @@
 package edu.ponomarev.step.controller;
 
 import edu.ponomarev.step.component.task.Task;
-import edu.ponomarev.step.view.edit.EditPanel;
+import edu.ponomarev.step.view.edit.TaskState;
 import edu.ponomarev.step.view.main.Window;
 import edu.ponomarev.step.manager.DataHandler;
 
@@ -13,7 +13,6 @@ import java.awt.event.KeyListener;
 
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.util.function.Consumer;
 
 public class Controller {
   private Window window;
@@ -25,12 +24,14 @@ public class Controller {
   }
 
   public void initView() {
-    window.run();
     initMainWindow();
     initTaskPanel();
     initBoxButtons();
     initTextPanel();
     initButtonPanel();
+    setOnlineDesign();
+
+    window.run();
   }
 
   private void initMainWindow() {
@@ -138,29 +139,40 @@ public class Controller {
       }
     });
 
-    final Consumer<EditPanel> repaintEditWindow =  panel -> {
+    window.getButtonPanel().getEditButton().addActionListener(e -> {
+      if (window.getTaskPanel().getList().isSelectionEmpty()) {
+        return;
+      }
+
       window.getContentPane().removeAll();
-      window.getContentPane().add(panel, BorderLayout.CENTER);
+      window.getContentPane().add(window.getEditPanel(), BorderLayout.CENTER);
 
-      panel.getButtonPanel().getSaveButton().addActionListener(e2 -> {
-        String taskName = panel.getTaskNameField().getText().strip();
-        if (taskName.isEmpty()) {
-          // TODO Запустить диалог ошибки.
-        } else {
-          panel.getCurrentTask().setStatement(taskName);
-          window.repaintMainWindow();
-        }
-      });
+      window.getEditPanel().setCurrentTask(window.getTaskPanel().getSelected());
+      window.getEditPanel().getTaskNameField().setText(window.getTaskPanel().getSelected().getStatement().trim());
+      window.getEditPanel().setTaskStateBeforeChanges(new TaskState(window.getTaskPanel().getSelected()));
 
-      panel.run();
+      initEditPanel();
+
+      window.getEditPanel().run();
 
       window.getContentPane().revalidate();
       window.getContentPane().repaint();
-    };
+    });
+  }
 
-    window.getButtonPanel().getEditButton().addActionListener(e -> {
-      if (!window.getTaskPanel().getList().isSelectionEmpty()) {
-        repaintEditWindow.accept(new EditPanel(window.getTaskPanel().getSelected()));
+  private void initEditPanel() {
+    window.getEditPanel().getButtonPanel().getSaveButton().addActionListener(e -> {
+      String taskName = window.getEditPanel().getTaskNameField().getText().strip();
+      if (taskName.isEmpty()) {
+        // TODO Запустить диалог ошибки.
+      } else {
+        window.getEditPanel().getCurrentTask().setStatement(taskName);
+
+        if (!window.getEditPanel().getTaskStateBeforeChanges().isEquals(window.getEditPanel().getCurrentTask())) {
+          window.getEditPanel().getCurrentTask().isChanged();
+        }
+
+        window.repaintMainWindow();
       }
     });
   }
@@ -171,6 +183,15 @@ public class Controller {
     handler.setDataWorkerAuto();
     if (handler.getDBmanager().isONLINE()) {
       handler.pushDate();
+    }
+    setOnlineDesign();
+  }
+
+  private void setOnlineDesign() {
+    if (handler.getDBmanager().isONLINE()) {
+      window.setBackground(Color.GREEN);
+    } else {
+      window.setBackground(Color.RED);
     }
   }
 }
