@@ -21,6 +21,8 @@ public class TextPanel extends JPanel {
     this.add(boxList, BorderLayout.WEST);
     this.add(synchButton, BorderLayout.EAST);
 
+    this.textField.setPreferredSize( new Dimension(200, 24));
+
     this.setBackground(new Color(255, 255, 255));
     this.setVisible(true);
   }
