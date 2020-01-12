@@ -22,8 +22,8 @@ public class DataBaseManager {
   public DataWorker getWorker() {
     try {
       Class.forName("com.mysql.jdbc.Driver");
-      connection = DriverManager.getConnection(connectionUrl, userName, password);
-      ONLINE = true;
+      this.connection = DriverManager.getConnection(connectionUrl, userName, password);
+      this.ONLINE = true;
 
       return (new JDBSWorker(connection));
     } catch (Exception e) {
@@ -35,11 +35,11 @@ public class DataBaseManager {
 
   @Description("Creates certain offline worker if you need work with data offline.")
   public DataWorker getOfflineWorker() {
-    ONLINE = false;
+    this.ONLINE = false;
     return (new Serializator());
   }
 
   public boolean isONLINE() {
-    return ONLINE;
+    return this.ONLINE;
   }
 }

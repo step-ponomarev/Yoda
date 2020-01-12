@@ -1,25 +1,25 @@
 package edu.ponomarev.step.component.task;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 import java.io.Serializable;
 
 public class Task implements Comparable<Task>, Serializable {
   private String statement;
-  private LocalDate date_of_creation;
+  private LocalDateTime time_of_creation;
   private LocalDateTime time_of_last_change;
 
   public Task(String statement) {
     this.statement = statement;
-    this.date_of_creation = LocalDate.now();
+    this.time_of_creation = LocalDateTime.now();
     this.time_of_last_change = LocalDateTime.now();
   }
 
-  public Task(String statement, LocalDate date_of_creation, LocalDateTime time_of_last_change) {
+  public Task(String statement, LocalDateTime time_of_creation, LocalDateTime time_of_last_change) {
     this.statement = statement;
-    this.date_of_creation = date_of_creation;
+    this.time_of_creation = time_of_creation;
     this.time_of_last_change = time_of_last_change;
   }
 
@@ -29,9 +29,11 @@ public class Task implements Comparable<Task>, Serializable {
     return this.statement;
   }
 
-  public LocalDate getDateOfCreation() { return this.date_of_creation; }
+  public LocalDateTime getTimeOfCreation() { return this.time_of_creation; }
 
   public LocalDateTime getTimeOfLastChange() { return this.time_of_last_change; }
+
+  public void setTTimeOfLastChange(LocalDateTime time_of_last_change) { this.time_of_last_change = time_of_last_change; }
 
   public void isChanged() { this.time_of_last_change = LocalDateTime.now(); }
 
@@ -43,16 +45,19 @@ public class Task implements Comparable<Task>, Serializable {
     if (this == o) return true;
     if (!(o instanceof Task)) return false;
     Task task = (Task) o;
-    return ( this.statement.equals(task.statement) && this.date_of_creation.equals(task.date_of_creation) );
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
+
+    return ( this.time_of_creation.format(formatter).equals(task.time_of_creation.format(formatter)) );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.statement, this.date_of_creation);
+    return Objects.hash(this.time_of_creation);
   }
 
   @Override
   public int compareTo(Task o) {
-    return this.date_of_creation.compareTo(o.date_of_creation);
+    return this.time_of_creation.compareTo(o.time_of_creation);
   }
 }

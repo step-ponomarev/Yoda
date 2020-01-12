@@ -24,14 +24,16 @@ public class Controller {
   }
 
   public void initView() {
+    window.run();
+
     initMainWindow();
     initTaskPanel();
     initBoxButtons();
     initTextPanel();
     initButtonPanel();
-    setOnlineDesign();
+    changeWindowColorMode();
 
-    window.run();
+    defaultSynch();
   }
 
   private void initMainWindow() {
@@ -126,9 +128,9 @@ public class Controller {
     window.getButtonPanel().getAddButton().addActionListener(e -> {
       final DataHandler.BoxRequestWrap item = (DataHandler.BoxRequestWrap) window.getTextPanel().getBoxList().getSelectedItem();
 
-      String task = window.getTextPanel().getTextField().getText().strip();
-      if (!task.isEmpty()) {
-        handler.addTask(item.type, new Task(task));
+      String taskStatement = window.getTextPanel().getTextField().getText().strip();
+      if (!taskStatement.isEmpty()) {
+        handler.addTask(item.type, new Task(taskStatement));
 
         window.getTextPanel().getTextField().selectAll();
 
@@ -184,10 +186,11 @@ public class Controller {
     if (handler.getDBmanager().isONLINE()) {
       handler.pushDate();
     }
-    setOnlineDesign();
+
+    changeWindowColorMode();
   }
 
-  private void setOnlineDesign() {
+  private void changeWindowColorMode() {
     if (handler.getDBmanager().isONLINE()) {
       window.setBackground(Color.GREEN);
     } else {

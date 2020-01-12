@@ -30,11 +30,6 @@ public class DataHandler {
       new BoxRequestWrap(DataHandler.BoxType.LATE, "Late")
   };
 
-  private DataBaseManager DBmanager;
-  private DataWorker dataWorker;
-
-  private HashMap<DataHandler.BoxType, TaskContainer> taskBox;
-
   public enum BoxType {
     INBOX,
     DAY,
@@ -42,11 +37,14 @@ public class DataHandler {
     LATE
   }
 
+  private DataBaseManager DBmanager;
+  private DataWorker dataWorker;
+
+  private HashMap<DataHandler.BoxType, TaskContainer> taskBox;
+
+
+
   public DataHandler() {
-    this.DBmanager = new DataBaseManager();
-
-    this.dataWorker = this.DBmanager.getWorker();
-
     taskBox = new HashMap<DataHandler.BoxType, TaskContainer>() {{
       put(BoxType.INBOX, new TaskContainer());
       put(BoxType.DAY, new TaskContainer());
@@ -54,23 +52,35 @@ public class DataHandler {
       put(BoxType.LATE, new TaskContainer());
     }};
 
+    this.DBmanager = new DataBaseManager();
+    this.dataWorker = DBmanager.getOfflineWorker();
     pullData();
   }
 
   public void addTask(BoxType type, Task task) {
     taskBox.get(type).add(task);
 
+
     try {
-      dataWorker.push(type, task);
-    } catch (Exception e) {
-      System.err.println(e.getMessage());
+      //Offline pushing;
+      this.dataWorker = DBmanager.getOfflineWorker();
+      this.dataWorker.push(task, type);
+
+
+      //Try to push to DB
+      this.dataWorker = DBmanager.getWorker();
+      if (DBmanager.isONLINE()) {
+        dataWorker.push(task, type);
+      }
+    } catch (Exception exception) {
+      System.err.println(exception.getMessage());
     }
   }
 
   public void pushDate() {
     try {
       for (Map.Entry<DataHandler.BoxType, TaskContainer> box : taskBox.entrySet()) {
-        dataWorker.pushAll(box.getValue().getList(), box.getKey());
+        this.dataWorker.pushAll(box.getValue().getList(), box.getKey());
       }
     } catch (Exception e) {
       System.err.println(e.getMessage());
@@ -80,7 +90,7 @@ public class DataHandler {
   public void pullData() {
     try {
       for (Map.Entry<DataHandler.BoxType, TaskContainer> box : taskBox.entrySet()) {
-        box.getValue().setList(dataWorker.pullAll(box.getKey()));
+        box.getValue().setList(dataWorker.getAll(box.getKey()));
       }
     } catch (Exception e) {
       System.err.println(e.getMessage());

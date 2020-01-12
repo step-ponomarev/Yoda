@@ -18,7 +18,7 @@ public class Serializator implements DataWorker {
   }
 
   @Override
-  public void push(DataHandler.BoxType type, Task task) throws Exception {
+  public void push(Task task, DataHandler.BoxType type) throws Exception {
     String dir = directory;
 
     File file = new File(directory);
@@ -26,7 +26,7 @@ public class Serializator implements DataWorker {
       file.mkdir();
     }
 
-    dir = addFileToPath(type, dir);
+    dir = addFileNameToPath(type, dir);
 
     ArrayList<Task> tasks;
     file = new File(dir);
@@ -62,9 +62,7 @@ public class Serializator implements DataWorker {
       file.mkdir();
     }
 
-    dir = addFileToPath(type, dir);
-
-    ArrayList<Task> tasks;
+    dir = addFileNameToPath(type, dir);
 
     file = new File(dir);
     if (!file.exists()) {
@@ -81,7 +79,7 @@ public class Serializator implements DataWorker {
   }
 
   @Override
-  public List pullAll(DataHandler.BoxType type) throws Exception {
+  public List getAll(DataHandler.BoxType type) throws Exception {
     String dir = directory;
 
     File file = new File(directory);
@@ -89,7 +87,7 @@ public class Serializator implements DataWorker {
       return (new ArrayList<Task>());
     }
 
-    dir = addFileToPath(type, dir);
+    dir = addFileNameToPath(type, dir);
 
     file = new File(dir);
     if (!file.exists()) {
@@ -107,7 +105,7 @@ public class Serializator implements DataWorker {
     return tasks;
   }
 
-  private String addFileToPath(DataHandler.BoxType type, String path) {
+  private String addFileNameToPath(DataHandler.BoxType type, String path) {
     switch (type) {
       case DAY:
         path = Paths.get(directory + "/box_today.ser").toAbsolutePath().toString();
