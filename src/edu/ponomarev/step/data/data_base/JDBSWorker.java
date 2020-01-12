@@ -73,7 +73,7 @@ public class JDBSWorker implements DataWorker {
   }
 
   @Override
-  public void pushAll(List<Task> list, DataHandler.BoxType type) throws Exception {
+  public void pushAll(List<Task> taskListOnClient, DataHandler.BoxType type) throws Exception {
     final String selectRequest = "SELECT * FROM task_box where type = ?";
 
     PreparedStatement statement = connection.prepareStatement(selectRequest);
@@ -107,7 +107,7 @@ public class JDBSWorker implements DataWorker {
     ArrayList<Task> updateList = new ArrayList<Task>();
 
     statement.setString(4, boxType);
-    for (Task clientTask : list) {
+    for (Task clientTask : taskListOnClient) {
       if (!BDlist.contains(clientTask)) {
         statement.setObject(1, clientTask.getTimeOfCreation());
         statement.setObject(2, clientTask.getTimeOfLastChange());
@@ -115,7 +115,8 @@ public class JDBSWorker implements DataWorker {
         statement.execute();
       } else {
         Task taskOnBD = BDlist.get(BDlist.indexOf(clientTask));
-        final boolean TASK_WAS_CHANGED_OFFLINE = clientTask.getTimeOfLastChange().isAfter(taskOnBD.getTimeOfLastChange());
+        final boolean TASK_WAS_CHANGED_OFFLINE =
+            clientTask.getTimeOfLastChange().isAfter(taskOnBD.getTimeOfLastChange());
 
         if (TASK_WAS_CHANGED_OFFLINE) {
           updateList.add(clientTask);
@@ -123,31 +124,25 @@ public class JDBSWorker implements DataWorker {
       }
     }
 
-    updateAll(updateList, type);
+    if (!updateList.isEmpty()) {
+      updateAll(updateList, type);
+    }
 
     statement.close();
   }
 
   private void updateAll(List<Task> updateList, DataHandler.BoxType type) throws Exception {
-    final String updateRequest = "UPDATE task_box SET statement = ?, time_of_last_change = ? where time_of_creation " +
+    final String updateRequest = "UPDATE task_box SET statement = ?, time_of_last_change = ? WHERE time_of_creation " +
         "= ?";
 
     PreparedStatement statement = connection.prepareStatement(updateRequest);
 
-    /*String boxType = new String();
-    for (DataHandler.BoxRequestWrap item : DataHandler.BOX_VARIABLES) {
-      if (type.equals(item.type)) {
-        boxType = item.boxName;
-        break;
-      }
-    }
-
-    statement.setString(4, boxType);*/
 
     for (Task updatedTask : updateList) {
       statement.setString(1, updatedTask.getStatement());
       statement.setObject(2, updatedTask.getTimeOfLastChange());
       statement.setObject(3, updatedTask.getTimeOfCreation());
+      statement.execute();
     }
 
     statement.close();

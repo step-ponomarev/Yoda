@@ -1,7 +1,6 @@
 package edu.ponomarev.step.component.task;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 import java.io.Serializable;
@@ -13,32 +12,47 @@ public class Task implements Comparable<Task>, Serializable {
 
   public Task(String statement) {
     this.statement = statement;
-    this.time_of_creation = LocalDateTime.now();
-    this.time_of_last_change = LocalDateTime.now();
+
+    this.time_of_creation = getLocalDateTimeOf(LocalDateTime.now());
+    this.time_of_last_change = getLocalDateTimeOf(LocalDateTime.now());
   }
 
   public Task(String statement, LocalDateTime time_of_creation, LocalDateTime time_of_last_change) {
     this.statement = statement;
-    this.time_of_creation = time_of_creation;
-    this.time_of_last_change = time_of_last_change;
+
+
+    this.time_of_creation = getLocalDateTimeOf(time_of_creation);
+    this.time_of_last_change = getLocalDateTimeOf(time_of_last_change);
   }
 
-  public void setStatement(String statement) { this.statement = statement; }
+  public void setStatement(String statement) {
+    this.statement = statement;
+  }
 
   public String getStatement() {
     return this.statement;
   }
 
-  public LocalDateTime getTimeOfCreation() { return this.time_of_creation; }
+  public LocalDateTime getTimeOfCreation() {
+    return this.time_of_creation;
+  }
 
-  public LocalDateTime getTimeOfLastChange() { return this.time_of_last_change; }
+  public LocalDateTime getTimeOfLastChange() {
+    return this.time_of_last_change;
+  }
 
-  public void setTTimeOfLastChange(LocalDateTime time_of_last_change) { this.time_of_last_change = time_of_last_change; }
+  public void setTTimeOfLastChange(LocalDateTime time_of_last_change) {
+    this.time_of_last_change = getLocalDateTimeOf(time_of_last_change);
+  }
 
-  public void isChanged() { this.time_of_last_change = LocalDateTime.now(); }
+  public void isChanged() {
+    this.time_of_last_change = getLocalDateTimeOf(LocalDateTime.now());
+  }
 
   @Override
-  public String toString() { return this.statement; }
+  public String toString() {
+    return this.statement;
+  }
 
   @Override
   public boolean equals(Object o) {
@@ -46,9 +60,9 @@ public class Task implements Comparable<Task>, Serializable {
     if (!(o instanceof Task)) return false;
     Task task = (Task) o;
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
+    //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
 
-    return ( this.time_of_creation.format(formatter).equals(task.time_of_creation.format(formatter)) );
+    return (this.time_of_creation.equals(task.time_of_creation));
   }
 
   @Override
@@ -59,5 +73,14 @@ public class Task implements Comparable<Task>, Serializable {
   @Override
   public int compareTo(Task o) {
     return this.time_of_creation.compareTo(o.time_of_creation);
+  }
+
+  private LocalDateTime getLocalDateTimeOf(final LocalDateTime dateTime) {
+    return LocalDateTime.of(
+        dateTime.getYear(),
+        dateTime.getMonth(),
+        dateTime.getDayOfMonth(), dateTime.getHour(),
+        dateTime.getMinute(), dateTime.getSecond()
+    );
   }
 }
