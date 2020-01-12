@@ -170,8 +170,12 @@ public class Controller {
       } else {
         window.getEditPanel().getCurrentTask().setStatement(taskName);
 
-        if (!window.getEditPanel().getTaskStateBeforeChanges().isEquals(window.getEditPanel().getCurrentTask())) {
+        final boolean TASK_WAS_CHANGED =
+            !window.getEditPanel().getTaskStateBeforeChanges().isEquals(window.getEditPanel().getCurrentTask());
+
+        if (TASK_WAS_CHANGED) {
           window.getEditPanel().getCurrentTask().isChanged();
+          defaultSynch();
         }
 
         window.repaintMainWindow();

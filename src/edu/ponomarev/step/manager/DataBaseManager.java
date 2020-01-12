@@ -11,7 +11,7 @@ import java.sql.DriverManager;
 public class DataBaseManager {
   private final String userName = "root";
   private final String password = "sql12345";
-  private final String connectionUrl = "jdbc:mysql://localhost:3306/mysql?useUnicode=true&serverTimezone=Europe/Moscow";
+  private final String connectionUrl = "jdbc:mysql://localhost:3306/mysql?useUnicode=true&serverTimezone=UTC";
 
   private boolean ONLINE;
 
