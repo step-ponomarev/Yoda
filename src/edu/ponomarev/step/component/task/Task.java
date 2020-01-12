@@ -1,5 +1,7 @@
 package edu.ponomarev.step.component.task;
 
+import edu.ponomarev.step.manager.TimeManager;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -13,15 +15,15 @@ public class Task implements Comparable<Task>, Serializable {
   public Task(String statement) {
     this.statement = statement;
 
-    this.time_of_creation = getLocalDateTimeOf(LocalDateTime.now());
+    this.time_of_creation = TimeManager.getLocalDateTimeOf(LocalDateTime.now());
     this.time_of_last_change = this.time_of_creation;
   }
 
   public Task(String statement, LocalDateTime time_of_creation, LocalDateTime time_of_last_change) {
     this.statement = statement;
 
-    this.time_of_creation = getLocalDateTimeOf(time_of_creation);
-    this.time_of_last_change = getLocalDateTimeOf(time_of_last_change);
+    this.time_of_creation = TimeManager.getLocalDateTimeOf(time_of_creation);
+    this.time_of_last_change = TimeManager.getLocalDateTimeOf(time_of_last_change);
   }
 
   public void setStatement(String statement) {
@@ -41,11 +43,11 @@ public class Task implements Comparable<Task>, Serializable {
   }
 
   public void setTTimeOfLastChange(LocalDateTime time_of_last_change) {
-    this.time_of_last_change = getLocalDateTimeOf(time_of_last_change);
+    this.time_of_last_change = TimeManager.getLocalDateTimeOf(time_of_last_change);
   }
 
   public void isChanged() {
-    this.time_of_last_change = getLocalDateTimeOf(LocalDateTime.now());
+    this.time_of_last_change = TimeManager.getLocalDateTimeOf(LocalDateTime.now());
   }
 
   @Override
@@ -72,14 +74,5 @@ public class Task implements Comparable<Task>, Serializable {
   @Override
   public int compareTo(Task o) {
     return this.time_of_creation.compareTo(o.time_of_creation);
-  }
-
-  private LocalDateTime getLocalDateTimeOf(final LocalDateTime dateTime) {
-    return LocalDateTime.of(
-        dateTime.getYear(),
-        dateTime.getMonth(),
-        dateTime.getDayOfMonth(), dateTime.getHour(),
-        dateTime.getMinute(), dateTime.getSecond()
-    );
   }
 }

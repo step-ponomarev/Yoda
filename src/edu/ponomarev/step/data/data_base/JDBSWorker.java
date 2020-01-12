@@ -3,12 +3,12 @@ package edu.ponomarev.step.data.data_base;
 import edu.ponomarev.step.data.DataWorker;
 import edu.ponomarev.step.manager.DataHandler;
 import edu.ponomarev.step.component.task.Task;
+import edu.ponomarev.step.manager.TimeManager;
 
 import java.sql.*;
 import java.text.ParseException;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,8 +63,8 @@ public class JDBSWorker implements DataWorker {
     while (rs.next()) {
       list.add(new Task(
           rs.getString("statement"),
-          UTCtoSystemTimeZone(rs.getObject("date_of_creation", LocalDateTime.class)),
-          UTCtoSystemTimeZone(rs.getObject("time_of_last_change", LocalDateTime.class))
+          TimeManager.convertToLocalTimeZone(rs.getObject("date_of_creation", LocalDateTime.class)),
+          TimeManager.convertToLocalTimeZone(rs.getObject("time_of_last_change", LocalDateTime.class))
       ));
     }
     rs.close();
@@ -94,8 +94,8 @@ public class JDBSWorker implements DataWorker {
     while (resultSet.next()) {
       BDlist.add(new Task(
           resultSet.getString("statement"),
-          UTCtoSystemTimeZone(resultSet.getObject("time_of_creation", LocalDateTime.class)),
-          UTCtoSystemTimeZone(resultSet.getObject("time_of_last_change", LocalDateTime.class))
+          TimeManager.convertToLocalTimeZone(resultSet.getObject("time_of_creation", LocalDateTime.class)),
+          TimeManager.convertToLocalTimeZone(resultSet.getObject("time_of_last_change", LocalDateTime.class))
       ));
     }
     resultSet.close();
@@ -147,11 +147,5 @@ public class JDBSWorker implements DataWorker {
     }
 
     statement.close();
-  }
-
-  private LocalDateTime UTCtoSystemTimeZone(LocalDateTime dateTimeInUTC) {
-    return dateTimeInUTC.atZone(ZoneId.of("UTC"))
-        .withZoneSameInstant(ZoneId.systemDefault())
-        .toLocalDateTime();
   }
 }
