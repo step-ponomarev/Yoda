@@ -23,13 +23,6 @@ public class DataHandler {
     }
   }
 
-  final public static BoxRequestWrap[] BOX_VARIABLES = new DataHandler.BoxRequestWrap[] {
-      new BoxRequestWrap(DataHandler.BoxType.INBOX, "Inbox"),
-      new BoxRequestWrap(DataHandler.BoxType.DAY, "Today"),
-      new BoxRequestWrap(DataHandler.BoxType.WEEK, "Week"),
-      new BoxRequestWrap(DataHandler.BoxType.LATE, "Late")
-  };
-
   public enum BoxType {
     INBOX,
     DAY,
@@ -37,12 +30,28 @@ public class DataHandler {
     LATE
   }
 
+  final public static BoxRequestWrap[] BOX_VARIABLES = new DataHandler.BoxRequestWrap[] {
+      new BoxRequestWrap(DataHandler.BoxType.INBOX, "Inbox"),
+      new BoxRequestWrap(DataHandler.BoxType.DAY, "Today"),
+      new BoxRequestWrap(DataHandler.BoxType.WEEK, "Week"),
+      new BoxRequestWrap(DataHandler.BoxType.LATE, "Late")
+  };
+
   private DataBaseManager DBmanager;
   private DataWorker dataWorker;
 
   private HashMap<DataHandler.BoxType, TaskContainer> taskBox;
 
+  public static String getBoxName(BoxType boxType) {
+    String boxName =  new String();
+    for (DataHandler.BoxRequestWrap item : DataHandler.BOX_VARIABLES) {
+      if (boxType.equals(item.type)) {
+        boxName = item.boxName;
+      }
+    }
 
+    return boxName;
+  }
 
   public DataHandler() {
     taskBox = new HashMap<DataHandler.BoxType, TaskContainer>() {{
@@ -59,7 +68,6 @@ public class DataHandler {
 
   public void addTask(BoxType type, Task task) {
     taskBox.get(type).add(task);
-
 
     try {
       //Offline pushing;

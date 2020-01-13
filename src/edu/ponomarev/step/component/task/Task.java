@@ -9,21 +9,19 @@ import java.io.Serializable;
 
 public class Task implements Comparable<Task>, Serializable {
   private String statement;
-  private LocalDateTime time_of_creation;
-  private LocalDateTime time_of_last_change;
+  private LocalDateTime timeOfCreation;
+  private LocalDateTime timeOfLastChange;
 
   public Task(String statement) {
     this.statement = statement;
-
-    this.time_of_creation = TimeManager.getLocalDateTimeOf(LocalDateTime.now());
-    this.time_of_last_change = this.time_of_creation;
+    this.timeOfCreation = TimeManager.getLocalDateTimeOf(LocalDateTime.now());
+    this.timeOfLastChange = this.timeOfCreation;
   }
 
-  public Task(String statement, LocalDateTime time_of_creation, LocalDateTime time_of_last_change) {
+  public Task(String statement, LocalDateTime timeOfCreation, LocalDateTime timeOfLastChange) {
     this.statement = statement;
-
-    this.time_of_creation = TimeManager.getLocalDateTimeOf(time_of_creation);
-    this.time_of_last_change = TimeManager.getLocalDateTimeOf(time_of_last_change);
+    this.timeOfCreation = TimeManager.getLocalDateTimeOf(timeOfCreation);
+    this.timeOfLastChange = TimeManager.getLocalDateTimeOf(timeOfLastChange);
   }
 
   public void setStatement(String statement) {
@@ -35,19 +33,19 @@ public class Task implements Comparable<Task>, Serializable {
   }
 
   public LocalDateTime getTimeOfCreation() {
-    return this.time_of_creation;
+    return this.timeOfCreation;
   }
 
   public LocalDateTime getTimeOfLastChange() {
-    return this.time_of_last_change;
+    return this.timeOfLastChange;
   }
 
   public void setTTimeOfLastChange(LocalDateTime time_of_last_change) {
-    this.time_of_last_change = TimeManager.getLocalDateTimeOf(time_of_last_change);
+    this.timeOfLastChange = TimeManager.getLocalDateTimeOf(time_of_last_change);
   }
 
   public void isChanged() {
-    this.time_of_last_change = TimeManager.getLocalDateTimeOf(LocalDateTime.now());
+    this.timeOfLastChange = TimeManager.getLocalDateTimeOf(LocalDateTime.now());
   }
 
   @Override
@@ -60,19 +58,16 @@ public class Task implements Comparable<Task>, Serializable {
     if (this == o) return true;
     if (!(o instanceof Task)) return false;
     Task task = (Task) o;
-
-    //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
-
-    return (this.time_of_creation.equals(task.time_of_creation));
+    return (this.timeOfCreation.equals(task.timeOfCreation));
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.time_of_creation);
+    return Objects.hash(this.timeOfCreation);
   }
 
   @Override
   public int compareTo(Task o) {
-    return this.time_of_creation.compareTo(o.time_of_creation);
+    return this.timeOfCreation.compareTo(o.timeOfCreation);
   }
 }

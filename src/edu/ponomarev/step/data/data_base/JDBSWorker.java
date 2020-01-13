@@ -21,13 +21,7 @@ public class JDBSWorker implements DataWorker {
 
   @Override
   public void push(Task task, DataHandler.BoxType type) throws SQLException {
-    String boxType = new String();
-    for (DataHandler.BoxRequestWrap item : DataHandler.BOX_VARIABLES) {
-      if (type.equals(item.type)) {
-        boxType = item.boxName;
-        break;
-      }
-    }
+    String boxType = DataHandler.getBoxName(type);
 
     final String insertRequest = "INSERT INTO task_box (time_of_creation, time_of_last_change, statement, type) " +
         "VALUES (?, ?, ?, ?);";
@@ -48,13 +42,8 @@ public class JDBSWorker implements DataWorker {
 
     PreparedStatement statement = connection.prepareStatement(sqlRequest);
 
-    String boxType = new String();
-    for (DataHandler.BoxRequestWrap item : DataHandler.BOX_VARIABLES) {
-      if (type.equals(item.type)) {
-        boxType = item.boxName;
-        break;
-      }
-    }
+    String boxType = DataHandler.getBoxName(type);
+
     statement.setString(1, boxType);
 
     ArrayList<Task> list = new ArrayList<Task>();
@@ -79,13 +68,7 @@ public class JDBSWorker implements DataWorker {
 
     PreparedStatement statement = connection.prepareStatement(selectRequest);
 
-    String boxType = new String();
-    for (DataHandler.BoxRequestWrap item : DataHandler.BOX_VARIABLES) {
-      if (type.equals(item.type)) {
-        boxType = item.boxName;
-        break;
-      }
-    }
+    String boxType = DataHandler.getBoxName(type);
 
     statement.setString(1, boxType);
 
@@ -115,7 +98,7 @@ public class JDBSWorker implements DataWorker {
         statement.setString(3, clientTask.getStatement());
         statement.execute();
       } else {
-        Task taskOnBD = BDlist.get(BDlist.indexOf(clientTask));
+        Task taskOnBD = BDlist.get(BDlist.indexOf(clientTask)); // The elements equal only by dates_of_creation
         final boolean TASK_WAS_CHANGED_OFFLINE =
             clientTask.getTimeOfLastChange().isAfter(taskOnBD.getTimeOfLastChange());
 

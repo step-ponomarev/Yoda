@@ -20,5 +20,4 @@ public class TimeManager {
         .withZoneSameInstant(ZoneId.systemDefault())
         .toLocalDateTime();
   }
-
 }
