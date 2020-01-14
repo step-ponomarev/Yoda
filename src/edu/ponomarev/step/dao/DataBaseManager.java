@@ -1,18 +1,17 @@
-package edu.ponomarev.step.manager;
+package edu.ponomarev.step.dao;
 
 import edu.ponomarev.step.data.DataWorker;
 import edu.ponomarev.step.data.data_base.JDBSWorker;
 import edu.ponomarev.step.data.offile.Serializator;
 import jdk.jfr.Description;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.Properties;
 
 public class DataBaseManager {
-  private final String userName = "root";
-  private final String password = "sql12345";
-  private final String connectionUrl = "jdbc:mysql://localhost:3306/mysql?useUnicode=true&serverTimezone=UTC";
-
   private boolean ONLINE;
 
   private Connection connection;
@@ -20,9 +19,12 @@ public class DataBaseManager {
 
   @Description("Sets worker automatically. Depends of connection status. ")
   public DataWorker getWorker() {
+    ApplicationContext context = new ClassPathXmlApplicationContext("classpath:edu/ponomarev/step/dao/daoContext.xml");
+
     try {
       Class.forName("com.mysql.jdbc.Driver");
-      this.connection = DriverManager.getConnection(connectionUrl, userName, password);
+      this.connection = DriverManager.getConnection(context.getBean("daoUrl", String.class),
+          context.getBean("daoProperties", Properties.class));
       this.ONLINE = true;
 
       return (new JDBSWorker(connection));

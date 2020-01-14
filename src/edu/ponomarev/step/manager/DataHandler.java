@@ -1,5 +1,6 @@
 package edu.ponomarev.step.manager;
 
+import edu.ponomarev.step.dao.DataBaseManager;
 import edu.ponomarev.step.data.DataWorker;
 import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.component.task.TaskContainer;
