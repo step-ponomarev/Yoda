@@ -33,7 +33,7 @@ public class Controller {
     initButtonPanel();
     changeWindowColorMode();
 
-    defaultSynch();
+    synchFull();
   }
 
   private void initMainWindow() {
@@ -50,7 +50,7 @@ public class Controller {
 
       @Override
       public void windowClosed(WindowEvent e) {
-        defaultSynch();
+        synchFull();
       }
 
       @Override
@@ -102,6 +102,10 @@ public class Controller {
     for (DataHandler.BoxRequestWrap item : DataHandler.BOX_VARIABLES) {
       window.getTextPanel().getBoxList().addItem(item);
     }
+
+    window.getTextPanel().resetTextField();
+    window.getTextPanel().getTextField().selectAll();
+
     window.getTextPanel().getBoxList().setSelectedIndex(0);
 
     window.getTextPanel().getTextField().addKeyListener( new KeyListener() {
@@ -120,7 +124,7 @@ public class Controller {
     });
 
     window.getTextPanel().getSynchButton().addActionListener(e -> {
-      defaultSynch();
+      synchFull();
     });
   }
 
@@ -139,6 +143,9 @@ public class Controller {
           window.getTaskPanel().getList().repaint();
         }
       }
+
+      window.getTextPanel().resetTextField();
+      window.getTextPanel().getTextField().selectAll();
     });
 
     window.getButtonPanel().getEditButton().addActionListener(e -> {
@@ -175,25 +182,63 @@ public class Controller {
 
         if (TASK_WAS_CHANGED) {
           window.getEditPanel().getCurrentTask().isChanged();
-          defaultSynch();
+          window.repaintMainWindow();
+          synchAfterChanging();
+          return;
         }
 
         window.repaintMainWindow();
       }
     });
+
+    window.getEditPanel().getButtonPanel().getDeleteButton().addActionListener(e -> {
+      //TODO Вызвать диалоговое окно подтверждения удаления
+
+      Task removingTask = window.getEditPanel().getCurrentTask();
+      DataHandler.BoxType typeOfRemovingTask = window.getTaskPanel().getCurrentBoxType();
+
+      handler.removeTask(removingTask);
+
+      window.getTaskPanel().getList().setListData(handler.getBox().get(typeOfRemovingTask).toArray());
+      window.getTaskPanel().getList().repaint();
+      window.repaintMainWindow();
+      synchAfterRemoving();
+    });
   }
 
-  private void defaultSynch() {
-    handler.setOfflineDataWorker();
-    handler.pushAll();
-    handler.setDataWorkerAuto();
+  private void synchFull() {
+    synchAfterChanging();
     if (handler.getDBmanager().isONLINE()) {
-      handler.pushAll();
       handler.updateAll();
     }
 
     changeWindowColorMode();
   }
+
+  private void synchAfterChanging() {
+    handler.setOfflineWorker();
+    handler.pushAll();
+
+    handler.setOnlineWorker();
+    if (handler.getDBmanager().isONLINE()) {
+      handler.pushAll();
+    }
+
+    changeWindowColorMode();
+  }
+
+  private void synchAfterRemoving() {
+    handler.setOfflineWorker();
+    handler.pushAll();
+
+    handler.setOnlineWorker();
+    if (handler.getDBmanager().isONLINE()) {
+      handler.removeAll();
+    }
+
+    changeWindowColorMode();
+  }
+
 
   private void changeWindowColorMode() {
     if (handler.getDBmanager().isONLINE()) {

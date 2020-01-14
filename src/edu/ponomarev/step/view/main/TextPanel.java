@@ -27,6 +27,10 @@ public class TextPanel extends JPanel {
     this.setVisible(true);
   }
 
+  public void resetTextField() {
+    textField.setText("Новая задача...");
+  }
+
   public JTextField getTextField() {
     return textField;
   }

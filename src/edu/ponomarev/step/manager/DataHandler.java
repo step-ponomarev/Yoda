@@ -5,9 +5,7 @@ import edu.ponomarev.step.worker.DataWorker;
 import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.component.task.TaskContainer;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DataHandler {
   public static class BoxRequestWrap {
@@ -44,6 +42,8 @@ public class DataHandler {
 
   private HashMap<DataHandler.BoxType, TaskContainer> taskBox;
 
+  private Queue<Task> tasksToRemoveQueue;
+
   public static String getBoxName(BoxType boxType) {
     String boxName =  new String();
     for (DataHandler.BoxRequestWrap item : DataHandler.BOX_VARIABLES) {
@@ -62,6 +62,7 @@ public class DataHandler {
       put(BoxType.WEEK, new TaskContainer());
       put(BoxType.LATE, new TaskContainer());
     }};
+    this.tasksToRemoveQueue = new LinkedList<Task>();
 
     this.DBmanager = new DataBaseManager();
     this.dataWorker = DBmanager.getOfflineWorker();
@@ -84,6 +85,24 @@ public class DataHandler {
       }
     } catch (Exception exception) {
       System.err.println(exception.getMessage());
+    }
+  }
+
+  public void removeTask(Task task) {
+    tasksToRemoveQueue.add(task);
+
+    for (Task removingTask : tasksToRemoveQueue) {
+      for (Map.Entry<BoxType, TaskContainer> box : taskBox.entrySet()) {
+        box.getValue().getList().remove(removingTask);
+      }
+    }
+  }
+
+  public void removeAll() {
+    try {
+      dataWorker.removeAll(tasksToRemoveQueue);
+    } catch (Exception e) {
+      System.err.println(e.getMessage());
     }
   }
 
@@ -144,9 +163,7 @@ public class DataHandler {
     return dataWorker;
   }
 
-  public void setDataWorkerAuto() { this.dataWorker = this.DBmanager.getOnlineWorker(); }
+  public void setOnlineWorker() { this.dataWorker = this.DBmanager.getOnlineWorker(); }
 
-  public void setOfflineDataWorker() {
-    this.dataWorker = this.DBmanager.getOfflineWorker();
-  }
+  public void setOfflineWorker() { this.dataWorker = this.DBmanager.getOfflineWorker(); }
 };

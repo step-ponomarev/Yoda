@@ -1,4 +1,4 @@
-package edu.ponomarev.step.worker.online;
+package edu.ponomarev.step.worker.taskWorker.online;
 
 import edu.ponomarev.step.worker.DataWorker;
 import edu.ponomarev.step.manager.DataHandler;
@@ -11,6 +11,7 @@ import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 public class JDBCWorker implements DataWorker {
   private Connection connection;
@@ -34,32 +35,6 @@ public class JDBCWorker implements DataWorker {
 
     statement.execute();
     statement.close();
-  }
-
-  @Override
-  public List getAll(DataHandler.BoxType type) throws SQLException, ParseException {
-    final String sqlRequest = "SELECT * FROM task_box where type = ?";
-
-    PreparedStatement statement = connection.prepareStatement(sqlRequest);
-
-    String boxType = DataHandler.getBoxName(type);
-
-    statement.setString(1, boxType);
-
-    ArrayList<Task> list = new ArrayList<Task>();
-
-    ResultSet rs = statement.executeQuery();
-    while (rs.next()) {
-      list.add(new Task(
-          rs.getString("statement"),
-          TimeManager.convertToLocalTimeZone(rs.getObject("time_of_creation", LocalDateTime.class)),
-          TimeManager.convertToLocalTimeZone(rs.getObject("time_of_last_change", LocalDateTime.class))
-      ));
-    }
-    rs.close();
-    statement.close();
-
-    return list;
   }
 
   @Override
@@ -102,6 +77,7 @@ public class JDBCWorker implements DataWorker {
         final boolean TASK_WAS_CHANGED_OFFLINE =
             clientTask.getTimeOfLastChange().isAfter(taskOnBD.getTimeOfLastChange());
 
+
         if (TASK_WAS_CHANGED_OFFLINE) {
           updateList.add(clientTask);
         }
@@ -113,6 +89,61 @@ public class JDBCWorker implements DataWorker {
     }
 
     statement.close();
+  }
+
+  @Override
+  public void remove(Task tasks) throws SQLException{
+    final String removeRequest = "DELETE FROM task_box WHERE time_of_creation = ?";
+
+    PreparedStatement statement = connection.prepareStatement(removeRequest);
+
+    statement.setObject(1, tasks.getTimeOfCreation());
+
+    statement.execute();
+
+    statement.close();
+  }
+
+  @Override
+  public void removeAll(Queue<Task> tasks) throws SQLException {
+    final String removeRequest = "DELETE FROM task_box WHERE time_of_creation = ?";
+
+    PreparedStatement statement = connection.prepareStatement(removeRequest);
+
+    for (Task task : tasks) {
+      statement.setObject(1, task.getTimeOfCreation());
+      statement.execute();
+    }
+
+    tasks.clear();
+
+    statement.close();
+  }
+
+  @Override
+  public List getAll(DataHandler.BoxType type) throws SQLException, ParseException {
+    final String sqlRequest = "SELECT * FROM task_box where type = ?";
+
+    PreparedStatement statement = connection.prepareStatement(sqlRequest);
+
+    String boxType = DataHandler.getBoxName(type);
+
+    statement.setString(1, boxType);
+
+    ArrayList<Task> list = new ArrayList<Task>();
+
+    ResultSet rs = statement.executeQuery();
+    while (rs.next()) {
+      list.add(new Task(
+          rs.getString("statement"),
+          TimeManager.convertToLocalTimeZone(rs.getObject("time_of_creation", LocalDateTime.class)),
+          TimeManager.convertToLocalTimeZone(rs.getObject("time_of_last_change", LocalDateTime.class))
+      ));
+    }
+    rs.close();
+    statement.close();
+
+    return list;
   }
 
   private void updateAll(List<Task> updateList, DataHandler.BoxType type) throws Exception {

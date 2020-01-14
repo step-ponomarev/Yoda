@@ -1,8 +1,8 @@
 package edu.ponomarev.step.dao;
 
 import edu.ponomarev.step.worker.DataWorker;
-import edu.ponomarev.step.worker.online.JDBCWorker;
-import edu.ponomarev.step.worker.offile.Serializator;
+import edu.ponomarev.step.worker.taskWorker.online.JDBCWorker;
+import edu.ponomarev.step.worker.taskWorker.offile.Serializator;
 
 import jdk.jfr.Description;
 

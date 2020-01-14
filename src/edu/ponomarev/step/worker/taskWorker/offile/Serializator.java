@@ -1,4 +1,4 @@
-package edu.ponomarev.step.worker.offile;
+package edu.ponomarev.step.worker.taskWorker.offile;
 
 import edu.ponomarev.step.worker.DataWorker;
 import edu.ponomarev.step.manager.DataHandler;
@@ -9,6 +9,7 @@ import java.io.*;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 public class Serializator implements DataWorker {
   private String directory;
@@ -77,6 +78,12 @@ public class Serializator implements DataWorker {
     osObj.close();
     os.close();
   }
+
+  @Override
+  public void remove(Task tasks) {}
+
+  @Override
+  public void removeAll(Queue<Task> tasks) {}
 
   @Override
   public List getAll(DataHandler.BoxType type) throws Exception {
