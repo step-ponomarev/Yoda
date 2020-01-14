@@ -163,6 +163,10 @@ public class DataHandler {
     return dataWorker;
   }
 
+  public HashMap<BoxType, TaskContainer> getTaskBox() {
+    return taskBox;
+  }
+
   public void setOnlineWorker() { this.dataWorker = this.DBmanager.getOnlineWorker(); }
 
   public void setOfflineWorker() { this.dataWorker = this.DBmanager.getOfflineWorker(); }

@@ -1,6 +1,7 @@
 package edu.ponomarev.step.view.main;
 
 import edu.ponomarev.step.view.edit.EditPanel;
+import edu.ponomarev.step.view.taskPanel.TaskPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,7 +25,6 @@ public class Window extends JFrame {
 
   public void run() {
     this.boxButtonsPanel.run();
-    this.taskPanel.run();
     this.textPanel.run();
     this.buttonPanel.run();
 

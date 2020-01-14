@@ -1,7 +1,6 @@
 package edu.ponomarev.step.controller;
 
 import edu.ponomarev.step.component.task.Task;
-import edu.ponomarev.step.view.edit.TaskState;
 import edu.ponomarev.step.view.main.Window;
 import edu.ponomarev.step.manager.DataHandler;
 
@@ -76,9 +75,9 @@ public class Controller {
   }
 
   private void initTaskPanel() {
-    window.getTaskPanel().getList().setListData(handler.getBox().get(DataHandler.BoxType.DAY).toArray());
+    window.getTaskPanel().setListMap(handler.getBox());
     window.getTaskPanel().setCurrentBoxType(DataHandler.BoxType.DAY);
-    window.getTaskPanel().getBoxLabel().setText("Today");
+    window.getTaskPanel().run();
   }
 
   private void initBoxButtons() {
@@ -87,7 +86,7 @@ public class Controller {
         for (DataHandler.BoxRequestWrap boxRequest : DataHandler.BOX_VARIABLES) {
           if (boxRequest.boxName.equals(button.getText())) {
             window.getTaskPanel().setCurrentBoxType(boxRequest.type);
-            window.getTaskPanel().getList().setListData(handler.getBox().get(boxRequest.type).toArray());
+            window.getTaskPanel().getListMap().get(boxRequest.type).setListData(handler.getBox().get(boxRequest.type).toArray());
             window.getTaskPanel().getBoxLabel().setText(boxRequest.boxName);
             break;
           }
@@ -129,6 +128,7 @@ public class Controller {
   }
 
   private void initButtonPanel() {
+    //AddTask Button
     window.getButtonPanel().getAddButton().addActionListener(e -> {
       final DataHandler.BoxRequestWrap item = (DataHandler.BoxRequestWrap) window.getTextPanel().getBoxList().getSelectedItem();
 
@@ -139,8 +139,8 @@ public class Controller {
         window.getTextPanel().getTextField().selectAll();
 
         if (item.type.equals(window.getTaskPanel().getCurrentBoxType())) {
-          window.getTaskPanel().getList().setListData(handler.getBox().get(item.type).toArray());
-          window.getTaskPanel().getList().repaint();
+          window.getTaskPanel().getListMap().get(item.type).setListData(handler.getBox().get(item.type).toArray());
+          window.getTaskPanel().getListMap().get(item.type).repaint();
         }
       }
 
@@ -149,16 +149,17 @@ public class Controller {
     });
 
     window.getButtonPanel().getEditButton().addActionListener(e -> {
-      if (window.getTaskPanel().getList().isSelectionEmpty()) {
+      //TODO Сделать проверку выбранного таска(у нас 4 блока)
+      /*if (window.getTaskPanel().getList().isSelectionEmpty()) {
         return;
-      }
+      }*/
 
       window.getContentPane().removeAll();
       window.getContentPane().add(window.getEditPanel(), BorderLayout.CENTER);
 
-      window.getEditPanel().setCurrentTask(window.getTaskPanel().getSelected());
+      /*window.getEditPanel().setCurrentTask(window.getTaskPanel().getSelected());
       window.getEditPanel().getTaskNameField().setText(window.getTaskPanel().getSelected().getStatement().trim());
-      window.getEditPanel().setTaskStateBeforeChanges(new TaskState(window.getTaskPanel().getSelected()));
+      window.getEditPanel().setTaskStateBeforeChanges(new TaskState(window.getTaskPanel().getSelected()));*/
 
       initEditPanel();
 
@@ -193,14 +194,15 @@ public class Controller {
 
     window.getEditPanel().getButtonPanel().getDeleteButton().addActionListener(e -> {
       //TODO Вызвать диалоговое окно подтверждения удаления
+      //TODO Доделать удаление таска из нужной коробки
 
       Task removingTask = window.getEditPanel().getCurrentTask();
       DataHandler.BoxType typeOfRemovingTask = window.getTaskPanel().getCurrentBoxType();
 
       handler.removeTask(removingTask);
 
-      window.getTaskPanel().getList().setListData(handler.getBox().get(typeOfRemovingTask).toArray());
-      window.getTaskPanel().getList().repaint();
+     /* window.getTaskPanel().getList().setListData(handler.getBox().get(typeOfRemovingTask).toArray());
+      window.getTaskPanel().getList().repaint();*/
       window.repaintMainWindow();
       synchAfterRemoving();
     });
