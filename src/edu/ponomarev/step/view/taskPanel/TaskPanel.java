@@ -1,6 +1,5 @@
 package edu.ponomarev.step.view.taskPanel;
 
-import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.component.task.TaskContainer;
 import edu.ponomarev.step.manager.DataHandler;
 
@@ -8,7 +7,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 public class TaskPanel extends JPanel {
   private JScrollPane scrollPane;
@@ -30,10 +28,11 @@ public class TaskPanel extends JPanel {
   public void run() {
     this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-    for (Map.Entry<DataHandler.BoxType, JList> boxList : listMap.entrySet()) {
-      DataHandler.BoxType boxType = boxList.getKey();
-      boxList.getValue().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-      this.boxModules.add(new TaskBoxModule(DataHandler.getBoxName(boxType), boxList.getValue(), boxType));
+    //Creating TaskBlocks in certain sequence
+    for (DataHandler.BoxVariable boxVariavle : DataHandler.BOX_VARIABLES) {
+      DataHandler.BoxType boxType = boxVariavle.type;
+      listMap.get(boxType).setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+      this.boxModules.add(new TaskBoxModule(DataHandler.getBoxName(boxType), listMap.get(boxType), boxType));
     }
 
     boxLabel.setBackground(Color.WHITE);
@@ -43,7 +42,7 @@ public class TaskPanel extends JPanel {
       boxModule.run();
     }
 
-    this.setBackground(new Color(255, 255, 255));
+    this.setBackground(Color.WHITE);
     this.setVisible(true);
   }
 
@@ -61,9 +60,8 @@ public class TaskPanel extends JPanel {
 
   public void setListMap(HashMap<DataHandler.BoxType, TaskContainer> listMap) {
     this.listMap.clear();
-
-    for (Map.Entry<DataHandler.BoxType, TaskContainer> taksBox : listMap.entrySet()) {
-      this.listMap.put(taksBox.getKey(), new JList(taksBox.getValue().getList().toArray()));
+    for (DataHandler.BoxVariable boxVariavle : DataHandler.BOX_VARIABLES) {
+      this.listMap.put(boxVariavle.type, new JList(listMap.get(boxVariavle.type).toArray()));
     }
   }
 

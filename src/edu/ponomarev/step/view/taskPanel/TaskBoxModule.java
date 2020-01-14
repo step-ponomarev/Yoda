@@ -25,6 +25,7 @@ public class TaskBoxModule extends JPanel {
     this.add(BorderLayout.NORTH, boxNameLabel);
     this.add(BorderLayout.CENTER, taskScrollPane);
 
+    //TODO Make it alwasys in focus
 
     taskScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
     taskScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);

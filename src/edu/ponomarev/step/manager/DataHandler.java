@@ -8,11 +8,11 @@ import edu.ponomarev.step.component.task.TaskContainer;
 import java.util.*;
 
 public class DataHandler {
-  public static class BoxRequestWrap {
+  public static class BoxVariable {
     public DataHandler.BoxType type;
     public String boxName;
 
-    public BoxRequestWrap(DataHandler.BoxType type, String boxName) {
+    public BoxVariable(DataHandler.BoxType type, String boxName) {
       this.type = type;
       this.boxName = boxName;
     }
@@ -30,11 +30,11 @@ public class DataHandler {
     LATE
   }
 
-  final public static BoxRequestWrap[] BOX_VARIABLES = new DataHandler.BoxRequestWrap[] {
-      new BoxRequestWrap(DataHandler.BoxType.INBOX, "Inbox"),
-      new BoxRequestWrap(DataHandler.BoxType.DAY, "Today"),
-      new BoxRequestWrap(DataHandler.BoxType.WEEK, "Week"),
-      new BoxRequestWrap(DataHandler.BoxType.LATE, "Late")
+  final public static BoxVariable[] BOX_VARIABLES = new BoxVariable[] {
+      new BoxVariable(DataHandler.BoxType.INBOX, "Входящие"),
+      new BoxVariable(DataHandler.BoxType.DAY, "Сегодня"),
+      new BoxVariable(DataHandler.BoxType.WEEK, "На неделе"),
+      new BoxVariable(DataHandler.BoxType.LATE, "Позже")
   };
 
   private DataBaseManager DBmanager;
@@ -46,7 +46,7 @@ public class DataHandler {
 
   public static String getBoxName(BoxType boxType) {
     String boxName =  new String();
-    for (DataHandler.BoxRequestWrap item : DataHandler.BOX_VARIABLES) {
+    for (BoxVariable item : DataHandler.BOX_VARIABLES) {
       if (boxType.equals(item.type)) {
         boxName = item.boxName;
       }
