@@ -185,10 +185,11 @@ public class Controller {
 
   private void defaultSynch() {
     handler.setOfflineDataWorker();
-    handler.pushDate();
+    handler.pushAll();
     handler.setDataWorkerAuto();
     if (handler.getDBmanager().isONLINE()) {
-      handler.pushDate();
+      handler.pushAll();
+      handler.updateAll();
     }
 
     changeWindowColorMode();

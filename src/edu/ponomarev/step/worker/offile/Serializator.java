@@ -1,6 +1,6 @@
-package edu.ponomarev.step.data.offile;
+package edu.ponomarev.step.worker.offile;
 
-import edu.ponomarev.step.data.DataWorker;
+import edu.ponomarev.step.worker.DataWorker;
 import edu.ponomarev.step.manager.DataHandler;
 import edu.ponomarev.step.component.task.Task;
 

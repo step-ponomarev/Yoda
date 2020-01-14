@@ -1,11 +1,12 @@
 package edu.ponomarev.step.manager;
 
 import edu.ponomarev.step.dao.DataBaseManager;
-import edu.ponomarev.step.data.DataWorker;
+import edu.ponomarev.step.worker.DataWorker;
 import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.component.task.TaskContainer;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DataHandler {
@@ -64,7 +65,7 @@ public class DataHandler {
 
     this.DBmanager = new DataBaseManager();
     this.dataWorker = DBmanager.getOfflineWorker();
-    pullData();
+    pullAll();
   }
 
   public void addTask(BoxType type, Task task) {
@@ -77,7 +78,7 @@ public class DataHandler {
 
 
       //Try to push to DB
-      this.dataWorker = DBmanager.getWorker();
+      this.dataWorker = DBmanager.getOnlineWorker();
       if (DBmanager.isONLINE()) {
         dataWorker.push(task, type);
       }
@@ -86,7 +87,7 @@ public class DataHandler {
     }
   }
 
-  public void pushDate() {
+  public void pushAll() {
     try {
       for (Map.Entry<DataHandler.BoxType, TaskContainer> box : taskBox.entrySet()) {
         this.dataWorker.pushAll(box.getValue().getList(), box.getKey());
@@ -96,7 +97,7 @@ public class DataHandler {
     }
   }
 
-  public void pullData() {
+  public void pullAll() {
     try {
       for (Map.Entry<DataHandler.BoxType, TaskContainer> box : taskBox.entrySet()) {
         box.getValue().setList(dataWorker.getAll(box.getKey()));
@@ -106,6 +107,35 @@ public class DataHandler {
     }
   }
 
+  public void updateAll() {
+    try {
+      for (Map.Entry<DataHandler.BoxType, TaskContainer> box : taskBox.entrySet()) {
+        BoxType boxType = box.getKey();
+        synchList(boxType, dataWorker.getAll(boxType));
+      }
+    } catch (Exception e) {
+      System.err.println(e.getMessage());
+    }
+  }
+
+  private void synchList(BoxType type, List<Task> updatedList) {
+    List<Task> listToUpdate = this.taskBox.get(type).getList();
+
+    for (Task task : updatedList) {
+      if (!listToUpdate.contains(task)) {
+        listToUpdate.add(task);
+      } else {
+        Task taskToUpdate = listToUpdate.get(listToUpdate.indexOf(task));
+
+        if ( task.getTimeOfLastChange().isAfter(taskToUpdate.getTimeOfLastChange()) ) {
+          taskToUpdate.setStatement(task.getStatement());
+          taskToUpdate.setTTimeOfLastChange(task.getTimeOfLastChange());
+        }
+      }
+    }
+  }
+
+
   public HashMap<DataHandler.BoxType, TaskContainer> getBox() { return taskBox; }
 
   public DataBaseManager getDBmanager() { return DBmanager; }
@@ -114,7 +144,7 @@ public class DataHandler {
     return dataWorker;
   }
 
-  public void setDataWorkerAuto() { this.dataWorker = this.DBmanager.getWorker(); }
+  public void setDataWorkerAuto() { this.dataWorker = this.DBmanager.getOnlineWorker(); }
 
   public void setOfflineDataWorker() {
     this.dataWorker = this.DBmanager.getOfflineWorker();

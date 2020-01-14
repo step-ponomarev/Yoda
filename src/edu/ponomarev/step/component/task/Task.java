@@ -1,6 +1,6 @@
 package edu.ponomarev.step.component.task;
 
-import edu.ponomarev.step.manager.TimeManager;
+import edu.ponomarev.step.system.TimeManager;
 
 import java.time.LocalDateTime;
 import java.util.Objects;

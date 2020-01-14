@@ -1,4 +1,4 @@
-package edu.ponomarev.step.data;
+package edu.ponomarev.step.worker;
 
 import edu.ponomarev.step.manager.DataHandler;
 import edu.ponomarev.step.component.task.Task;

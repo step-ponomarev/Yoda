@@ -1,9 +1,9 @@
-package edu.ponomarev.step.data.data_base;
+package edu.ponomarev.step.worker.online;
 
-import edu.ponomarev.step.data.DataWorker;
+import edu.ponomarev.step.worker.DataWorker;
 import edu.ponomarev.step.manager.DataHandler;
 import edu.ponomarev.step.component.task.Task;
-import edu.ponomarev.step.manager.TimeManager;
+import edu.ponomarev.step.system.TimeManager;
 
 import java.sql.*;
 import java.text.ParseException;
@@ -12,10 +12,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JDBSWorker implements DataWorker {
+public class JDBCWorker implements DataWorker {
   private Connection connection;
 
-  public JDBSWorker(Connection connection) throws SQLException {
+  public JDBCWorker(Connection connection) throws SQLException {
     this.connection = connection;
   }
 
@@ -52,7 +52,7 @@ public class JDBSWorker implements DataWorker {
     while (rs.next()) {
       list.add(new Task(
           rs.getString("statement"),
-          TimeManager.convertToLocalTimeZone(rs.getObject("date_of_creation", LocalDateTime.class)),
+          TimeManager.convertToLocalTimeZone(rs.getObject("time_of_creation", LocalDateTime.class)),
           TimeManager.convertToLocalTimeZone(rs.getObject("time_of_last_change", LocalDateTime.class))
       ));
     }

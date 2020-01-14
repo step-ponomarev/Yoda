@@ -1,9 +1,11 @@
 package edu.ponomarev.step.dao;
 
-import edu.ponomarev.step.data.DataWorker;
-import edu.ponomarev.step.data.data_base.JDBSWorker;
-import edu.ponomarev.step.data.offile.Serializator;
+import edu.ponomarev.step.worker.DataWorker;
+import edu.ponomarev.step.worker.online.JDBCWorker;
+import edu.ponomarev.step.worker.offile.Serializator;
+
 import jdk.jfr.Description;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -15,10 +17,9 @@ public class DataBaseManager {
   private boolean ONLINE;
 
   private Connection connection;
-  //private DataWorker worker;
 
   @Description("Sets worker automatically. Depends of connection status. ")
-  public DataWorker getWorker() {
+  public DataWorker getOnlineWorker() {
     ApplicationContext context = new ClassPathXmlApplicationContext("classpath:edu/ponomarev/step/dao/daoContext.xml");
 
     try {
@@ -27,7 +28,7 @@ public class DataBaseManager {
           context.getBean("daoProperties", Properties.class));
       this.ONLINE = true;
 
-      return (new JDBSWorker(connection));
+      return (new JDBCWorker(connection));
     } catch (Exception e) {
       System.err.println(e.getMessage());
       ONLINE = false;
