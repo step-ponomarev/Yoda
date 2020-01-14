@@ -1,0 +1,3 @@
+url=jdbc:mysql://localhost:3306/mysql?useUnicode=true&serverTimezone=UTC
+sql_user=root
+password=sql12345
