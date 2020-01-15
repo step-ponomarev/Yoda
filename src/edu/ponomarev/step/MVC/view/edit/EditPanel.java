@@ -1,6 +1,6 @@
-package edu.ponomarev.step.view.edit;
+package edu.ponomarev.step.MVC.view.edit;
 
-import edu.ponomarev.step.component.task.Task;
+import edu.ponomarev.step.component.task.InformatedTask;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,8 +10,7 @@ public class EditPanel extends JPanel {
 
   private TextField taskNameField;
 
-  private Task currentTask;
-  private TaskState taskStateBeforeChanges;
+  private InformatedTask informatedTask;
 
 
   public EditPanel() {
@@ -21,7 +20,7 @@ public class EditPanel extends JPanel {
   }
 
   public void run() {
-    this.taskNameField.setText(currentTask.toString());
+    this.taskNameField.setText(informatedTask.toString());
     this.taskNameField.setBackground(Color.WHITE);
     this.taskNameField.setSize(new Dimension(200, 24));
 
@@ -50,15 +49,11 @@ public class EditPanel extends JPanel {
     this.taskNameField = taskNameField;
   }
 
-  public Task getCurrentTask() {
-    return currentTask;
+  public InformatedTask getInformatedTask() {
+    return informatedTask;
   }
 
-  public void setCurrentTask(Task currentTask) {
-    this.currentTask = currentTask;
+  public void setInformatedTask(InformatedTask informatedTask) {
+    this.informatedTask = informatedTask;
   }
-
-  public TaskState getTaskStateBeforeChanges() { return taskStateBeforeChanges; }
-
-  public void setTaskStateBeforeChanges(TaskState taskStateBeforeChanges) { this.taskStateBeforeChanges = taskStateBeforeChanges; }
 }

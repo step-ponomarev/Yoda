@@ -1,8 +1,8 @@
 package edu.ponomarev.step;
 
-import edu.ponomarev.step.controller.Controller;
-import edu.ponomarev.step.view.main.Window;
-import edu.ponomarev.step.manager.DataHandler;
+import edu.ponomarev.step.MVC.controller.Controller;
+import edu.ponomarev.step.MVC.view.main.Window;
+import edu.ponomarev.step.MVC.model.DataHandler;
 
 public class Main {
   public static void main(String[] args) {

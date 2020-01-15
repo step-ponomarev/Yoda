@@ -1,12 +1,13 @@
-package edu.ponomarev.step.view.taskPanel;
+package edu.ponomarev.step.MVC.view.taskPanel;
 
 import edu.ponomarev.step.component.task.TaskContainer;
-import edu.ponomarev.step.manager.DataHandler;
+import edu.ponomarev.step.MVC.model.DataHandler;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class TaskPanel extends JPanel {
   private JScrollPane scrollPane;
@@ -62,6 +63,12 @@ public class TaskPanel extends JPanel {
     this.listMap.clear();
     for (DataHandler.BoxVariable boxVariavle : DataHandler.BOX_VARIABLES) {
       this.listMap.put(boxVariavle.type, new JList(listMap.get(boxVariavle.type).toArray()));
+    }
+  }
+
+  public void repaintAllModules() {
+    for (Map.Entry<DataHandler.BoxType, JList> boxBlock : listMap.entrySet()) {
+      boxBlock.getValue().repaint();
     }
   }
 

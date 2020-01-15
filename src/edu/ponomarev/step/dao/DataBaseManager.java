@@ -1,8 +1,8 @@
 package edu.ponomarev.step.dao;
 
-import edu.ponomarev.step.worker.DataWorker;
-import edu.ponomarev.step.worker.taskWorker.online.JDBCWorker;
-import edu.ponomarev.step.worker.taskWorker.offile.Serializator;
+import edu.ponomarev.step.MVC.model.worker.TaskWorker;
+import edu.ponomarev.step.MVC.model.worker.taskWorker.online.JDBCWorker;
+import edu.ponomarev.step.MVC.model.worker.taskWorker.offile.Serializator;
 
 import jdk.jfr.Description;
 
@@ -19,7 +19,7 @@ public class DataBaseManager {
   private Connection connection;
 
   @Description("Sets worker automatically. Depends of connection status. ")
-  public DataWorker getOnlineWorker() {
+  public TaskWorker getOnlineWorker() {
     ApplicationContext context = new ClassPathXmlApplicationContext("classpath:edu/ponomarev/step/dao/daoContext.xml");
 
     try {
@@ -37,7 +37,7 @@ public class DataBaseManager {
   }
 
   @Description("Creates certain offline worker if you need work with data offline.")
-  public DataWorker getOfflineWorker() {
+  public TaskWorker getOfflineWorker() {
     this.ONLINE = false;
     return (new Serializator());
   }

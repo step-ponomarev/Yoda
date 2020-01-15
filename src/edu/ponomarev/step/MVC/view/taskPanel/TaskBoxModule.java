@@ -1,7 +1,7 @@
-package edu.ponomarev.step.view.taskPanel;
+package edu.ponomarev.step.MVC.view.taskPanel;
 
 import edu.ponomarev.step.component.task.Task;
-import edu.ponomarev.step.manager.DataHandler;
+import edu.ponomarev.step.MVC.model.DataHandler;
 
 import javax.swing.*;
 import java.awt.*;

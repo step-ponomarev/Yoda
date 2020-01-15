@@ -1,7 +1,8 @@
-package edu.ponomarev.step.manager;
+package edu.ponomarev.step.MVC.model;
 
+import edu.ponomarev.step.component.task.InformatedTask;
 import edu.ponomarev.step.dao.DataBaseManager;
-import edu.ponomarev.step.worker.DataWorker;
+import edu.ponomarev.step.MVC.model.worker.TaskWorker;
 import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.component.task.TaskContainer;
 
@@ -38,11 +39,11 @@ public class DataHandler {
   };
 
   private DataBaseManager DBmanager;
-  private DataWorker dataWorker;
+  private TaskWorker dataWorker;
 
   private HashMap<DataHandler.BoxType, TaskContainer> taskBox;
 
-  private Queue<Task> tasksToRemoveQueue;
+  private Queue<InformatedTask> tasksToRemoveQueue;
 
   public static String getBoxName(BoxType boxType) {
     String boxName =  new String();
@@ -62,7 +63,7 @@ public class DataHandler {
       put(BoxType.WEEK, new TaskContainer());
       put(BoxType.LATE, new TaskContainer());
     }};
-    this.tasksToRemoveQueue = new LinkedList<Task>();
+    this.tasksToRemoveQueue = new LinkedList<InformatedTask>();
 
     this.DBmanager = new DataBaseManager();
     this.dataWorker = DBmanager.getOfflineWorker();
@@ -88,14 +89,10 @@ public class DataHandler {
     }
   }
 
-  public void removeTask(Task task) {
+  public void removeTask(InformatedTask task) {
     tasksToRemoveQueue.add(task);
 
-    for (Task removingTask : tasksToRemoveQueue) {
-      for (Map.Entry<BoxType, TaskContainer> box : taskBox.entrySet()) {
-        box.getValue().getList().remove(removingTask);
-      }
-    }
+    taskBox.get(task.getBoxType()).remove(task);
   }
 
   public void removeAll() {
@@ -159,7 +156,7 @@ public class DataHandler {
 
   public DataBaseManager getDBmanager() { return DBmanager; }
 
-  public DataWorker getDataWorker() {
+  public TaskWorker getDataWorker() {
     return dataWorker;
   }
 

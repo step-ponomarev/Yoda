@@ -1,14 +1,13 @@
-package edu.ponomarev.step.view.main;
+package edu.ponomarev.step.MVC.view.main;
 
-import edu.ponomarev.step.view.edit.EditPanel;
-import edu.ponomarev.step.view.taskPanel.TaskPanel;
+import edu.ponomarev.step.MVC.view.edit.EditPanel;
+import edu.ponomarev.step.MVC.view.taskPanel.TaskPanel;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class Window extends JFrame {
   private TextPanel textPanel;
-  private BoxButtonsPanel boxButtonsPanel;
   private ButtonPanel buttonPanel;
   private TaskPanel taskPanel;
   private EditPanel editPanel;
@@ -18,13 +17,11 @@ public class Window extends JFrame {
 
     this.textPanel = new TextPanel();
     this.taskPanel = new TaskPanel();
-    this.boxButtonsPanel = new BoxButtonsPanel();
     this.buttonPanel = new ButtonPanel();
     this.editPanel = new EditPanel();
   }
 
   public void run() {
-    this.boxButtonsPanel.run();
     this.textPanel.run();
     this.buttonPanel.run();
 
@@ -41,7 +38,6 @@ public class Window extends JFrame {
 
     this.getContentPane().add(textPanel, BorderLayout.NORTH);
     this.getContentPane().add(taskPanel, BorderLayout.CENTER);
-    this.getContentPane().add(boxButtonsPanel, BorderLayout.EAST);
     this.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
     this.getContentPane().revalidate();
@@ -52,14 +48,6 @@ public class Window extends JFrame {
 
   public void setTextPanel(TextPanel textPanel) {
     this.textPanel = textPanel;
-  }
-
-  public BoxButtonsPanel getBoxButtonsPanel() {
-    return boxButtonsPanel;
-  }
-
-  public void setBoxButtonsPanel(BoxButtonsPanel boxButtonsPanel) {
-    this.boxButtonsPanel = boxButtonsPanel;
   }
 
   public ButtonPanel getButtonPanel() {

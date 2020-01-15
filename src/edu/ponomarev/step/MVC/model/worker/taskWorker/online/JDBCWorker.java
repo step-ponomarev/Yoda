@@ -1,7 +1,8 @@
-package edu.ponomarev.step.worker.taskWorker.online;
+package edu.ponomarev.step.MVC.model.worker.taskWorker.online;
 
-import edu.ponomarev.step.worker.DataWorker;
-import edu.ponomarev.step.manager.DataHandler;
+import edu.ponomarev.step.MVC.model.worker.TaskWorker;
+import edu.ponomarev.step.MVC.model.DataHandler;
+import edu.ponomarev.step.component.task.InformatedTask;
 import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.system.TimeManager;
 
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
-public class JDBCWorker implements DataWorker {
+public class JDBCWorker implements TaskWorker {
   private Connection connection;
 
   public JDBCWorker(Connection connection) throws SQLException {
@@ -92,7 +93,7 @@ public class JDBCWorker implements DataWorker {
   }
 
   @Override
-  public void remove(Task tasks) throws SQLException{
+  public void remove(InformatedTask tasks) throws SQLException{
     final String removeRequest = "DELETE FROM task_box WHERE time_of_creation = ?";
 
     PreparedStatement statement = connection.prepareStatement(removeRequest);
@@ -105,7 +106,7 @@ public class JDBCWorker implements DataWorker {
   }
 
   @Override
-  public void removeAll(Queue<Task> tasks) throws SQLException {
+  public void removeAll(Queue<InformatedTask> tasks) throws SQLException {
     final String removeRequest = "DELETE FROM task_box WHERE time_of_creation = ?";
 
     PreparedStatement statement = connection.prepareStatement(removeRequest);

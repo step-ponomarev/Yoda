@@ -1,7 +1,8 @@
-package edu.ponomarev.step.worker.taskWorker.offile;
+package edu.ponomarev.step.MVC.model.worker.taskWorker.offile;
 
-import edu.ponomarev.step.worker.DataWorker;
-import edu.ponomarev.step.manager.DataHandler;
+import edu.ponomarev.step.MVC.model.worker.TaskWorker;
+import edu.ponomarev.step.MVC.model.DataHandler;
+import edu.ponomarev.step.component.task.InformatedTask;
 import edu.ponomarev.step.component.task.Task;
 
 import java.io.*;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
-public class Serializator implements DataWorker {
+public class Serializator implements TaskWorker {
   private String directory;
 
   public Serializator() {
@@ -80,10 +81,10 @@ public class Serializator implements DataWorker {
   }
 
   @Override
-  public void remove(Task tasks) {}
+  public void remove(InformatedTask tasks) {}
 
   @Override
-  public void removeAll(Queue<Task> tasks) {}
+  public void removeAll(Queue<InformatedTask> tasks) {}
 
   @Override
   public List getAll(DataHandler.BoxType type) throws Exception {

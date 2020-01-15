@@ -1,22 +1,22 @@
-package edu.ponomarev.step.view.edit;
+package edu.ponomarev.step.MVC.view.edit;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class ButtonPanel extends JPanel {
   private JButton saveButton;
-  private JButton deleteButton;
+  private JButton removeButton;
 
   public ButtonPanel() {
     super();
     this.saveButton = new JButton("Save");
-    this.deleteButton = new JButton("Remove");
+    this.removeButton = new JButton("Remove");
   }
 
   public void run() {
     this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
     this.add(saveButton);
-    this.add(deleteButton);
+    this.add(removeButton);
 
     this.setBackground(Color.WHITE);
     this.setVisible(true);
@@ -30,11 +30,11 @@ public class ButtonPanel extends JPanel {
     this.saveButton = saveButton;
   }
 
-  public JButton getDeleteButton() {
-    return deleteButton;
+  public JButton getRemoveButton() {
+    return removeButton;
   }
 
-  public void setDeleteButton(JButton deleteButton) {
-    this.deleteButton = deleteButton;
+  public void setRemoveButton(JButton removeButton) {
+    this.removeButton = removeButton;
   }
 }
