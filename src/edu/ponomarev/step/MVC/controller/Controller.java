@@ -22,6 +22,7 @@ public class Controller {
   }
 
   public void initView() {
+    synchFull();
     window.run();
 
     initMainWindow();
@@ -29,9 +30,6 @@ public class Controller {
     initTextPanel();
     initButtonPanel();
     changeWindowColorMode();
-
-    synchFull();
-    window.getTaskPanel().repaintAllModules();
   }
 
   private void initMainWindow() {
@@ -121,6 +119,9 @@ public class Controller {
 
     window.getTextPanel().getSynchButton().addActionListener(e -> {
       synchFull();
+      for (DataHandler.BoxVariable boxVariable : DataHandler.BOX_VARIABLES) {
+        window.getTaskPanel().getListMap().get(boxVariable.type).setListData(handler.getBox().get(boxVariable.type).toArray());
+      }
       window.getTaskPanel().repaintAllModules();
     });
   }
