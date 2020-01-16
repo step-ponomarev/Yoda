@@ -1,6 +1,6 @@
 package edu.ponomarev.step.component.project;
 
-import edu.ponomarev.step.component.task.TaskContainer;
+import edu.ponomarev.step.component.taskContainer.TermTaskContainer;
 
 import java.util.Calendar;
 import java.util.Objects;
@@ -8,13 +8,13 @@ import java.util.Objects;
 public class Project {
   private String name;
   private Calendar date_of_creation;
-  private TaskContainer tasks;
+  private TermTaskContainer tasks;
   private ProjectStatus status;
 
   public Project(String name) {
     this.name = name;
     this.date_of_creation = Calendar.getInstance();
-    this.tasks = new TaskContainer();
+    //this.tasks = new TermTaskContainer();
     this.status = ProjectStatus.PLANNING;
   }
 

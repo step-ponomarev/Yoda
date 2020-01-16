@@ -1,50 +1,36 @@
 package edu.ponomarev.step.component.task;
 
-import edu.ponomarev.step.MVC.model.DataHandler;
 import edu.ponomarev.step.component.project.Project;
-
-import java.time.LocalDateTime;
+import edu.ponomarev.step.component.taskContainer.TermTaskContainer;
 
 public class InformatedTask extends TaskDecorator {
   private Task task;
-  private DataHandler.BoxType boxType;
+  private TermTaskContainer.ContainerType containerType;
   private Project project;
 
-  public InformatedTask(Task task, DataHandler.BoxType boxType) {
+  public InformatedTask(Task task, TermTaskContainer.ContainerType containerType) {
     super(task);
     this.task = task;
-    this.boxType = boxType;
+    this.containerType = containerType;
   }
 
-  public InformatedTask(Task task, DataHandler.BoxType boxType, Project project) {
+  public InformatedTask(Task task, TermTaskContainer.ContainerType containerType, Project project) {
     super(task);
     this.task = task;
-    this.boxType = boxType;
+    this.containerType = containerType;
     this.project = project;
-  }
-
-  public InformatedTask(String statement) {
-    super(statement);
-  }
-
-  public InformatedTask(String statement, LocalDateTime timeOfCreation, LocalDateTime timeOfLastChange) {
-    super(statement, timeOfCreation, timeOfLastChange);
   }
 
   public Task getTask() {
     return task;
   }
 
-  public void setTask(Task task) {
-    this.task = task;
+  public TermTaskContainer.ContainerType getContainerType() {
+    return containerType;
   }
 
-  public DataHandler.BoxType getBoxType() {
-    return boxType;
-  }
-
-  public void setBoxType(DataHandler.BoxType boxType) {
-    this.boxType = boxType;
+  public void setContainerType(TermTaskContainer.ContainerType containerType) {
+    this.containerType = containerType;
   }
 
   public Project getProject() {

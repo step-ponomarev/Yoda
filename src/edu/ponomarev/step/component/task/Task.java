@@ -50,7 +50,7 @@ public class Task implements Comparable<Task>, Serializable {
     this.timeOfLastChange = TimeManager.getLocalDateTimeOf(time_of_last_change);
   }
 
-  public void isChanged() {
+  public void updateTimeOfLastChange() {
     this.timeOfLastChange = TimeManager.getLocalDateTimeOf(LocalDateTime.now());
   }
 

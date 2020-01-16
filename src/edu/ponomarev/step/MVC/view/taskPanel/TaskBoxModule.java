@@ -1,7 +1,6 @@
 package edu.ponomarev.step.MVC.view.taskPanel;
 
-import edu.ponomarev.step.component.task.Task;
-import edu.ponomarev.step.MVC.model.DataHandler;
+import edu.ponomarev.step.component.taskContainer.TermTaskContainer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,14 +8,14 @@ import java.awt.*;
 public class TaskBoxModule extends JPanel {
   private JLabel boxNameLabel;
   private JScrollPane taskScrollPane;
-  private DataHandler.BoxType currentType;
+  private TermTaskContainer.ContainerType moduleType;
 
-  public TaskBoxModule(String boxName, JList<Task> list, DataHandler.BoxType type) {
+  public TaskBoxModule(String boxName, JList list, TermTaskContainer.ContainerType containerType) {
     super();
 
     this.boxNameLabel = new JLabel(boxName);
     this.taskScrollPane = new JScrollPane(list);
-    this.currentType = type;
+    this.moduleType = containerType;
   }
 
   public void run() {
@@ -24,8 +23,6 @@ public class TaskBoxModule extends JPanel {
 
     this.add(BorderLayout.NORTH, boxNameLabel);
     this.add(BorderLayout.CENTER, taskScrollPane);
-
-    //TODO Make it alwasys in focus
 
     taskScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
     taskScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -42,12 +39,12 @@ public class TaskBoxModule extends JPanel {
     this.taskScrollPane = taskScrollPane;
   }
 
-  public DataHandler.BoxType getCurrentType() {
-    return currentType;
+  public TermTaskContainer.ContainerType getModuleType() {
+    return moduleType;
   }
 
-  public void setCurrentType(DataHandler.BoxType currentType) {
-    this.currentType = currentType;
+  public void setModuleType(TermTaskContainer.ContainerType moduleType) {
+    this.moduleType = moduleType;
   }
 }
 

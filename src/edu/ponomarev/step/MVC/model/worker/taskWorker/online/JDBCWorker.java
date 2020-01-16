@@ -4,6 +4,7 @@ import edu.ponomarev.step.MVC.model.worker.TaskWorker;
 import edu.ponomarev.step.MVC.model.DataHandler;
 import edu.ponomarev.step.component.task.InformatedTask;
 import edu.ponomarev.step.component.task.Task;
+import edu.ponomarev.step.component.taskContainer.TermTaskContainer;
 import edu.ponomarev.step.system.TimeManager;
 
 import java.sql.*;
@@ -11,7 +12,6 @@ import java.text.ParseException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Queue;
 
 public class JDBCWorker implements TaskWorker {
@@ -22,8 +22,8 @@ public class JDBCWorker implements TaskWorker {
   }
 
   @Override
-  public void push(Task task, DataHandler.BoxType type) throws SQLException {
-    String boxType = DataHandler.getBoxName(type);
+  public void push(InformatedTask task) throws SQLException {
+    String boxType = DataHandler.getBoxName(task.getContainerType());
 
     final String insertRequest = "INSERT INTO task_box (time_of_creation, time_of_last_change, statement, type) " +
         "VALUES (?, ?, ?, ?);";
@@ -39,12 +39,12 @@ public class JDBCWorker implements TaskWorker {
   }
 
   @Override
-  public void pushAll(List<Task> taskListOnClient, DataHandler.BoxType type) throws Exception {
+  public void push(TermTaskContainer container) throws Exception {
     final String selectRequest = "SELECT * FROM task_box where type = ?";
 
     PreparedStatement statement = connection.prepareStatement(selectRequest);
 
-    String boxType = DataHandler.getBoxName(type);
+    String boxType = DataHandler.getBoxName(container.getContainerType());
 
     statement.setString(1, boxType);
 
@@ -64,10 +64,10 @@ public class JDBCWorker implements TaskWorker {
 
     statement = connection.prepareStatement(insertRequest);
 
-    ArrayList<Task> updateList = new ArrayList<Task>();
+    TermTaskContainer updateContainer = new TermTaskContainer(container.getContainerType());
 
     statement.setString(4, boxType);
-    for (Task clientTask : taskListOnClient) {
+    for (Task clientTask : container.getList()) {
       if (!BDlist.contains(clientTask)) {
         statement.setObject(1, clientTask.getTimeOfCreation());
         statement.setObject(2, clientTask.getTimeOfLastChange());
@@ -78,15 +78,14 @@ public class JDBCWorker implements TaskWorker {
         final boolean TASK_WAS_CHANGED_OFFLINE =
             clientTask.getTimeOfLastChange().isAfter(taskOnBD.getTimeOfLastChange());
 
-
         if (TASK_WAS_CHANGED_OFFLINE) {
-          updateList.add(clientTask);
+          updateContainer.add(clientTask);
         }
       }
     }
 
-    if (!updateList.isEmpty()) {
-      updateAll(updateList, type);
+    if (!updateContainer.isEmpty()) {
+      updateAll(updateContainer);
     }
 
     statement.close();
@@ -106,7 +105,7 @@ public class JDBCWorker implements TaskWorker {
   }
 
   @Override
-  public void removeAll(Queue<InformatedTask> tasks) throws SQLException {
+  public void remove(Queue<InformatedTask> tasks) throws SQLException {
     final String removeRequest = "DELETE FROM task_box WHERE time_of_creation = ?";
 
     PreparedStatement statement = connection.prepareStatement(removeRequest);
@@ -122,20 +121,20 @@ public class JDBCWorker implements TaskWorker {
   }
 
   @Override
-  public List getAll(DataHandler.BoxType type) throws SQLException, ParseException {
+  public TermTaskContainer getContainer(TermTaskContainer.ContainerType containerTask) throws SQLException, ParseException {
     final String sqlRequest = "SELECT * FROM task_box where type = ?";
 
     PreparedStatement statement = connection.prepareStatement(sqlRequest);
 
-    String boxType = DataHandler.getBoxName(type);
+    String boxType = DataHandler.getBoxName(containerTask);
 
     statement.setString(1, boxType);
 
-    ArrayList<Task> list = new ArrayList<Task>();
+    TermTaskContainer container = new TermTaskContainer(containerTask);
 
     ResultSet rs = statement.executeQuery();
     while (rs.next()) {
-      list.add(new Task(
+      container.add(new Task(
           rs.getString("statement"),
           TimeManager.convertToLocalTimeZone(rs.getObject("time_of_creation", LocalDateTime.class)),
           TimeManager.convertToLocalTimeZone(rs.getObject("time_of_last_change", LocalDateTime.class))
@@ -144,17 +143,17 @@ public class JDBCWorker implements TaskWorker {
     rs.close();
     statement.close();
 
-    return list;
+    return container;
   }
 
-  private void updateAll(List<Task> updateList, DataHandler.BoxType type) throws Exception {
+  private void updateAll(TermTaskContainer container) throws Exception {
     final String updateRequest = "UPDATE task_box SET statement = ?, time_of_last_change = ? WHERE time_of_creation " +
         "= ?";
 
     PreparedStatement statement = connection.prepareStatement(updateRequest);
 
 
-    for (Task updatedTask : updateList) {
+    for (Task updatedTask : container.getList()) {
       statement.setString(1, updatedTask.getStatement());
       statement.setObject(2, updatedTask.getTimeOfLastChange());
       statement.setObject(3, updatedTask.getTimeOfCreation());

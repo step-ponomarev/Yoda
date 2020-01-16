@@ -1,15 +1,15 @@
 package edu.ponomarev.step.MVC.model.worker.taskWorker.offile;
 
 import edu.ponomarev.step.MVC.model.worker.TaskWorker;
-import edu.ponomarev.step.MVC.model.DataHandler;
 import edu.ponomarev.step.component.task.InformatedTask;
 import edu.ponomarev.step.component.task.Task;
+import edu.ponomarev.step.component.taskContainer.TaskContainer;
+import edu.ponomarev.step.component.taskContainer.TermTaskContainer;
 
 import java.io.*;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Queue;
 
 public class Serializator implements TaskWorker {
@@ -20,7 +20,7 @@ public class Serializator implements TaskWorker {
   }
 
   @Override
-  public void push(Task task, DataHandler.BoxType type) throws Exception {
+  public void push(InformatedTask task) throws Exception {
     String dir = directory;
 
     File file = new File(directory);
@@ -28,7 +28,7 @@ public class Serializator implements TaskWorker {
       file.mkdir();
     }
 
-    dir = addFileNameToPath(type, dir);
+    dir = addFileNameToPath(task.getContainerType(), dir);
 
     ArrayList<Task> tasks;
     file = new File(dir);
@@ -56,7 +56,7 @@ public class Serializator implements TaskWorker {
   }
 
   @Override
-  public void pushAll(List<Task> task, DataHandler.BoxType type) throws Exception {
+  public void push(TermTaskContainer container) throws Exception {
     String dir = directory;
 
     File file = new File(directory);
@@ -64,7 +64,7 @@ public class Serializator implements TaskWorker {
       file.mkdir();
     }
 
-    dir = addFileNameToPath(type, dir);
+    dir = addFileNameToPath(container.getContainerType(), dir);
 
     file = new File(dir);
     if (!file.exists()) {
@@ -74,7 +74,7 @@ public class Serializator implements TaskWorker {
     FileOutputStream os = new FileOutputStream(file);
     ObjectOutputStream osObj = new ObjectOutputStream(os);
 
-    osObj.writeObject(task);
+    osObj.writeObject(container.getList());
 
     osObj.close();
     os.close();
@@ -84,28 +84,28 @@ public class Serializator implements TaskWorker {
   public void remove(InformatedTask tasks) {}
 
   @Override
-  public void removeAll(Queue<InformatedTask> tasks) {}
+  public void remove(Queue<InformatedTask> tasks) {}
 
   @Override
-  public List getAll(DataHandler.BoxType type) throws Exception {
+  public TaskContainer getContainer(TermTaskContainer.ContainerType containerTask) throws Exception {
     String dir = directory;
 
     File file = new File(directory);
     if (!file.exists()) {
-      return (new ArrayList<Task>());
+      return (new TermTaskContainer(containerTask));
     }
 
-    dir = addFileNameToPath(type, dir);
+    dir = addFileNameToPath(containerTask, dir);
 
     file = new File(dir);
     if (!file.exists()) {
-      return (new ArrayList<Task>());
+      return (new TermTaskContainer(containerTask));
     }
 
     FileInputStream is = new FileInputStream(file);
     ObjectInputStream isObj = new ObjectInputStream(is);
 
-    ArrayList<Task> tasks = (ArrayList<Task>) isObj.readObject();
+    TermTaskContainer tasks = (TermTaskContainer) isObj.readObject();
 
     isObj.close();
     is.close();
@@ -113,8 +113,8 @@ public class Serializator implements TaskWorker {
     return tasks;
   }
 
-  private String addFileNameToPath(DataHandler.BoxType type, String path) {
-    switch (type) {
+  private String addFileNameToPath(TermTaskContainer.ContainerType containerType, String path) {
+    switch (containerType) {
       case DAY:
         path = Paths.get(directory + "/box_today.ser").toAbsolutePath().toString();
         break;

@@ -1,50 +1,52 @@
 package edu.ponomarev.step.MVC.view.main;
 
+import edu.ponomarev.step.component.taskContainer.TermTaskContainer;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class TextPanel extends JPanel {
-  JTextField textField;
-  JComboBox boxList;
-  JButton synchButton;
+  private JTextField taskStatementField;
+  private JComboBox<TermTaskContainer.ContainerVariable> containerTypeList;
+  private JButton synchButton;
 
   public TextPanel() {
     super();
-    textField = new JTextField("Новая задача...");
-    boxList = new JComboBox();
+    taskStatementField = new JTextField("Новая задача...");
+    containerTypeList = new JComboBox();
     synchButton = new JButton("Synch");
   }
 
   public void run() {
     this.setLayout(new BorderLayout());
-    this.add(textField, BorderLayout.CENTER);
-    this.add(boxList, BorderLayout.WEST);
+    this.add(taskStatementField, BorderLayout.CENTER);
+    this.add(containerTypeList, BorderLayout.WEST);
     this.add(synchButton, BorderLayout.EAST);
 
-    this.textField.setPreferredSize( new Dimension(200, 24));
+    this.taskStatementField.setPreferredSize( new Dimension(200, 24));
 
     this.setBackground(new Color(255, 255, 255));
     this.setVisible(true);
   }
 
   public void resetTextField() {
-    textField.setText("Новая задача...");
+    taskStatementField.setText("Новая задача...");
   }
 
-  public JTextField getTextField() {
-    return textField;
+  public JTextField getTaskStatementField() {
+    return taskStatementField;
   }
 
-  public void setTextField(JTextField textField) {
-    this.textField = textField;
+  public void setTaskStatementField(JTextField taskStatementField) {
+    this.taskStatementField = taskStatementField;
   }
 
-  public JComboBox getBoxList() {
-    return boxList;
+  public JComboBox getContainerTypeList() {
+    return containerTypeList;
   }
 
-  public void setBoxList(JComboBox boxList) {
-    this.boxList = boxList;
+  public void setContainerTypeList(JComboBox containerTypeList) {
+    this.containerTypeList = containerTypeList;
   }
 
   public JButton getSynchButton() {

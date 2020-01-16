@@ -4,100 +4,69 @@ import edu.ponomarev.step.component.task.InformatedTask;
 import edu.ponomarev.step.dao.DataBaseManager;
 import edu.ponomarev.step.MVC.model.worker.TaskWorker;
 import edu.ponomarev.step.component.task.Task;
-import edu.ponomarev.step.component.task.TaskContainer;
+import edu.ponomarev.step.component.taskContainer.TermTaskContainer;
 
 import java.util.*;
 
 public class DataHandler {
-  public static class BoxVariable {
-    public DataHandler.BoxType type;
-    public String boxName;
+  private DataBaseManager dataBaseManager;
+  private TaskWorker taskWorker;
 
-    public BoxVariable(DataHandler.BoxType type, String boxName) {
-      this.type = type;
-      this.boxName = boxName;
-    }
-
-    @Override
-    public String toString() {
-      return boxName;
-    }
-  }
-
-  public enum BoxType {
-    INBOX,
-    DAY,
-    WEEK,
-    LATE
-  }
-
-  final public static BoxVariable[] BOX_VARIABLES = new BoxVariable[] {
-      new BoxVariable(DataHandler.BoxType.INBOX, "Входящие"),
-      new BoxVariable(DataHandler.BoxType.DAY, "Сегодня"),
-      new BoxVariable(DataHandler.BoxType.WEEK, "На неделе"),
-      new BoxVariable(DataHandler.BoxType.LATE, "Позже")
-  };
-
-  private DataBaseManager DBmanager;
-  private TaskWorker dataWorker;
-
-  private HashMap<DataHandler.BoxType, TaskContainer> taskBox;
+  private HashMap<TermTaskContainer.ContainerType, TermTaskContainer> taskContainers;
 
   private Queue<InformatedTask> tasksToRemoveQueue;
 
-  public static String getBoxName(BoxType boxType) {
-    String boxName =  new String();
-    for (BoxVariable item : DataHandler.BOX_VARIABLES) {
-      if (boxType.equals(item.type)) {
-        boxName = item.boxName;
+  public DataHandler() {
+    taskContainers = new HashMap<>() {{
+      put(TermTaskContainer.ContainerType.INBOX, new TermTaskContainer(TermTaskContainer.ContainerType.INBOX));
+      put(TermTaskContainer.ContainerType.DAY, new TermTaskContainer(TermTaskContainer.ContainerType.DAY));
+      put(TermTaskContainer.ContainerType.WEEK, new TermTaskContainer(TermTaskContainer.ContainerType.WEEK));
+      put(TermTaskContainer.ContainerType.LATE, new TermTaskContainer(TermTaskContainer.ContainerType.LATE));
+    }};
+
+    this.tasksToRemoveQueue = new LinkedList<>();
+    this.dataBaseManager = new DataBaseManager();
+    this.taskWorker = dataBaseManager.getOfflineWorker();
+  }
+
+  public static String getBoxName(TermTaskContainer.ContainerType containerType) {
+    for (TermTaskContainer.ContainerVariable item : TermTaskContainer.BOX_VARIABLES) {
+      if (containerType.equals(item.type)) {
+        return item.name;
       }
     }
 
-    return boxName;
+    return null;
   }
 
-  public DataHandler() {
-    taskBox = new HashMap<DataHandler.BoxType, TaskContainer>() {{
-      put(BoxType.INBOX, new TaskContainer());
-      put(BoxType.DAY, new TaskContainer());
-      put(BoxType.WEEK, new TaskContainer());
-      put(BoxType.LATE, new TaskContainer());
-    }};
-    this.tasksToRemoveQueue = new LinkedList<InformatedTask>();
-
-    this.DBmanager = new DataBaseManager();
-    this.dataWorker = DBmanager.getOfflineWorker();
-    pullAll();
-  }
-
-  public void addTask(BoxType type, Task task) {
-    taskBox.get(type).add(task);
+  public void addTask(InformatedTask informatedTask) {
+    taskContainers.get(informatedTask.getContainerType()).add(informatedTask);
 
     try {
       //Offline pushing;
-      this.dataWorker = DBmanager.getOfflineWorker();
-      this.dataWorker.push(task, type);
+      this.taskWorker = dataBaseManager.getOfflineWorker();
+      this.taskWorker.push(informatedTask);
 
 
       //Try to push to DB
-      this.dataWorker = DBmanager.getOnlineWorker();
-      if (DBmanager.isONLINE()) {
-        dataWorker.push(task, type);
+      this.taskWorker = dataBaseManager.getOnlineWorker();
+      if (dataBaseManager.isONLINE()) {
+        taskWorker.push(informatedTask);
       }
     } catch (Exception exception) {
       System.err.println(exception.getMessage());
     }
   }
 
-  public void removeTask(InformatedTask task) {
-    tasksToRemoveQueue.add(task);
+  public void removeTask(InformatedTask informatedTask) {
+    tasksToRemoveQueue.add(informatedTask);
 
-    taskBox.get(task.getBoxType()).remove(task);
+    taskContainers.get(informatedTask.getContainerType()).remove(informatedTask);
   }
 
   public void removeAll() {
     try {
-      dataWorker.removeAll(tasksToRemoveQueue);
+      taskWorker.remove(tasksToRemoveQueue);
     } catch (Exception e) {
       System.err.println(e.getMessage());
     }
@@ -105,8 +74,8 @@ public class DataHandler {
 
   public void pushAll() {
     try {
-      for (Map.Entry<DataHandler.BoxType, TaskContainer> box : taskBox.entrySet()) {
-        this.dataWorker.pushAll(box.getValue().getList(), box.getKey());
+      for (Map.Entry<TermTaskContainer.ContainerType, TermTaskContainer> box : taskContainers.entrySet()) {
+        this.taskWorker.push(box.getValue());
       }
     } catch (Exception e) {
       System.err.println(e.getMessage());
@@ -115,8 +84,8 @@ public class DataHandler {
 
   public void pullAll() {
     try {
-      for (Map.Entry<DataHandler.BoxType, TaskContainer> box : taskBox.entrySet()) {
-        box.getValue().setList(dataWorker.getAll(box.getKey()));
+      for (Map.Entry<TermTaskContainer.ContainerType, TermTaskContainer> box : taskContainers.entrySet()) {
+        taskContainers.replace(box.getKey(), (TermTaskContainer) taskWorker.getContainer(box.getKey()));
       }
     } catch (Exception e) {
       System.err.println(e.getMessage());
@@ -125,46 +94,50 @@ public class DataHandler {
 
   public void updateAll() {
     try {
-      for (Map.Entry<DataHandler.BoxType, TaskContainer> box : taskBox.entrySet()) {
-        BoxType boxType = box.getKey();
-        synchList(boxType, dataWorker.getAll(boxType));
+      for (Map.Entry<TermTaskContainer.ContainerType, TermTaskContainer> box : taskContainers.entrySet()) {
+        TermTaskContainer.ContainerType containerTask = box.getKey();
+        synchTasks((TermTaskContainer) taskWorker.getContainer(containerTask));
       }
     } catch (Exception e) {
       System.err.println(e.getMessage());
     }
   }
 
-  private void synchList(BoxType type, List<Task> updatedList) {
-    List<Task> listToUpdate = this.taskBox.get(type).getList();
+  public HashMap<TermTaskContainer.ContainerType, TermTaskContainer> getContainer() { return taskContainers; }
 
-    for (Task task : updatedList) {
-      if (!listToUpdate.contains(task)) {
-        listToUpdate.add(task);
-      } else {
-        Task taskToUpdate = listToUpdate.get(listToUpdate.indexOf(task));
+  public TermTaskContainer getContainer(TermTaskContainer.ContainerType containerType) {
+    return taskContainers.get(containerType);
+  }
 
-        if ( task.getTimeOfLastChange().isAfter(taskToUpdate.getTimeOfLastChange()) ) {
-          taskToUpdate.setStatement(task.getStatement());
-          taskToUpdate.setTTimeOfLastChange(task.getTimeOfLastChange());
+
+  public DataBaseManager getDataBaseManager() { return dataBaseManager; }
+
+  public TaskWorker getTaskWorker() {
+    return taskWorker;
+  }
+
+  public HashMap<TermTaskContainer.ContainerType, TermTaskContainer> getTaskContainers() {
+    return taskContainers;
+  }
+
+  public void setOnlineWorker() { this.taskWorker = this.dataBaseManager.getOnlineWorker(); }
+
+  public void setOfflineWorker() { this.taskWorker = this.dataBaseManager.getOfflineWorker(); }
+
+  private void synchTasks(TermTaskContainer updatedTasks) {
+    List<Task> tasksToUpdate = this.taskContainers.get(updatedTasks.getContainerType()).getList();
+
+    for (Task currentTask : updatedTasks.getList()) {
+      if (tasksToUpdate.contains(currentTask)) {
+        Task taskToUpdate = tasksToUpdate.get(tasksToUpdate.indexOf(currentTask));
+        if (currentTask.getTimeOfLastChange().isAfter(taskToUpdate.getTimeOfLastChange())) {
+          taskToUpdate.setStatement(currentTask.getStatement());
+          taskToUpdate.setTTimeOfLastChange(currentTask.getTimeOfLastChange());
         }
       }
     }
+
+    tasksToUpdate.removeAll(updatedTasks.getList());
+    tasksToUpdate.addAll(updatedTasks.getList());
   }
-
-
-  public HashMap<DataHandler.BoxType, TaskContainer> getBox() { return taskBox; }
-
-  public DataBaseManager getDBmanager() { return DBmanager; }
-
-  public TaskWorker getDataWorker() {
-    return dataWorker;
-  }
-
-  public HashMap<BoxType, TaskContainer> getTaskBox() {
-    return taskBox;
-  }
-
-  public void setOnlineWorker() { this.dataWorker = this.DBmanager.getOnlineWorker(); }
-
-  public void setOfflineWorker() { this.dataWorker = this.DBmanager.getOfflineWorker(); }
-};
+}

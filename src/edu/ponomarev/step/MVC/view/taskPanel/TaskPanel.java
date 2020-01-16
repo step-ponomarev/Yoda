@@ -1,6 +1,7 @@
 package edu.ponomarev.step.MVC.view.taskPanel;
 
-import edu.ponomarev.step.component.task.TaskContainer;
+import edu.ponomarev.step.component.task.Task;
+import edu.ponomarev.step.component.taskContainer.TermTaskContainer;
 import edu.ponomarev.step.MVC.model.DataHandler;
 
 import javax.swing.*;
@@ -10,33 +11,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TaskPanel extends JPanel {
-  private JScrollPane scrollPane;
-  private JLabel boxLabel;
-
-  private HashMap<DataHandler.BoxType, JList> listMap;
-
+  private TermTaskContainer.ContainerType selectedType;
+  private HashMap<TermTaskContainer.ContainerType, JList> listMap;
   private ArrayList<TaskBoxModule> boxModules;
-
-  private DataHandler.BoxType currentBoxType;
 
   public TaskPanel() {
     super();
-    this.boxLabel = new JLabel();
-    this.listMap = new HashMap<DataHandler.BoxType, JList>();
-    this.boxModules = new ArrayList<TaskBoxModule>();
+    this.listMap = new HashMap<>();
+    this.boxModules = new ArrayList<>();
   }
 
   public void run() {
     this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
     //Creating TaskBlocks in certain sequence
-    for (DataHandler.BoxVariable boxVariavle : DataHandler.BOX_VARIABLES) {
-      DataHandler.BoxType boxType = boxVariavle.type;
-      listMap.get(boxType).setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-      this.boxModules.add(new TaskBoxModule(DataHandler.getBoxName(boxType), listMap.get(boxType), boxType));
-    }
+    for (TermTaskContainer.ContainerVariable boxVariavle : TermTaskContainer.BOX_VARIABLES) {
+      final var boxContainerType = boxVariavle.type;
 
-    boxLabel.setBackground(Color.WHITE);
+      this.listMap.get(boxContainerType).setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+      this.boxModules.add(new TaskBoxModule(DataHandler.getBoxName(boxContainerType),
+          this.listMap.get(boxContainerType), boxContainerType));
+    }
 
     for (TaskBoxModule boxModule : boxModules) {
       this.add(boxModule);
@@ -47,37 +42,42 @@ public class TaskPanel extends JPanel {
     this.setVisible(true);
   }
 
-  public DataHandler.BoxType getCurrentBoxType() {
-    return currentBoxType;
-  }
 
-  public void setCurrentBoxType(DataHandler.BoxType currentBoxType) {
-    this.currentBoxType = currentBoxType;
-  }
-
-  public HashMap<DataHandler.BoxType, JList> getListMap() {
+  public HashMap<TermTaskContainer.ContainerType, JList> getListMap() {
     return listMap;
   }
 
-  public void setListMap(HashMap<DataHandler.BoxType, TaskContainer> listMap) {
+  public void setListMap(HashMap<TermTaskContainer.ContainerType, TermTaskContainer> listMap) {
     this.listMap.clear();
-    for (DataHandler.BoxVariable boxVariavle : DataHandler.BOX_VARIABLES) {
+    for (TermTaskContainer.ContainerVariable boxVariavle : TermTaskContainer.BOX_VARIABLES) {
       this.listMap.put(boxVariavle.type, new JList(listMap.get(boxVariavle.type).toArray()));
     }
   }
 
   public void repaintAllModules() {
-    for (Map.Entry<DataHandler.BoxType, JList> boxBlock : listMap.entrySet()) {
+    for (Map.Entry<TermTaskContainer.ContainerType, JList> boxBlock : listMap.entrySet()) {
       boxBlock.getValue().repaint();
     }
   }
 
-  public JScrollPane getScrollPane() {
-    return scrollPane;
+  public Task getSelectedTask() {
+    Task task = null;
+    for (Map.Entry<TermTaskContainer.ContainerType, JList> boxBlock : listMap.entrySet()) {
+      if (!boxBlock.getValue().isSelectionEmpty()) {
+        task = (Task) boxBlock.getValue().getSelectedValue();
+        break;
+      }
+    }
+
+    return task;
   }
 
-  public void setScrollPane(JScrollPane scrollPane) {
-    this.scrollPane = scrollPane;
+  public TermTaskContainer.ContainerType getSelectedType() {
+    return selectedType;
+  }
+
+  public void setSelectedType(TermTaskContainer.ContainerType selectedType) {
+    this.selectedType = selectedType;
   }
 
   public ArrayList<TaskBoxModule> getBoxModules() {
@@ -86,13 +86,5 @@ public class TaskPanel extends JPanel {
 
   public void setBoxModules(ArrayList<TaskBoxModule> boxModules) {
     this.boxModules = boxModules;
-  }
-
-  public void setBoxLabel(String label) {
-    boxLabel.setText(label);
-  }
-
-  public JLabel getBoxLabel() {
-    return boxLabel;
   }
 }
