@@ -8,6 +8,8 @@ import edu.ponomarev.step.component.taskContainer.TermTaskContainer;
 
 import java.util.*;
 
+import static edu.ponomarev.step.Main.context;
+
 public class DataHandler {
   private DataBaseManager dataBaseManager;
   private TaskWorker taskWorker;
@@ -25,7 +27,7 @@ public class DataHandler {
     }};
 
     this.tasksToRemoveQueue = new LinkedList<>();
-    this.dataBaseManager = new DataBaseManager();
+    this.dataBaseManager = context.getBean("dataBaseManager", DataBaseManager.class);
     this.taskWorker = dataBaseManager.getOfflineWorker();
   }
 
