@@ -1,9 +1,10 @@
 package edu.ponomarev.step.MVC.model.repository.task;
 
-import edu.ponomarev.step.MVC.model.TaskWorker;
 import edu.ponomarev.step.component.task.InformatedTask;
 import edu.ponomarev.step.component.task.Task;
+import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable;
 import edu.ponomarev.step.component.taskContainer.termContainer.TermTaskContainer;
+import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable.ContainerType;
 import edu.ponomarev.step.system.TimeManager;
 
 import java.sql.*;
@@ -23,7 +24,7 @@ public class sqlTaskRepository implements TaskRepository {
   public void add(InformatedTask task) {
     final String insertRequest = "INSERT INTO task_box (time_of_creation, time_of_last_change, statement, type) " +
         "VALUES (?, ?, ?, ?);";
-    String boxType = TaskWorker.getBoxName(task.getContainerType());
+    String boxType = ContainerVariable.getBoxName(task.getContainerType());
 
     try {
       PreparedStatement statement = connection.prepareStatement(insertRequest);
@@ -49,7 +50,7 @@ public class sqlTaskRepository implements TaskRepository {
     try {
       PreparedStatement statement = connection.prepareStatement(selectRequest);
 
-      String boxType = TaskWorker.getBoxName(container.getContainerType());
+      String boxType = ContainerVariable.getBoxName(container.getContainerType());
 
       statement.setString(1, boxType);
 
@@ -180,7 +181,7 @@ public class sqlTaskRepository implements TaskRepository {
   }
 
   @Override
-  public TermTaskContainer getContainer(TermTaskContainer.ContainerType containerType) {
+  public TermTaskContainer getContainer(ContainerType containerType) {
     final String sqlRequest = "SELECT * FROM task_box where type = ?";
 
     TermTaskContainer container = new TermTaskContainer(containerType);
@@ -188,7 +189,7 @@ public class sqlTaskRepository implements TaskRepository {
     try {
       PreparedStatement statement = connection.prepareStatement(sqlRequest);
 
-      String boxType = TaskWorker.getBoxName(containerType);
+      String boxType = ContainerVariable.getBoxName(containerType);
 
       statement.setString(1, boxType);
 

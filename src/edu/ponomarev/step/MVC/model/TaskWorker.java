@@ -45,6 +45,7 @@ public class TaskWorker {
     if (repositoryFactory.isOnline()) {
       taskSqlRepository.add(informatedTask);
     } else {
+      System.err.println("No connection");
       return;
       //TODO пытаемся восстановить коннекшен
     }
@@ -59,6 +60,7 @@ public class TaskWorker {
     if (repositoryFactory.isOnline()) {
       taskSqlRepository.remove(informatedTask);
     } else {
+      System.err.println("No connection");
       return;
       // TODO Пытаемся восстановить коннекшен
     }
@@ -70,6 +72,7 @@ public class TaskWorker {
     if (repositoryFactory.isOnline()) {
       taskSqlRepository.remove(removeQueueOfTasks);
     } else {
+      System.err.println("No connection");
       return;
       // TODO пытаесчя восстановить коннекшен
     }
@@ -85,6 +88,7 @@ public class TaskWorker {
       if (repositoryFactory.isOnline()) {
         taskSqlRepository.add(container);
       } else {
+        System.err.println("No connection");
         return;
         // TODO Востсанавливаем коннекшен в другом потоке....
       }
@@ -93,11 +97,7 @@ public class TaskWorker {
 
   // TODO Реализовать обновлеие задач/задачи
 
-  public HashMap<ContainerType, TermTaskContainer> getContainer() {
-    return taskContainers;
-  }
+  public HashMap<ContainerType, TermTaskContainer> getContainer() { return taskContainers; }
 
-  public TermTaskContainer getContainer(ContainerType containerType) {
-    return taskContainers.get(containerType);
-  }
+  public TermTaskContainer getContainer(ContainerType containerType) { return taskContainers.get(containerType); }
 }

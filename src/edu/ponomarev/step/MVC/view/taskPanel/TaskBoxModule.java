@@ -1,6 +1,6 @@
 package edu.ponomarev.step.MVC.view.taskPanel;
 
-import edu.ponomarev.step.component.taskContainer.termContainer.TermTaskContainer;
+import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable.ContainerType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,9 +8,9 @@ import java.awt.*;
 public class TaskBoxModule extends JPanel {
   private JLabel boxNameLabel;
   private JScrollPane taskScrollPane;
-  private TermTaskContainer.ContainerType moduleType;
+  private ContainerType moduleType;
 
-  public TaskBoxModule(String boxName, JList list, TermTaskContainer.ContainerType containerType) {
+  public TaskBoxModule(String boxName, JList list, ContainerType containerType) {
     super();
 
     this.boxNameLabel = new JLabel(boxName);
@@ -39,11 +39,11 @@ public class TaskBoxModule extends JPanel {
     this.taskScrollPane = taskScrollPane;
   }
 
-  public TermTaskContainer.ContainerType getModuleType() {
+  public ContainerType getModuleType() {
     return moduleType;
   }
 
-  public void setModuleType(TermTaskContainer.ContainerType moduleType) {
+  public void setModuleType(ContainerType moduleType) {
     this.moduleType = moduleType;
   }
 }

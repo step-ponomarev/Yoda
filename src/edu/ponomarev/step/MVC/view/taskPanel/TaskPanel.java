@@ -45,26 +45,26 @@ public class TaskPanel extends JPanel {
   }
 
 
-  public HashMap<TermTaskContainer.ContainerType, JList> getListMap() {
+  public HashMap<ContainerType, JList> getListMap() {
     return listMap;
   }
 
-  public void setListMap(HashMap<TermTaskContainer.ContainerType, TermTaskContainer> listMap) {
+  public void setListMap(HashMap<ContainerType, TermTaskContainer> listMap) {
     this.listMap.clear();
-    for (TermTaskContainer.ContainerVariable boxVariavle : TermTaskContainer.BOX_VARIABLES) {
+    for (ContainerVariable boxVariavle : ContainerVariable.BOX_VARIABLES) {
       this.listMap.put(boxVariavle.type, new JList(listMap.get(boxVariavle.type).toArray()));
     }
   }
 
   public void repaintAllModules() {
-    for (Map.Entry<TermTaskContainer.ContainerType, JList> boxBlock : listMap.entrySet()) {
+    for (Map.Entry<ContainerType, JList> boxBlock : listMap.entrySet()) {
       boxBlock.getValue().repaint();
     }
   }
 
   public Task getSelectedTask() {
     Task task = null;
-    for (Map.Entry<TermTaskContainer.ContainerType, JList> boxBlock : listMap.entrySet()) {
+    for (Map.Entry<ContainerType, JList> boxBlock : listMap.entrySet()) {
       if (!boxBlock.getValue().isSelectionEmpty()) {
         task = (Task) boxBlock.getValue().getSelectedValue();
         break;
@@ -74,7 +74,7 @@ public class TaskPanel extends JPanel {
     return task;
   }
 
-  public TermTaskContainer.ContainerType getSelectedType() {
+  public ContainerType getSelectedType() {
     return selectedType;
   }
 

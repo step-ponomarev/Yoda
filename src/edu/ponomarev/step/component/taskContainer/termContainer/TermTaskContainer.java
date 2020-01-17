@@ -1,4 +1,5 @@
 package edu.ponomarev.step.component.taskContainer.termContainer;
+
 import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.component.taskContainer.TaskContainer;
 import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable.ContainerType;

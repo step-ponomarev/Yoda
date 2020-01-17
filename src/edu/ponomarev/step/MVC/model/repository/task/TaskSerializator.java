@@ -4,6 +4,7 @@ import edu.ponomarev.step.component.task.InformatedTask;
 import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.component.taskContainer.TaskContainer;
 import edu.ponomarev.step.component.taskContainer.termContainer.TermTaskContainer;
+import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable.ContainerType;
 
 import java.io.*;
 
@@ -96,7 +97,7 @@ public class TaskSerializator implements TaskRepository {
   }
 
   @Override
-  public TaskContainer getContainer(TermTaskContainer.ContainerType containerType) {
+  public TaskContainer getContainer(ContainerType containerType) {
     setUpPath(containerType);
 
     File file = new File(directory);
@@ -172,7 +173,7 @@ public class TaskSerializator implements TaskRepository {
     }
   }
 
-  private void setUpPath(TermTaskContainer.ContainerType containerType) {
+  private void setUpPath(ContainerType containerType) {
     File file = new File(directory);
     if (!file.exists()) {
       file.mkdir();
@@ -181,7 +182,7 @@ public class TaskSerializator implements TaskRepository {
     addFileNameToPath(containerType);
   }
 
-  private void addFileNameToPath(TermTaskContainer.ContainerType containerType) {
+  private void addFileNameToPath(ContainerType containerType) {
     switch (containerType) {
       case DAY:
         directory = Paths.get(directory + "/box_today.ser").toAbsolutePath().toString();

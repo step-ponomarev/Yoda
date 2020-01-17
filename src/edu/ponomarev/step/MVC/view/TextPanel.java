@@ -1,13 +1,13 @@
 package edu.ponomarev.step.MVC.view;
 
-import edu.ponomarev.step.component.taskContainer.termContainer.TermTaskContainer;
+import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class TextPanel extends JPanel {
   private JTextField taskStatementField;
-  private JComboBox<TermTaskContainer.ContainerVariable> containerTypeList;
+  private JComboBox<ContainerVariable> containerTypeList;
   private JButton synchButton;
 
   public TextPanel() {

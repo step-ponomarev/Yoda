@@ -26,6 +26,16 @@ public class RepositoryFactory {
 
   private Connection connection;
 
+  @PostConstruct
+  private void setConnection() {
+    try {
+      Class.forName("com.mysql.jdbc.Driver");
+      connection = DriverManager.getConnection(url, user, password);
+    } catch (Exception e) {
+      System.err.println(e.getMessage());
+    }
+  }
+
   public TaskRepository getSqlTaskRepository() {
     try {
       if (!connection.isClosed()) {
@@ -54,16 +64,6 @@ public class RepositoryFactory {
     }
 
     return status;
-  }
-
-  @PostConstruct
-  private void setConnection() {
-    try {
-      Class.forName("com.mysql.jdbc.Driver");
-      connection = DriverManager.getConnection(url, user, password);
-    } catch (Exception e) {
-      System.err.println(e.getMessage());
-    }
   }
 
   @PreDestroy
