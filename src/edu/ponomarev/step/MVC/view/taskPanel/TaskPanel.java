@@ -1,7 +1,9 @@
 package edu.ponomarev.step.MVC.view.taskPanel;
 
 import edu.ponomarev.step.component.task.Task;
-import edu.ponomarev.step.component.taskContainer.TermTaskContainer;
+import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable;
+import edu.ponomarev.step.component.taskContainer.termContainer.TermTaskContainer;
+import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable.ContainerType;
 import edu.ponomarev.step.MVC.model.TaskWorker;
 
 import javax.swing.*;
@@ -11,8 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TaskPanel extends JPanel {
-  private TermTaskContainer.ContainerType selectedType;
-  private HashMap<TermTaskContainer.ContainerType, JList> listMap;
+  private ContainerType selectedType;
+  private HashMap<ContainerType, JList> listMap;
   private ArrayList<TaskBoxModule> boxModules;
 
   public TaskPanel() {
@@ -25,11 +27,11 @@ public class TaskPanel extends JPanel {
     this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
     //Creating TaskBlocks in certain sequence
-    for (TermTaskContainer.ContainerVariable boxVariavle : TermTaskContainer.BOX_VARIABLES) {
+    for (ContainerVariable boxVariavle : ContainerVariable.BOX_VARIABLES) {
       final var boxContainerType = boxVariavle.type;
 
       this.listMap.get(boxContainerType).setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-      this.boxModules.add(new TaskBoxModule(TaskWorker.getBoxName(boxContainerType),
+      this.boxModules.add(new TaskBoxModule(ContainerVariable.getBoxName(boxContainerType),
           this.listMap.get(boxContainerType), boxContainerType));
     }
 
@@ -76,7 +78,7 @@ public class TaskPanel extends JPanel {
     return selectedType;
   }
 
-  public void setSelectedType(TermTaskContainer.ContainerType selectedType) {
+  public void setSelectedType(ContainerType selectedType) {
     this.selectedType = selectedType;
   }
 

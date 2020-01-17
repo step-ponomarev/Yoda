@@ -4,7 +4,8 @@ import edu.ponomarev.step.MVC.model.repository.task.TaskSerializator;
 import edu.ponomarev.step.MVC.model.repository.task.sqlTaskRepository;
 import edu.ponomarev.step.component.task.InformatedTask;
 import edu.ponomarev.step.MVC.model.repository.RepositoryFactory;
-import edu.ponomarev.step.component.taskContainer.TermTaskContainer;
+import edu.ponomarev.step.component.taskContainer.termContainer.TermTaskContainer;
+import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable.ContainerType;
 
 import java.util.*;
 
@@ -16,16 +17,16 @@ public class TaskWorker {
   private TaskSerializator taskSerializator;
   private sqlTaskRepository taskSqlRepository;
 
-  private HashMap<TermTaskContainer.ContainerType, TermTaskContainer> taskContainers;
+  private HashMap<ContainerType, TermTaskContainer> taskContainers;
 
   private Queue<InformatedTask> removeQueueOfTasks;
 
   public TaskWorker() {
     taskContainers = new HashMap<>() {{
-      put(TermTaskContainer.ContainerType.INBOX, new TermTaskContainer(TermTaskContainer.ContainerType.INBOX));
-      put(TermTaskContainer.ContainerType.DAY, new TermTaskContainer(TermTaskContainer.ContainerType.DAY));
-      put(TermTaskContainer.ContainerType.WEEK, new TermTaskContainer(TermTaskContainer.ContainerType.WEEK));
-      put(TermTaskContainer.ContainerType.LATE, new TermTaskContainer(TermTaskContainer.ContainerType.LATE));
+      put(ContainerType.INBOX, new TermTaskContainer(ContainerType.INBOX));
+      put(ContainerType.DAY, new TermTaskContainer(ContainerType.DAY));
+      put(ContainerType.WEEK, new TermTaskContainer(ContainerType.WEEK));
+      put(ContainerType.LATE, new TermTaskContainer(ContainerType.LATE));
     }};
 
     removeQueueOfTasks = new LinkedList<>();
@@ -34,16 +35,6 @@ public class TaskWorker {
 
     taskSerializator = (TaskSerializator) repositoryFactory.getTaskSerializator();
     taskSqlRepository = (sqlTaskRepository) repositoryFactory.getSqlTaskRepository();
-  }
-
-  public static String getBoxName(TermTaskContainer.ContainerType containerType) {
-    for (TermTaskContainer.ContainerVariable item : TermTaskContainer.BOX_VARIABLES) {
-      if (containerType.equals(item.type)) {
-        return item.name;
-      }
-    }
-
-    return null;
   }
 
   public void addTask(InformatedTask informatedTask) {
@@ -102,11 +93,11 @@ public class TaskWorker {
 
   // TODO Реализовать обновлеие задач/задачи
 
-  public HashMap<TermTaskContainer.ContainerType, TermTaskContainer> getContainer() {
+  public HashMap<ContainerType, TermTaskContainer> getContainer() {
     return taskContainers;
   }
 
-  public TermTaskContainer getContainer(TermTaskContainer.ContainerType containerType) {
+  public TermTaskContainer getContainer(ContainerType containerType) {
     return taskContainers.get(containerType);
   }
 }

@@ -1,6 +1,6 @@
 package edu.ponomarev.step.MVC.view;
 
-import edu.ponomarev.step.component.taskContainer.TermTaskContainer;
+import edu.ponomarev.step.component.taskContainer.termContainer.TermTaskContainer;
 
 import javax.swing.*;
 import java.awt.*;

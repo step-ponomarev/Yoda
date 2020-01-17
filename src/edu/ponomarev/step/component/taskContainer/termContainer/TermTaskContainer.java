@@ -1,5 +1,7 @@
-package edu.ponomarev.step.component.taskContainer;
+package edu.ponomarev.step.component.taskContainer.termContainer;
 import edu.ponomarev.step.component.task.Task;
+import edu.ponomarev.step.component.taskContainer.TaskContainer;
+import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable.ContainerType;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -8,21 +10,6 @@ import java.util.Comparator;
 import java.util.List;
 
 public class TermTaskContainer implements TaskContainer, Serializable {
-  public static class ContainerVariable implements Serializable {
-    public ContainerType type;
-    public String name;
-
-    public ContainerVariable(ContainerType type, String name) {
-      this.type = type;
-      this.name = name;
-    }
-
-    @Override
-    public String toString() {
-      return name;
-    }
-  }
-
   class DateCompare implements Comparator<Task> {
     @Override
     public int compare(Task o1, Task o2) {
@@ -37,36 +24,12 @@ public class TermTaskContainer implements TaskContainer, Serializable {
     }
   }
 
-  public enum ContainerType {
-    INBOX(0),
-    DAY(1),
-    WEEK(2),
-    LATE(3);
-
-    private int value;
-
-    ContainerType(int i) {
-      this.value = i;
-    }
-
-    public int toInteger() {
-      return value;
-    }
-  }
-
   enum Strategy {
     DATE,
     STATEMENT
   }
 
-  final public static ContainerVariable[] BOX_VARIABLES = new ContainerVariable[] {
-      new ContainerVariable(ContainerType.INBOX, "Inbox"),
-      new ContainerVariable(ContainerType.DAY, "Today"),
-      new ContainerVariable(ContainerType.WEEK, "Week"),
-      new ContainerVariable(ContainerType.LATE, "Late")
-  };
-
-  private ContainerType containerType;
+  private ContainerVariable.ContainerType containerType;
   private ArrayList<Task> taskList;
   private Comparator<Task> sortStrategy;
 

@@ -4,7 +4,8 @@ import edu.ponomarev.step.component.task.InformatedTask;
 import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.MVC.view.Window;
 import edu.ponomarev.step.MVC.model.TaskWorker;
-import edu.ponomarev.step.component.taskContainer.TermTaskContainer;
+import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable;
+import edu.ponomarev.step.component.taskContainer.termContainer.TermTaskContainer;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -75,10 +76,10 @@ public class Controller {
     window.getTaskPanel().setListMap(taskWorker.getContainer());
     window.getTaskPanel().run();
 
-    for (var currentVariable : TermTaskContainer.BOX_VARIABLES) {
+    for (var currentVariable : ContainerVariable.BOX_VARIABLES) {
       window.getTaskPanel().getListMap().get(currentVariable.type).addListSelectionListener(e -> {
         //Clear selection of every box besides current.
-        for (var anotherVariable : TermTaskContainer.BOX_VARIABLES) {
+        for (var anotherVariable : ContainerVariable.BOX_VARIABLES) {
           if (!anotherVariable.type.equals(currentVariable.type)) {
             window.getTaskPanel().getListMap().get(anotherVariable.type).clearSelection();
           }
@@ -92,13 +93,13 @@ public class Controller {
   private void initTextPanel() {
     final int ENTER = 10;
 
-    for (var containerType : TermTaskContainer.BOX_VARIABLES) {
+    for (var containerType : ContainerVariable.BOX_VARIABLES) {
       window.getTextPanel().getContainerTypeList().addItem(containerType);
     }
 
     window.getTextPanel().resetTextField();
     window.getTextPanel().getTaskStatementField().selectAll();
-    window.getTextPanel().getContainerTypeList().setSelectedIndex(TermTaskContainer.ContainerType.INBOX.toInteger());
+    window.getTextPanel().getContainerTypeList().setSelectedIndex(ContainerVariable.ContainerType.INBOX.toInteger());
 
     window.getTextPanel().getTaskStatementField().addKeyListener(new KeyListener() {
       @Override
@@ -123,7 +124,8 @@ public class Controller {
   private void initButtonPanel() {
     //AddTask Button
     window.getButtonPanel().getAddButton().addActionListener(e -> {
-      final var selectedItem = (TermTaskContainer.ContainerVariable) window.getTextPanel().getContainerTypeList().getSelectedItem();
+      final var selectedItem =
+          (ContainerVariable) window.getTextPanel().getContainerTypeList().getSelectedItem();
 
       String taskStatement = window.getTextPanel().getTaskStatementField().getText().strip();
       //TODO Добавить ошибку при пустом поле при добавлении задачи
@@ -144,7 +146,7 @@ public class Controller {
     window.getButtonPanel().getEditButton().addActionListener(e -> {
       //TODO Сделать проверку выбранного таска(у нас 4 блока)
       boolean VALUE_IS_SELECTED = false;
-      for (var containerVariable : TermTaskContainer.BOX_VARIABLES) {
+      for (var containerVariable : ContainerVariable.BOX_VARIABLES) {
         VALUE_IS_SELECTED |= window.getTaskPanel().getListMap().get(containerVariable.type).isSelectionEmpty();
       }
 

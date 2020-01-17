@@ -2,7 +2,7 @@ package edu.ponomarev.step.MVC.model.repository.task;
 
 import edu.ponomarev.step.component.task.InformatedTask;
 import edu.ponomarev.step.component.taskContainer.TaskContainer;
-import edu.ponomarev.step.component.taskContainer.TermTaskContainer;
+import edu.ponomarev.step.component.taskContainer.termContainer.TermTaskContainer;
 
 import java.util.Queue;
 

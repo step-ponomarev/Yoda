@@ -1,6 +1,6 @@
 package edu.ponomarev.step.component.project;
 
-import edu.ponomarev.step.component.taskContainer.TermTaskContainer;
+import edu.ponomarev.step.component.taskContainer.termContainer.TermTaskContainer;
 
 import java.util.Calendar;
 import java.util.Objects;
