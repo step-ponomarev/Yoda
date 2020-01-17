@@ -23,14 +23,12 @@ public class Controller {
   }
 
   public void initView() {
-    synchFull();
     window.run();
 
     initMainWindow();
     initTaskPanel();
     initTextPanel();
     initButtonPanel();
-    changeWindowColorMode();
   }
 
   private void initMainWindow() {
@@ -47,7 +45,8 @@ public class Controller {
 
       @Override
       public void windowClosed(WindowEvent e) {
-        synchFull();
+        // TODO КНОПКА СИНХРОНИЗАЦИИ
+        return;
       }
 
       @Override
@@ -117,7 +116,6 @@ public class Controller {
     });
 
     window.getTextPanel().getSynchButton().addActionListener(e -> {
-      synchFull();
       window.getTaskPanel().repaintAllModules();
     });
   }
@@ -186,7 +184,6 @@ public class Controller {
           window.getEditPanel().getInformatedTask().getTask().setStatement(taskName);
           window.getEditPanel().getInformatedTask().getTask().updateTimeOfLastChange();
 
-          synchAfterChanging();
         }
 
         window.repaintMainWindow();
@@ -206,48 +203,6 @@ public class Controller {
       window.getTaskPanel().getListMap().get(typeOfRemovingTask).setListData(taskWorker.getContainer().get(typeOfRemovingTask).getList().toArray());
       window.getTaskPanel().getListMap().get(typeOfRemovingTask).repaint();
       window.repaintMainWindow();
-      synchAfterRemoving();
     });
-  }
-
-  private void synchFull() {
-    synchAfterChanging();
-    if (taskWorker.getDataBaseManager().isONLINE()) {
-      taskWorker.updateAll();
-    }
-
-    changeWindowColorMode();
-  }
-
-  private void synchAfterChanging() {
-    taskWorker.setOfflineWorker();
-    taskWorker.pushAll();
-
-    taskWorker.setOnlineWorker();
-    if (taskWorker.getDataBaseManager().isONLINE()) {
-      taskWorker.pushAll();
-    }
-
-    changeWindowColorMode();
-  }
-
-  private void synchAfterRemoving() {
-    taskWorker.setOfflineWorker();
-    taskWorker.pushAll();
-
-    taskWorker.setOnlineWorker();
-    if (taskWorker.getDataBaseManager().isONLINE()) {
-      taskWorker.removeAll();
-    }
-
-    changeWindowColorMode();
-  }
-
-  private void changeWindowColorMode() {
-    if (taskWorker.getDataBaseManager().isONLINE()) {
-      window.setBackground(Color.GREEN);
-    } else {
-      window.setBackground(Color.RED);
-    }
   }
 }

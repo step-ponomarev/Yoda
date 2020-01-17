@@ -24,11 +24,6 @@ public class TaskWorkerTest {
   }
 
   @Test
-  public void newTaskMasterShouldBeOffline() {
-    Assert.assertFalse(taskWorker.getDataBaseManager().isONLINE());
-  }
-
-  @Test
   public void containerOfNewTaskMasterShouldBeEmpty() {
     for (var entry : taskWorker.getContainer().entrySet()) {
       Assert.assertTrue(entry.getValue().isEmpty());

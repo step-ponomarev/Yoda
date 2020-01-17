@@ -1,6 +1,5 @@
-package edu.ponomarev.step.MVC.model.dao.taskSaver.online;
+package edu.ponomarev.step.MVC.model.repository.task;
 
-import edu.ponomarev.step.MVC.model.dao.TaskDAO;
 import edu.ponomarev.step.MVC.model.TaskWorker;
 import edu.ponomarev.step.component.task.InformatedTask;
 import edu.ponomarev.step.component.task.Task;
@@ -13,15 +12,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Queue;
 
-public class JDBC_DAO implements TaskDAO {
+public class sqlTaskRepository implements TaskRepository {
   private Connection connection;
 
-  public JDBC_DAO(Connection connection) {
+  public sqlTaskRepository(Connection connection) {
     this.connection = connection;
   }
 
   @Override
-  public void push(InformatedTask task) {
+  public void add(InformatedTask task) {
     final String insertRequest = "INSERT INTO task_box (time_of_creation, time_of_last_change, statement, type) " +
         "VALUES (?, ?, ?, ?);";
     String boxType = TaskWorker.getBoxName(task.getContainerType());
@@ -42,7 +41,7 @@ public class JDBC_DAO implements TaskDAO {
   }
 
   @Override
-  public void push(TermTaskContainer container) {
+  public void add(TermTaskContainer container) {
     final String selectRequest = "SELECT * FROM task_box where type = ?";
     final String insertRequest = "INSERT INTO task_box (time_of_creation, time_of_last_change, statement, type) " +
         "VALUES (?, ?, ?, ?);";
@@ -88,7 +87,7 @@ public class JDBC_DAO implements TaskDAO {
       }
 
       if (!updateContainer.isEmpty()) {
-        updateAll(updateContainer);
+        update(updateContainer);
       }
 
       statement.close();
@@ -116,6 +115,10 @@ public class JDBC_DAO implements TaskDAO {
 
   @Override
   public void remove(Queue<InformatedTask> tasks) {
+    if (tasks.isEmpty()) {
+      return;
+    }
+
     final String removeRequest = "DELETE FROM task_box WHERE time_of_creation = ?";
 
     try {
@@ -126,9 +129,51 @@ public class JDBC_DAO implements TaskDAO {
         statement.execute();
       }
 
-      tasks.clear();
+      statement.close();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Override
+  public void update(InformatedTask informatedTask) {
+    final String updateRequest = "UPDATE task_box SET statement = ?, time_of_last_change = ? WHERE time_of_creation " +
+        "= ?";
+
+    try {
+      PreparedStatement statement = connection.prepareStatement(updateRequest);
+
+      statement.setString(1, informatedTask.getStatement());
+      statement.setObject(2, informatedTask.getTimeOfLastChange());
+      statement.setObject(3, informatedTask.getTimeOfCreation());
+
+      statement.execute();
 
       statement.close();
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Override
+  public void update(TermTaskContainer container) {
+    final String updateRequest = "UPDATE task_box SET statement = ?, time_of_last_change = ? WHERE time_of_creation " +
+        "= ?";
+
+    try {
+      PreparedStatement statement = connection.prepareStatement(updateRequest);
+
+
+      for (Task updatedTask : container.getList()) {
+        statement.setString(1, updatedTask.getStatement());
+        statement.setObject(2, updatedTask.getTimeOfLastChange());
+        statement.setObject(3, updatedTask.getTimeOfCreation());
+        statement.execute();
+      }
+
+      statement.close();
+
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -163,28 +208,5 @@ public class JDBC_DAO implements TaskDAO {
 
 
     return container;
-  }
-
-  private void updateAll(TermTaskContainer container) {
-    final String updateRequest = "UPDATE task_box SET statement = ?, time_of_last_change = ? WHERE time_of_creation " +
-        "= ?";
-
-    try {
-      PreparedStatement statement = connection.prepareStatement(updateRequest);
-
-
-      for (Task updatedTask : container.getList()) {
-        statement.setString(1, updatedTask.getStatement());
-        statement.setObject(2, updatedTask.getTimeOfLastChange());
-        statement.setObject(3, updatedTask.getTimeOfCreation());
-        statement.execute();
-      }
-
-      statement.close();
-
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
   }
 }

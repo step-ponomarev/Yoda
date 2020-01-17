@@ -1,9 +1,9 @@
 package edu.ponomarev.step.MVC.model;
 
+import edu.ponomarev.step.MVC.model.repository.task.TaskSerializator;
+import edu.ponomarev.step.MVC.model.repository.task.sqlTaskRepository;
 import edu.ponomarev.step.component.task.InformatedTask;
-import edu.ponomarev.step.db.DataBaseManager;
-import edu.ponomarev.step.MVC.model.dao.TaskDAO;
-import edu.ponomarev.step.component.task.Task;
+import edu.ponomarev.step.MVC.model.repository.RepositoryFactory;
 import edu.ponomarev.step.component.taskContainer.TermTaskContainer;
 
 import java.util.*;
@@ -11,8 +11,10 @@ import java.util.*;
 import static edu.ponomarev.step.Main.context;
 
 public class TaskWorker {
-  private DataBaseManager dataBaseManager;
-  private TaskDAO taskDAO;
+  private RepositoryFactory repositoryFactory;
+
+  private TaskSerializator taskSerializator;
+  private sqlTaskRepository taskSqlRepository;
 
   private HashMap<TermTaskContainer.ContainerType, TermTaskContainer> taskContainers;
 
@@ -26,9 +28,12 @@ public class TaskWorker {
       put(TermTaskContainer.ContainerType.LATE, new TermTaskContainer(TermTaskContainer.ContainerType.LATE));
     }};
 
-    this.removeQueueOfTasks = new LinkedList<>();
-    this.dataBaseManager = context.getBean("dataBaseManager", DataBaseManager.class);
-    this.taskDAO = dataBaseManager.getOfflineWorker();
+    removeQueueOfTasks = new LinkedList<>();
+
+    repositoryFactory = context.getBean("repositoryFactory", RepositoryFactory.class);
+
+    taskSerializator = (TaskSerializator) repositoryFactory.getTaskSerializator();
+    taskSqlRepository = (sqlTaskRepository) repositoryFactory.getSqlTaskRepository();
   }
 
   public static String getBoxName(TermTaskContainer.ContainerType containerType) {
@@ -44,46 +49,58 @@ public class TaskWorker {
   public void addTask(InformatedTask informatedTask) {
     taskContainers.get(informatedTask.getContainerType()).add(informatedTask);
 
-    //Offline pushing;
-    this.taskDAO = dataBaseManager.getOfflineWorker();
-    this.taskDAO.push(informatedTask);
+    taskSerializator.add(informatedTask);
 
-
-    //Try to push to DB
-    this.taskDAO = dataBaseManager.getOnlineWorker();
-    if (dataBaseManager.isONLINE()) {
-      taskDAO.push(informatedTask);
+    if (repositoryFactory.isOnline()) {
+      taskSqlRepository.add(informatedTask);
+    } else {
+      return;
+      //TODO пытаемся восстановить коннекшен
     }
   }
 
   public void removeTask(InformatedTask informatedTask) {
     removeQueueOfTasks.add(informatedTask);
-
     taskContainers.get(informatedTask.getContainerType()).remove(informatedTask);
+
+    taskSerializator.remove(informatedTask);
+
+    if (repositoryFactory.isOnline()) {
+      taskSqlRepository.remove(informatedTask);
+    } else {
+      return;
+      // TODO Пытаемся восстановить коннекшен
+    }
   }
 
-  public void removeAll() {
-    taskDAO.remove(removeQueueOfTasks);
+  public void cleanQueueToDelete() {
+    taskSerializator.remove(removeQueueOfTasks);
+
+    if (repositoryFactory.isOnline()) {
+      taskSqlRepository.remove(removeQueueOfTasks);
+    } else {
+      return;
+      // TODO пытаесчя восстановить коннекшен
+    }
+
+    removeQueueOfTasks.clear();
   }
 
   public void pushAll() {
-    for (Map.Entry<TermTaskContainer.ContainerType, TermTaskContainer> box : taskContainers.entrySet()) {
-      this.taskDAO.push(box.getValue());
+    for (var box : taskContainers.entrySet()) {
+      TermTaskContainer container = box.getValue();
+
+      taskSerializator.add(container);
+      if (repositoryFactory.isOnline()) {
+        taskSqlRepository.add(container);
+      } else {
+        return;
+        // TODO Востсанавливаем коннекшен в другом потоке....
+      }
     }
   }
 
-  public void pullAll() {
-    for (Map.Entry<TermTaskContainer.ContainerType, TermTaskContainer> box : taskContainers.entrySet()) {
-      taskContainers.replace(box.getKey(), (TermTaskContainer) taskDAO.getContainer(box.getKey()));
-    }
-  }
-
-  public void updateAll() {
-    for (Map.Entry<TermTaskContainer.ContainerType, TermTaskContainer> box : taskContainers.entrySet()) {
-      TermTaskContainer.ContainerType containerTask = box.getKey();
-      synchTasks((TermTaskContainer) taskDAO.getContainer(containerTask));
-    }
-  }
+  // TODO Реализовать обновлеие задач/задачи
 
   public HashMap<TermTaskContainer.ContainerType, TermTaskContainer> getContainer() {
     return taskContainers;
@@ -91,39 +108,5 @@ public class TaskWorker {
 
   public TermTaskContainer getContainer(TermTaskContainer.ContainerType containerType) {
     return taskContainers.get(containerType);
-  }
-
-  public DataBaseManager getDataBaseManager() {
-    return dataBaseManager;
-  }
-
-  public TaskDAO getTaskDAO() {
-    return taskDAO;
-  }
-
-
-  public void setOnlineWorker() {
-    this.taskDAO = this.dataBaseManager.getOnlineWorker();
-  }
-
-  public void setOfflineWorker() {
-    this.taskDAO = this.dataBaseManager.getOfflineWorker();
-  }
-
-  private void synchTasks(TermTaskContainer updatedTasks) {
-    List<Task> tasksToUpdate = this.taskContainers.get(updatedTasks.getContainerType()).getList();
-
-    for (Task currentTask : updatedTasks.getList()) {
-      if (tasksToUpdate.contains(currentTask)) {
-        Task taskToUpdate = tasksToUpdate.get(tasksToUpdate.indexOf(currentTask));
-        if (currentTask.getTimeOfLastChange().isAfter(taskToUpdate.getTimeOfLastChange())) {
-          taskToUpdate.setStatement(currentTask.getStatement());
-          taskToUpdate.setTTimeOfLastChange(currentTask.getTimeOfLastChange());
-        }
-      }
-    }
-
-    tasksToUpdate.removeAll(updatedTasks.getList());
-    tasksToUpdate.addAll(updatedTasks.getList());
   }
 }
