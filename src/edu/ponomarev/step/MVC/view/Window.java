@@ -1,18 +1,23 @@
-package edu.ponomarev.step.MVC.view.main;
+package edu.ponomarev.step.MVC.view;
 
 import edu.ponomarev.step.MVC.view.edit.EditPanel;
 import edu.ponomarev.step.MVC.view.taskPanel.TaskPanel;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import javax.swing.*;
 import java.awt.*;
 
+@Component
 public class Window extends JFrame {
   private TextPanel textPanel;
   private ButtonPanel buttonPanel;
   private TaskPanel taskPanel;
   private EditPanel editPanel;
 
-  public Window(String applicationName) {
+  @Autowired
+  public Window(@Value(value = "Yoda") String applicationName) {
     super(applicationName);
 
     this.textPanel = new TextPanel();

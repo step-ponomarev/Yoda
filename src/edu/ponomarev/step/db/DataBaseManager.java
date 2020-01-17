@@ -1,18 +1,20 @@
-package edu.ponomarev.step.dao;
+package edu.ponomarev.step.db;
 
-import edu.ponomarev.step.MVC.model.worker.TaskWorker;
-import edu.ponomarev.step.MVC.model.worker.taskWorker.online.JDBCWorker;
-import edu.ponomarev.step.MVC.model.worker.taskWorker.offile.Serializator;
+import edu.ponomarev.step.MVC.model.dao.TaskDAO;
+import edu.ponomarev.step.MVC.model.dao.taskSaver.online.JDBC_DAO;
+import edu.ponomarev.step.MVC.model.dao.taskSaver.offile.Serializator;
 
-import jdk.jfr.Description;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 
+import javax.annotation.PreDestroy;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
 @Component
+@Scope("singleton")
 public class DataBaseManager {
   @Value("${url}")
   private String url;
@@ -26,14 +28,13 @@ public class DataBaseManager {
   private boolean ONLINE;
   private Connection connection;
 
-  @Description("Sets worker automatically. Depends of connection status. ")
-  public TaskWorker getOnlineWorker() {
+  public TaskDAO getOnlineWorker() {
     try {
       Class.forName("com.mysql.jdbc.Driver");
       this.connection = DriverManager.getConnection(url, user, password);
       this.ONLINE = true;
 
-      return (new JDBCWorker(connection));
+      return (new JDBC_DAO(connection));
     } catch (Exception e) {
       System.err.println(e.getMessage());
       ONLINE = false;
@@ -41,13 +42,21 @@ public class DataBaseManager {
     }
   }
 
-  @Description("Creates certain offline worker if you need work with data offline.")
-  public TaskWorker getOfflineWorker() {
+  public TaskDAO getOfflineWorker() {
     this.ONLINE = false;
     return (new Serializator());
   }
 
   public boolean isONLINE() {
     return this.ONLINE;
+  }
+
+  @PreDestroy
+  private void preDestroy() {
+    try {
+      connection.close();
+    } catch (Exception e) {
+      System.err.println(e.getMessage());
+    }
   }
 }

@@ -1,6 +1,6 @@
-package edu.ponomarev.step.MVC.model.worker.taskWorker.offile;
+package edu.ponomarev.step.MVC.model.dao.taskSaver.offile;
 
-import edu.ponomarev.step.MVC.model.worker.TaskWorker;
+import edu.ponomarev.step.MVC.model.dao.TaskDAO;
 import edu.ponomarev.step.component.task.InformatedTask;
 import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.component.taskContainer.TaskContainer;
@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Queue;
 
-public class Serializator implements TaskWorker {
+public class Serializator implements TaskDAO {
   private String directory;
 
   public Serializator() {
@@ -20,7 +20,7 @@ public class Serializator implements TaskWorker {
   }
 
   @Override
-  public void push(InformatedTask task) throws Exception {
+  public void push(InformatedTask task) {
     String dir = directory;
 
     File file = new File(directory);
@@ -31,32 +31,36 @@ public class Serializator implements TaskWorker {
     dir = addFileNameToPath(task.getContainerType(), dir);
 
     ArrayList<Task> tasks;
-    file = new File(dir);
-    if (!file.exists()) {
-      file.createNewFile();
-      tasks = new ArrayList<Task>();
-    } else {
-      FileInputStream is = new FileInputStream(file);
-      ObjectInputStream isObj = new ObjectInputStream(is);
+    try {
+      file = new File(dir);
+      if (!file.exists()) {
+        file.createNewFile();
+        tasks = new ArrayList<Task>();
+      } else {
+        FileInputStream is = new FileInputStream(file);
+        ObjectInputStream isObj = new ObjectInputStream(is);
 
-      tasks = (ArrayList<Task>) isObj.readObject();
-      tasks.add(task);
+        tasks = (ArrayList<Task>) isObj.readObject();
+        tasks.add(task);
 
-      is.close();
+        is.close();
+      }
+
+      FileOutputStream os = new FileOutputStream(file);
+      ObjectOutputStream osObj = new ObjectOutputStream(os);
+
+      osObj.writeObject(tasks);
+
+
+      osObj.close();
+      os.close();
+    } catch (Exception e) {
+      e.printStackTrace();
     }
-
-    FileOutputStream os = new FileOutputStream(file);
-    ObjectOutputStream osObj = new ObjectOutputStream(os);
-
-    osObj.writeObject(tasks);
-
-
-    osObj.close();
-    os.close();
   }
 
   @Override
-  public void push(TermTaskContainer container) throws Exception {
+  public void push(TermTaskContainer container) {
     String dir = directory;
 
     File file = new File(directory);
@@ -66,18 +70,22 @@ public class Serializator implements TaskWorker {
 
     dir = addFileNameToPath(container.getContainerType(), dir);
 
-    file = new File(dir);
-    if (!file.exists()) {
-      file.createNewFile();
+    try {
+      file = new File(dir);
+      if (!file.exists()) {
+        file.createNewFile();
+      }
+
+      FileOutputStream os = new FileOutputStream(file);
+      ObjectOutputStream osObj = new ObjectOutputStream(os);
+
+      osObj.writeObject(container.getList());
+
+      osObj.close();
+      os.close();
+    } catch (Exception e) {
+      e.printStackTrace();
     }
-
-    FileOutputStream os = new FileOutputStream(file);
-    ObjectOutputStream osObj = new ObjectOutputStream(os);
-
-    osObj.writeObject(container.getList());
-
-    osObj.close();
-    os.close();
   }
 
   @Override
@@ -87,28 +95,33 @@ public class Serializator implements TaskWorker {
   public void remove(Queue<InformatedTask> tasks) {}
 
   @Override
-  public TaskContainer getContainer(TermTaskContainer.ContainerType containerTask) throws Exception {
+  public TaskContainer getContainer(TermTaskContainer.ContainerType containerType) {
     String dir = directory;
 
     File file = new File(directory);
     if (!file.exists()) {
-      return (new TermTaskContainer(containerTask));
+      return (new TermTaskContainer(containerType));
     }
 
-    dir = addFileNameToPath(containerTask, dir);
+    dir = addFileNameToPath(containerType, dir);
 
     file = new File(dir);
     if (!file.exists()) {
-      return (new TermTaskContainer(containerTask));
+      return (new TermTaskContainer(containerType));
     }
 
-    FileInputStream is = new FileInputStream(file);
-    ObjectInputStream isObj = new ObjectInputStream(is);
+    TermTaskContainer tasks = new TermTaskContainer(containerType);
+    try {
+      FileInputStream is = new FileInputStream(file);
+      ObjectInputStream isObj = new ObjectInputStream(is);
 
-    TermTaskContainer tasks = (TermTaskContainer) isObj.readObject();
+      tasks = (TermTaskContainer) isObj.readObject();
 
-    isObj.close();
-    is.close();
+      isObj.close();
+      is.close();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
     return tasks;
   }

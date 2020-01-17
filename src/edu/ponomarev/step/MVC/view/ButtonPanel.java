@@ -1,4 +1,4 @@
-package edu.ponomarev.step.MVC.view.main;
+package edu.ponomarev.step.MVC.view;
 
 import javax.swing.*;
 import java.awt.*;

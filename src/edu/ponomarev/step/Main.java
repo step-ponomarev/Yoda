@@ -1,8 +1,8 @@
 package edu.ponomarev.step;
 
 import edu.ponomarev.step.MVC.controller.Controller;
-import edu.ponomarev.step.MVC.view.main.Window;
-import edu.ponomarev.step.MVC.model.DataHandler;
+import edu.ponomarev.step.MVC.model.TaskWorker;
+import edu.ponomarev.step.MVC.view.Window;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class Main {
@@ -12,11 +12,12 @@ public class Main {
     try {
       context = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
 
-      DataHandler handler1 = new DataHandler();
-      Window window = new Window("Yoda");
+      var window = context.getBean("window", Window.class);
+      var taskWorker = new TaskWorker();
 
-      Controller controller = new Controller(window, handler1);
+      var controller = new Controller(window, taskWorker);
       controller.initView();
+
     } catch (Exception e) {
       System.err.println(e.getMessage());
     }

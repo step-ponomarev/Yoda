@@ -2,7 +2,7 @@ package edu.ponomarev.step.MVC.view.taskPanel;
 
 import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.component.taskContainer.TermTaskContainer;
-import edu.ponomarev.step.MVC.model.DataHandler;
+import edu.ponomarev.step.MVC.model.TaskWorker;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,7 +29,7 @@ public class TaskPanel extends JPanel {
       final var boxContainerType = boxVariavle.type;
 
       this.listMap.get(boxContainerType).setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-      this.boxModules.add(new TaskBoxModule(DataHandler.getBoxName(boxContainerType),
+      this.boxModules.add(new TaskBoxModule(TaskWorker.getBoxName(boxContainerType),
           this.listMap.get(boxContainerType), boxContainerType));
     }
 

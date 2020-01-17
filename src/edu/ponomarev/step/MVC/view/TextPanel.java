@@ -1,4 +1,4 @@
-package edu.ponomarev.step.MVC.view.main;
+package edu.ponomarev.step.MVC.view;
 
 import edu.ponomarev.step.component.taskContainer.TermTaskContainer;
 

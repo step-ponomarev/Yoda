@@ -2,8 +2,8 @@ package edu.ponomarev.step.MVC.controller;
 
 import edu.ponomarev.step.component.task.InformatedTask;
 import edu.ponomarev.step.component.task.Task;
-import edu.ponomarev.step.MVC.view.main.Window;
-import edu.ponomarev.step.MVC.model.DataHandler;
+import edu.ponomarev.step.MVC.view.Window;
+import edu.ponomarev.step.MVC.model.TaskWorker;
 import edu.ponomarev.step.component.taskContainer.TermTaskContainer;
 
 import java.awt.*;
@@ -15,10 +15,10 @@ import java.awt.event.WindowListener;
 
 public class Controller {
   private Window window;
-  private DataHandler handler;
+  private TaskWorker taskWorker;
 
-  public Controller(Window window, DataHandler handler) {
-    this.handler = handler;
+  public Controller(Window window, TaskWorker taskWorker) {
+    this.taskWorker = taskWorker;
     this.window = window;
   }
 
@@ -73,7 +73,7 @@ public class Controller {
   }
 
   private void initTaskPanel() {
-    window.getTaskPanel().setListMap(handler.getContainer());
+    window.getTaskPanel().setListMap(taskWorker.getContainer());
     window.getTaskPanel().run();
 
     for (var currentVariable : TermTaskContainer.BOX_VARIABLES) {
@@ -130,11 +130,11 @@ public class Controller {
       String taskStatement = window.getTextPanel().getTaskStatementField().getText().strip();
       //TODO Добавить ошибку при пустом поле при добавлении задачи
       if (!taskStatement.isEmpty()) {
-        handler.addTask(new InformatedTask(new Task(taskStatement), selectedItem.type));
+        taskWorker.addTask(new InformatedTask(new Task(taskStatement), selectedItem.type));
 
         window.getTextPanel().getTaskStatementField().selectAll();
 
-        window.getTaskPanel().getListMap().get(selectedItem.type).setListData(handler.getContainer().get(selectedItem.type).getList().toArray());
+        window.getTaskPanel().getListMap().get(selectedItem.type).setListData(taskWorker.getContainer().get(selectedItem.type).getList().toArray());
         window.getTaskPanel().getListMap().get(selectedItem.type).repaint();
       }
 
@@ -201,9 +201,9 @@ public class Controller {
       InformatedTask removingTask = window.getEditPanel().getInformatedTask();
       var typeOfRemovingTask = removingTask.getContainerType();
 
-      handler.removeTask(removingTask);
+      taskWorker.removeTask(removingTask);
 
-      window.getTaskPanel().getListMap().get(typeOfRemovingTask).setListData(handler.getContainer().get(typeOfRemovingTask).getList().toArray());
+      window.getTaskPanel().getListMap().get(typeOfRemovingTask).setListData(taskWorker.getContainer().get(typeOfRemovingTask).getList().toArray());
       window.getTaskPanel().getListMap().get(typeOfRemovingTask).repaint();
       window.repaintMainWindow();
       synchAfterRemoving();
@@ -212,40 +212,39 @@ public class Controller {
 
   private void synchFull() {
     synchAfterChanging();
-    if (handler.getDataBaseManager().isONLINE()) {
-      handler.updateAll();
+    if (taskWorker.getDataBaseManager().isONLINE()) {
+      taskWorker.updateAll();
     }
 
     changeWindowColorMode();
   }
 
   private void synchAfterChanging() {
-    handler.setOfflineWorker();
-    handler.pushAll();
+    taskWorker.setOfflineWorker();
+    taskWorker.pushAll();
 
-    handler.setOnlineWorker();
-    if (handler.getDataBaseManager().isONLINE()) {
-      handler.pushAll();
+    taskWorker.setOnlineWorker();
+    if (taskWorker.getDataBaseManager().isONLINE()) {
+      taskWorker.pushAll();
     }
 
     changeWindowColorMode();
   }
 
   private void synchAfterRemoving() {
-    handler.setOfflineWorker();
-    handler.pushAll();
+    taskWorker.setOfflineWorker();
+    taskWorker.pushAll();
 
-    handler.setOnlineWorker();
-    if (handler.getDataBaseManager().isONLINE()) {
-      handler.removeAll();
+    taskWorker.setOnlineWorker();
+    if (taskWorker.getDataBaseManager().isONLINE()) {
+      taskWorker.removeAll();
     }
 
     changeWindowColorMode();
   }
 
-
   private void changeWindowColorMode() {
-    if (handler.getDataBaseManager().isONLINE()) {
+    if (taskWorker.getDataBaseManager().isONLINE()) {
       window.setBackground(Color.GREEN);
     } else {
       window.setBackground(Color.RED);
