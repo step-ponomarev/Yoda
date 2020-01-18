@@ -2,15 +2,15 @@ package edu.ponomarev.step.test;
 
 import edu.ponomarev.step.MVC.model.repository.RepositoryFactory;
 import edu.ponomarev.step.MVC.model.repository.task.TaskSerializator;
-import edu.ponomarev.step.MVC.model.repository.task.sqlTaskRepository;
 import edu.ponomarev.step.component.task.InformatedTask;
 import edu.ponomarev.step.component.task.Task;
-import edu.ponomarev.step.component.taskContainer.TaskContainer;
 import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable;
 
+import edu.ponomarev.step.component.taskContainer.termContainer.TermTaskContainer;
 import org.junit.*;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class TaskSerializatorTest {
@@ -53,16 +53,32 @@ public class TaskSerializatorTest {
       taskSerializator.add(exampleTasks.get(taskType.type));
 
       //Check existing of added tasks
-      TaskContainer containerFromDisk = taskSerializator.getContainer(taskType.type);
+      ArrayList<Task> tasksFromDist = (ArrayList<Task>) taskSerializator.getList(taskType.type);
       InformatedTask savedTask = exampleTasks.get(taskType.type);
 
-      Assert.assertTrue(containerFromDisk.contains(savedTask));
+      Assert.assertTrue(tasksFromDist.contains(savedTask));
 
       //Check correctness of removing
       taskSerializator.remove(exampleTasks.get(taskType.type));
-      containerFromDisk = taskSerializator.getContainer(taskType.type);
+      tasksFromDist = (ArrayList<Task>) taskSerializator.getList(taskType.type);
 
-      Assert.assertFalse(containerFromDisk.contains(savedTask));
+      Assert.assertFalse(tasksFromDist.contains(savedTask));
+    }
+  }
+
+  @Test
+  public void taskListShouldBeSavedOnDiskCorrect() {
+    for (var taskType : ContainerVariable.BOX_VARIABLES) {
+      //Add list
+      var container = new TermTaskContainer(taskType.type);
+      taskSerializator.add(container);
+
+      //Get taskList from disk
+      var containerFromDisk = new TermTaskContainer(taskType.type);
+      containerFromDisk.setList(taskSerializator.getList(taskType.type));
+
+      //Check equals of lists;
+      Assert.assertArrayEquals(container.getList().toArray(), containerFromDisk.getList().toArray());
     }
   }
 }

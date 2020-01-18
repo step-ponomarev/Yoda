@@ -11,6 +11,7 @@ import java.sql.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 
 public class sqlTaskRepository implements TaskRepository {
@@ -181,10 +182,10 @@ public class sqlTaskRepository implements TaskRepository {
   }
 
   @Override
-  public TermTaskContainer getContainer(ContainerType containerType) {
+  public List<Task> getList(ContainerType containerType) {
     final String sqlRequest = "SELECT * FROM task_box where type = ?";
 
-    TermTaskContainer container = new TermTaskContainer(containerType);
+    ArrayList<Task> tasks = new ArrayList<>();
 
     try {
       PreparedStatement statement = connection.prepareStatement(sqlRequest);
@@ -195,7 +196,7 @@ public class sqlTaskRepository implements TaskRepository {
 
       ResultSet rs = statement.executeQuery();
       while (rs.next()) {
-        container.add(new Task(
+        tasks.add(new Task(
             rs.getString("statement"),
             TimeManager.convertToLocalTimeZone(rs.getObject("time_of_creation", LocalDateTime.class)),
             TimeManager.convertToLocalTimeZone(rs.getObject("time_of_last_change", LocalDateTime.class))
@@ -208,6 +209,6 @@ public class sqlTaskRepository implements TaskRepository {
     }
 
 
-    return container;
+    return tasks;
   }
 }

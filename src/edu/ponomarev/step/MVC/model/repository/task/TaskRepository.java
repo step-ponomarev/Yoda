@@ -1,10 +1,11 @@
 package edu.ponomarev.step.MVC.model.repository.task;
 
 import edu.ponomarev.step.component.task.InformatedTask;
-import edu.ponomarev.step.component.taskContainer.TaskContainer;
+import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.component.taskContainer.termContainer.TermTaskContainer;
 import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable.ContainerType;
 
+import java.util.List;
 import java.util.Queue;
 
 public interface TaskRepository {
@@ -15,5 +16,5 @@ public interface TaskRepository {
   void update(InformatedTask task);
   void update(TermTaskContainer tasks);
 
-  TaskContainer getContainer(ContainerType containerTask);
+  List<Task> getList(ContainerType containerTask);
 }

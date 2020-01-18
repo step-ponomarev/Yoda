@@ -2,7 +2,6 @@ package edu.ponomarev.step.MVC.model.repository.task;
 
 import edu.ponomarev.step.component.task.InformatedTask;
 import edu.ponomarev.step.component.task.Task;
-import edu.ponomarev.step.component.taskContainer.TaskContainer;
 import edu.ponomarev.step.component.taskContainer.termContainer.TermTaskContainer;
 import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable.ContainerType;
 
@@ -109,24 +108,21 @@ public class TaskSerializator implements TaskRepository {
   }
 
   @Override
-  public TaskContainer getContainer(ContainerType containerType) {
+  public List<Task> getList(ContainerType containerType) {
     setUpPath(containerType);
 
-    TermTaskContainer container = new TermTaskContainer(containerType);
+    ArrayList<Task> tasks = new ArrayList<>();
 
     File file = new File(directory);
     if (!file.exists()) {
-      return container;
+      return tasks;
     }
 
-    ArrayList<Task> tasks = new ArrayList<>();
     try {
       FileInputStream is = new FileInputStream(file);
       ObjectInputStream isObj = new ObjectInputStream(is);
 
       tasks = (ArrayList<Task>) isObj.readObject();
-
-      container.setList(tasks);
 
       isObj.close();
       is.close();
@@ -136,7 +132,7 @@ public class TaskSerializator implements TaskRepository {
 
     resetPath();
 
-    return container;
+    return tasks;
   }
 
   private void putTaskIn(Task updatedTask, ArrayList<Task> tasks) {
