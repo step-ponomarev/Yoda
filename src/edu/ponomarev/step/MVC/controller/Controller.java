@@ -13,6 +13,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
+// TODO Переписать помойку
+
 public class Controller {
   private Window window;
   private TaskWorker taskWorker;
@@ -45,7 +47,6 @@ public class Controller {
 
       @Override
       public void windowClosed(WindowEvent e) {
-        // TODO КНОПКА СИНХРОНИЗАЦИИ
         return;
       }
 
@@ -127,7 +128,6 @@ public class Controller {
           (ContainerVariable) window.getTextPanel().getContainerTypeList().getSelectedItem();
 
       String taskStatement = window.getTextPanel().getTaskStatementField().getText().strip();
-      //TODO Добавить ошибку при пустом поле при добавлении задачи
       if (!taskStatement.isEmpty()) {
         taskWorker.addTask(new InformatedTask(new Task(taskStatement), selectedItem.type));
 
@@ -142,7 +142,6 @@ public class Controller {
     });
 
     window.getButtonPanel().getEditButton().addActionListener(e -> {
-      //TODO Сделать проверку выбранного таска(у нас 4 блока)
       boolean VALUE_IS_SELECTED = false;
       for (var containerVariable : ContainerVariable.BOX_VARIABLES) {
         VALUE_IS_SELECTED |= window.getTaskPanel().getListMap().get(containerVariable.type).isSelectionEmpty();
@@ -193,9 +192,6 @@ public class Controller {
 
     //RemoveTask button
     window.getEditPanel().getButtonPanel().getRemoveButton().addActionListener(e -> {
-      //TODO Вызвать диалоговое окно подтверждения удаления
-      //TODO Доделать удаление таска из нужной коробки
-
       InformatedTask removingTask = window.getEditPanel().getInformatedTask();
       var typeOfRemovingTask = removingTask.getContainerType();
 

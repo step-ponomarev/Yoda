@@ -5,6 +5,8 @@ import edu.ponomarev.step.system.TimeManager;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+// TODO как сохранять проекты в БД, что нужно записывать?
+
 public class Project {
   private String name;
   private LocalDateTime timeOfCreation;

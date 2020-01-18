@@ -107,7 +107,10 @@ public class TaskWorker {
     }
   }
 
-  // TODO Реализовать обновлеие задач/задачи
+  // TODO Добавить синхронизацию задач
+  public void synchronizeTasks() {
+    return;
+  }
 
   public HashMap<ContainerType, TermTaskContainer> getContainer() { return taskContainers; }
 
