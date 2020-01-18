@@ -5,5 +5,8 @@ import edu.ponomarev.step.component.task.Task;
 public interface TaskContainer {
   void add(Task task);
   void remove(Task task);
+  boolean contains(Object obj);
+  int size();
   boolean isEmpty();
+
 }

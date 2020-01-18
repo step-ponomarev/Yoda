@@ -2,6 +2,7 @@ package edu.ponomarev.step.MVC.model;
 
 import edu.ponomarev.step.MVC.model.repository.task.TaskSerializator;
 import edu.ponomarev.step.MVC.model.repository.task.sqlTaskRepository;
+import edu.ponomarev.step.component.project.Project;
 import edu.ponomarev.step.component.task.InformatedTask;
 import edu.ponomarev.step.MVC.model.repository.RepositoryFactory;
 import edu.ponomarev.step.component.taskContainer.termContainer.TermTaskContainer;
@@ -11,23 +12,26 @@ import java.util.*;
 
 import static edu.ponomarev.step.Main.context;
 
-public class TaskWorker {
+public class Worker {
   private RepositoryFactory repositoryFactory;
 
   private TaskSerializator taskSerializator;
   private sqlTaskRepository taskSqlRepository;
 
   private HashMap<ContainerType, TermTaskContainer> taskContainers;
+  private ArrayList<Project> projectList;
 
   private Queue<InformatedTask> removeQueueOfTasks;
 
-  public TaskWorker() {
+  public Worker() {
     taskContainers = new HashMap<>() {{
       put(ContainerType.INBOX, new TermTaskContainer(ContainerType.INBOX));
       put(ContainerType.DAY, new TermTaskContainer(ContainerType.DAY));
       put(ContainerType.WEEK, new TermTaskContainer(ContainerType.WEEK));
       put(ContainerType.LATE, new TermTaskContainer(ContainerType.LATE));
     }};
+
+    projectList = new ArrayList<>();
 
     removeQueueOfTasks = new LinkedList<>();
 
@@ -112,7 +116,11 @@ public class TaskWorker {
     return;
   }
 
-  public HashMap<ContainerType, TermTaskContainer> getContainer() { return taskContainers; }
+  public HashMap<ContainerType, TermTaskContainer> getTaskContainer() { return taskContainers; }
 
-  public TermTaskContainer getContainer(ContainerType containerType) { return taskContainers.get(containerType); }
+  public TermTaskContainer getTaskContainer(ContainerType containerType) { return taskContainers.get(containerType); }
+
+  public ArrayList<Project> getProjectList() {
+    return projectList;
+  }
 }

@@ -1,0 +1,68 @@
+package edu.ponomarev.step.test;
+
+import edu.ponomarev.step.MVC.model.repository.RepositoryFactory;
+import edu.ponomarev.step.MVC.model.repository.task.TaskSerializator;
+import edu.ponomarev.step.MVC.model.repository.task.sqlTaskRepository;
+import edu.ponomarev.step.component.task.InformatedTask;
+import edu.ponomarev.step.component.task.Task;
+import edu.ponomarev.step.component.taskContainer.TaskContainer;
+import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable;
+
+import org.junit.*;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.util.HashMap;
+
+public class TaskSerializatorTest {
+  private static RepositoryFactory repositoryFactory;
+
+  private TaskSerializator taskSerializator;
+
+  private HashMap<ContainerVariable.ContainerType, InformatedTask> exampleTasks;
+
+  @BeforeClass
+  public static void setConnection() {
+    var context = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
+
+    repositoryFactory = context.getBean("repositoryFactory", RepositoryFactory.class);
+  }
+
+  @Before
+  public void setState() {
+    exampleTasks = new HashMap<>();
+
+    taskSerializator = (TaskSerializator) repositoryFactory.getTaskSerializator();
+
+    for (var taskType : ContainerVariable.BOX_VARIABLES) {
+      String statement = taskType.name;
+      ContainerVariable.ContainerType boxType = taskType.type;
+
+      exampleTasks.put(boxType, new InformatedTask(new Task(statement), boxType));
+    }
+  }
+
+  @After
+  public void cleanUp() {
+    return;
+  }
+
+  @Test
+  public void taskShouldBeAddedAndRemovedCorrect() {
+    for (var taskType : ContainerVariable.BOX_VARIABLES) {
+      //Saving new task
+      taskSerializator.add(exampleTasks.get(taskType.type));
+
+      //Check existing of added tasks
+      TaskContainer containerFromDisk = taskSerializator.getContainer(taskType.type);
+      InformatedTask savedTask = exampleTasks.get(taskType.type);
+
+      Assert.assertTrue(containerFromDisk.contains(savedTask));
+
+      //Check correctness of removing
+      taskSerializator.remove(exampleTasks.get(taskType.type));
+      containerFromDisk = taskSerializator.getContainer(taskType.type);
+
+      Assert.assertFalse(containerFromDisk.contains(savedTask));
+    }
+  }
+}

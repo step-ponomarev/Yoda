@@ -63,6 +63,12 @@ public class TermTaskContainer implements TaskContainer, Serializable {
   }
 
   @Override
+  public boolean contains(Object obj) { return taskList.contains(obj); }
+
+  @Override
+  public int size() { return taskList.size(); }
+
+  @Override
   public boolean isEmpty() {
     return taskList.isEmpty();
   }

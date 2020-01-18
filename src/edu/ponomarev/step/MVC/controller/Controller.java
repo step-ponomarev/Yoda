@@ -3,7 +3,7 @@ package edu.ponomarev.step.MVC.controller;
 import edu.ponomarev.step.component.task.InformatedTask;
 import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.MVC.view.Window;
-import edu.ponomarev.step.MVC.model.TaskWorker;
+import edu.ponomarev.step.MVC.model.Worker;
 import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable;
 
 import java.awt.*;
@@ -17,10 +17,10 @@ import java.awt.event.WindowListener;
 
 public class Controller {
   private Window window;
-  private TaskWorker taskWorker;
+  private Worker worker;
 
-  public Controller(Window window, TaskWorker taskWorker) {
-    this.taskWorker = taskWorker;
+  public Controller(Window window, Worker worker) {
+    this.worker = worker;
     this.window = window;
   }
 
@@ -73,7 +73,7 @@ public class Controller {
   }
 
   private void initTaskPanel() {
-    window.getTaskPanel().setListMap(taskWorker.getContainer());
+    window.getTaskPanel().setListMap(worker.getTaskContainer());
     window.getTaskPanel().run();
 
     for (var currentVariable : ContainerVariable.BOX_VARIABLES) {
@@ -129,11 +129,11 @@ public class Controller {
 
       String taskStatement = window.getTextPanel().getTaskStatementField().getText().strip();
       if (!taskStatement.isEmpty()) {
-        taskWorker.addTask(new InformatedTask(new Task(taskStatement), selectedItem.type));
+        worker.addTask(new InformatedTask(new Task(taskStatement), selectedItem.type));
 
         window.getTextPanel().getTaskStatementField().selectAll();
 
-        window.getTaskPanel().getListMap().get(selectedItem.type).setListData(taskWorker.getContainer().get(selectedItem.type).getList().toArray());
+        window.getTaskPanel().getListMap().get(selectedItem.type).setListData(worker.getTaskContainer().get(selectedItem.type).getList().toArray());
         window.getTaskPanel().getListMap().get(selectedItem.type).repaint();
       }
 
@@ -183,7 +183,7 @@ public class Controller {
         if (STATEMENT_CHANGED) {
           window.getEditPanel().getInformatedTask().setStatement(taskName);
           window.getEditPanel().getInformatedTask().updateTimeOfLastChange();
-          taskWorker.updateTask(window.getEditPanel().getInformatedTask());
+          worker.updateTask(window.getEditPanel().getInformatedTask());
         }
 
         window.repaintMainWindow();
@@ -195,9 +195,9 @@ public class Controller {
       InformatedTask removingTask = window.getEditPanel().getInformatedTask();
       var typeOfRemovingTask = removingTask.getContainerType();
 
-      taskWorker.removeTask(removingTask);
+      worker.removeTask(removingTask);
 
-      window.getTaskPanel().getListMap().get(typeOfRemovingTask).setListData(taskWorker.getContainer().get(typeOfRemovingTask).getList().toArray());
+      window.getTaskPanel().getListMap().get(typeOfRemovingTask).setListData(worker.getTaskContainer().get(typeOfRemovingTask).getList().toArray());
       window.getTaskPanel().getListMap().get(typeOfRemovingTask).repaint();
       window.repaintMainWindow();
     });

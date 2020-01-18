@@ -1,12 +1,12 @@
 package edu.ponomarev.step.test;
 
-import edu.ponomarev.step.MVC.model.TaskWorker;
+import edu.ponomarev.step.MVC.model.Worker;
 import edu.ponomarev.step.Main;
 import org.junit.*;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class TaskWorkerTest {
-  private TaskWorker taskWorker;
+public class WorkerTest {
+  private Worker worker;
 
   @BeforeClass
   public static void beforeTestClass() {
@@ -20,12 +20,12 @@ public class TaskWorkerTest {
 
   @Before
   public void beforeTest() {
-    taskWorker = new TaskWorker();
+    worker = new Worker();
   }
 
   @Test
   public void containerOfNewTaskMasterShouldBeEmpty() {
-    for (var entry : taskWorker.getContainer().entrySet()) {
+    for (var entry : worker.getTaskContainer().entrySet()) {
       Assert.assertTrue(entry.getValue().isEmpty());
     }
   }

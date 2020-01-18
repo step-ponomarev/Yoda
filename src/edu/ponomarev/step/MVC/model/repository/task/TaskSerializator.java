@@ -112,17 +112,21 @@ public class TaskSerializator implements TaskRepository {
   public TaskContainer getContainer(ContainerType containerType) {
     setUpPath(containerType);
 
+    TermTaskContainer container = new TermTaskContainer(containerType);
+
     File file = new File(directory);
     if (!file.exists()) {
-      return (new TermTaskContainer(containerType));
+      return container;
     }
 
-    TermTaskContainer tasks = new TermTaskContainer(containerType);
+    ArrayList<Task> tasks = new ArrayList<>();
     try {
       FileInputStream is = new FileInputStream(file);
       ObjectInputStream isObj = new ObjectInputStream(is);
 
-      tasks = (TermTaskContainer) isObj.readObject();
+      tasks = (ArrayList<Task>) isObj.readObject();
+
+      container.setList(tasks);
 
       isObj.close();
       is.close();
@@ -132,7 +136,7 @@ public class TaskSerializator implements TaskRepository {
 
     resetPath();
 
-    return tasks;
+    return container;
   }
 
   private void putTaskIn(Task updatedTask, ArrayList<Task> tasks) {

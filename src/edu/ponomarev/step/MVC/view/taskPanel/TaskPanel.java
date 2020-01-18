@@ -4,7 +4,6 @@ import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable;
 import edu.ponomarev.step.component.taskContainer.termContainer.TermTaskContainer;
 import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable.ContainerType;
-import edu.ponomarev.step.MVC.model.TaskWorker;
 
 import javax.swing.*;
 import java.awt.*;
