@@ -1,21 +1,28 @@
 package edu.ponomarev.step.component.project;
 
-import edu.ponomarev.step.component.taskContainer.termContainer.TermTaskContainer;
+import edu.ponomarev.step.system.TimeManager;
 
-import java.util.Calendar;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Project {
   private String name;
-  private Calendar date_of_creation;
-  private TermTaskContainer tasks;
+  private LocalDateTime timeOfCreation;
+  private LocalDateTime timeOfLastChange;
   private ProjectStatus status;
 
+  public enum ProjectStatus {
+    PLANNING,
+    PAUSED,
+    RUNNING
+  }
+
   public Project(String name) {
-    this.name = name;
-    this.date_of_creation = Calendar.getInstance();
+    name = name;
+    timeOfCreation = TimeManager.getLocalDateTimeOf(LocalDateTime.now());
+    timeOfLastChange = timeOfCreation;
     //this.tasks = new TermTaskContainer();
-    this.status = ProjectStatus.PLANNING;
+    status = ProjectStatus.PLANNING;
   }
 
   public void setStatus(ProjectStatus status) {
@@ -31,12 +38,11 @@ public class Project {
     if (this == o) return true;
     if (!(o instanceof Project)) return false;
     Project project = (Project) o;
-    return Objects.equals(name, project.name) &&
-        Objects.equals(date_of_creation, project.date_of_creation);
+    return Objects.equals(timeOfCreation, project.timeOfCreation);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, date_of_creation);
+    return Objects.hash(timeOfCreation);
   }
 }

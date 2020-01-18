@@ -141,7 +141,6 @@ public class Controller {
       window.getTextPanel().getTaskStatementField().selectAll();
     });
 
-    //SaveTusk Button
     window.getButtonPanel().getEditButton().addActionListener(e -> {
       //TODO Сделать проверку выбранного таска(у нас 4 блока)
       boolean VALUE_IS_SELECTED = false;
@@ -157,7 +156,8 @@ public class Controller {
       window.getContentPane().removeAll();
       window.getContentPane().add(window.getEditPanel(), BorderLayout.CENTER);
 
-      InformatedTask informatedTask = new InformatedTask(window.getTaskPanel().getSelectedTask(), window.getTaskPanel().getSelectedType());
+      InformatedTask informatedTask = new InformatedTask(window.getTaskPanel().getSelectedTask(),
+          window.getTaskPanel().getSelectedType());
 
       window.getEditPanel().setInformatedTask(informatedTask);
       window.getEditPanel().getTaskNameField().setText(informatedTask.getStatement());
@@ -182,9 +182,9 @@ public class Controller {
         final boolean STATEMENT_CHANGED = !taskName.equals(window.getEditPanel().getInformatedTask().getStatement());
 
         if (STATEMENT_CHANGED) {
-          window.getEditPanel().getInformatedTask().getTask().setStatement(taskName);
-          window.getEditPanel().getInformatedTask().getTask().updateTimeOfLastChange();
-
+          window.getEditPanel().getInformatedTask().setStatement(taskName);
+          window.getEditPanel().getInformatedTask().updateTimeOfLastChange();
+          taskWorker.updateTask(window.getEditPanel().getInformatedTask());
         }
 
         window.repaintMainWindow();

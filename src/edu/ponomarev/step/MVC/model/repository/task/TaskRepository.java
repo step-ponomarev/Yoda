@@ -5,7 +5,6 @@ import edu.ponomarev.step.component.taskContainer.TaskContainer;
 import edu.ponomarev.step.component.taskContainer.termContainer.TermTaskContainer;
 import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable.ContainerType;
 
-
 import java.util.Queue;
 
 public interface TaskRepository {

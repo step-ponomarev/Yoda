@@ -95,6 +95,18 @@ public class TaskWorker {
     }
   }
 
+  public void updateTask(InformatedTask task) {
+    taskSerializator.update(task);
+
+    if (repositoryFactory.isOnline()) {
+      taskSqlRepository.update(task);
+    } else {
+      System.err.println("No connection");
+      return;
+      // TODO Востсанавливаем коннекшен в другом потоке....
+    }
+  }
+
   // TODO Реализовать обновлеие задач/задачи
 
   public HashMap<ContainerType, TermTaskContainer> getContainer() { return taskContainers; }

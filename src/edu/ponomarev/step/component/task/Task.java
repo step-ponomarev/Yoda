@@ -14,8 +14,8 @@ public class Task implements Comparable<Task>, Serializable {
 
   public Task(Task task) {
     this.statement = task.getStatement();
-    this.timeOfCreation = task.getTimeOfCreation();
-    this.timeOfLastChange = task.getTimeOfLastChange();
+    this.timeOfCreation = TimeManager.getLocalDateTimeOf(task.getTimeOfCreation());
+    this.timeOfLastChange =  TimeManager.getLocalDateTimeOf(task.getTimeOfLastChange());
   }
 
   public Task(String statement) {

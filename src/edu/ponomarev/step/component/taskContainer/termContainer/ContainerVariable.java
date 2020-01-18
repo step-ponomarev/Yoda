@@ -1,15 +1,14 @@
 package edu.ponomarev.step.component.taskContainer.termContainer;
 
 public class ContainerVariable {
+  public ContainerType type;
+  public String name;
   final public static ContainerVariable[] BOX_VARIABLES = new ContainerVariable[] {
       new ContainerVariable(ContainerType.INBOX, "Inbox"),
       new ContainerVariable(ContainerType.DAY, "Today"),
       new ContainerVariable(ContainerType.WEEK, "Week"),
       new ContainerVariable(ContainerType.LATE, "Late")
   };
-
-  public ContainerType type;
-  public String name;
 
   public enum ContainerType {
     INBOX(0),

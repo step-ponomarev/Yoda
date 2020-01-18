@@ -17,7 +17,7 @@ public class TaskSerializator implements TaskRepository {
   private String directory;
 
   public TaskSerializator() {
-    this.directory = Paths.get("data").toAbsolutePath().toString();
+    resetPath();
   }
 
   @Override
@@ -28,6 +28,8 @@ public class TaskSerializator implements TaskRepository {
     tasks.add(task);
 
     digInTaskList(tasks);
+
+    resetPath();
   }
 
   @Override
@@ -44,6 +46,8 @@ public class TaskSerializator implements TaskRepository {
     } catch (Exception e) {
       e.printStackTrace();
     }
+
+    resetPath();
   }
 
   @Override
@@ -54,6 +58,8 @@ public class TaskSerializator implements TaskRepository {
     tasks.remove(task);
 
     digInTaskList(tasks);
+
+    resetPath();
   }
 
   @Override
@@ -70,6 +76,8 @@ public class TaskSerializator implements TaskRepository {
     }
 
     digInTaskList(tasks);
+
+    resetPath();
   }
 
   @Override
@@ -81,6 +89,8 @@ public class TaskSerializator implements TaskRepository {
     putTaskIn(updatedTask, tasks);
 
     digInTaskList(tasks);
+
+    resetPath();
   }
 
   @Override
@@ -94,6 +104,8 @@ public class TaskSerializator implements TaskRepository {
     }
 
     digInTaskList(tasks);
+
+    resetPath();
   }
 
   @Override
@@ -117,6 +129,8 @@ public class TaskSerializator implements TaskRepository {
     } catch (Exception e) {
       e.printStackTrace();
     }
+
+    resetPath();
 
     return tasks;
   }
@@ -180,6 +194,10 @@ public class TaskSerializator implements TaskRepository {
     }
 
     addFileNameToPath(containerType);
+  }
+
+  private void resetPath() {
+    directory = Paths.get("data").toAbsolutePath().toString();
   }
 
   private void addFileNameToPath(ContainerType containerType) {
