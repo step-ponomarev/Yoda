@@ -41,11 +41,6 @@ public class TaskSerializatorTest {
     }
   }
 
-  @After
-  public void cleanUp() {
-    return;
-  }
-
   @Test
   public void taskShouldBeAddedAndRemovedCorrect() {
     for (var taskType : ContainerVariable.BOX_VARIABLES) {
