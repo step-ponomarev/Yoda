@@ -1,18 +1,17 @@
 package edu.ponomarev.step.MVC.model.repository.task;
 
-import edu.ponomarev.step.component.task.InformatedTask;
+import edu.ponomarev.step.MVC.model.repository.Repository;
+import edu.ponomarev.step.MVC.model.repository.Specification;
 import edu.ponomarev.step.component.task.Task;
-import edu.ponomarev.step.component.taskContainer.termContainer.TermTaskContainer;
-import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable.ContainerType;
+import edu.ponomarev.step.component.taskContainer.termContainer.ContainerType;
 
 import java.io.*;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 
-public class TaskSerializator implements TaskRepository {
+public class TaskSerializator implements Repository<Task> {
   private String directory;
 
   public TaskSerializator() {
@@ -20,20 +19,20 @@ public class TaskSerializator implements TaskRepository {
   }
 
   @Override
-  public void add(InformatedTask task) {
-    setUpPath(task.getContainerType());
+  public void add(Task task, Specification specification) {
+    setUpPath( (ContainerType) specification.getSerialisationSpecification());
 
-    ArrayList<Task> tasks = digUpTaskList();
+    ArrayList<Task> tasks = deseriadeserializeAndGetList();
     tasks.add(task);
 
-    digInTaskList(tasks);
+    serializeAndSaveList(tasks);
 
     resetPath();
   }
 
   @Override
-  public void add(TermTaskContainer container) {
-    setUpPath(container.getContainerType());
+  public void add(List<Task> tasks, Specification specification) {
+    setUpPath( (ContainerType) specification.getSerialisationSpecification());
 
     try {
       File file = new File(directory);
@@ -41,7 +40,7 @@ public class TaskSerializator implements TaskRepository {
         file.createNewFile();
       }
 
-      digInTaskList(container.getList());
+      serializeAndSaveList(tasks);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -50,66 +49,52 @@ public class TaskSerializator implements TaskRepository {
   }
 
   @Override
-  public void remove(InformatedTask task) {
-    setUpPath(task.getContainerType());
+  public void remove(Task task, Specification specification) {
+    setUpPath( (ContainerType) specification.getSerialisationSpecification());
 
-    ArrayList<Task> tasks = digUpTaskList();
+    ArrayList<Task> tasks = deseriadeserializeAndGetList();
     tasks.remove(task);
 
-    digInTaskList(tasks);
+    serializeAndSaveList(tasks);
 
     resetPath();
   }
 
   @Override
-  public void remove(Queue<InformatedTask> removedTasks) {
-    if (removedTasks.isEmpty()) {
-      return;
-    }
-
-    setUpPath(removedTasks.peek().getContainerType());
-
-    ArrayList<Task> tasks = digUpTaskList();
-    for (var removedTask : removedTasks) {
-      tasks.remove(removedTask);
-    }
-
-    digInTaskList(tasks);
-
-    resetPath();
-  }
+  // Never used.
+  public void remove(List<Task> removedTasks, Specification specification) {}
 
   @Override
-  public void update(InformatedTask updatedTask) {
-    setUpPath(updatedTask.getContainerType());
+  public void update(Task updatedTask, Specification specification) {
+    setUpPath( (ContainerType) specification.getSerialisationSpecification());
 
-    ArrayList<Task> tasks = digUpTaskList();
+    ArrayList<Task> tasks = deseriadeserializeAndGetList();
 
     putTaskIn(updatedTask, tasks);
 
-    digInTaskList(tasks);
+    serializeAndSaveList(tasks);
 
     resetPath();
   }
 
   @Override
-  public void update(TermTaskContainer updatedTasks) {
-    setUpPath(updatedTasks.getContainerType());
+  public void update(List<Task> updatedTasks, Specification specification) {
+    setUpPath( (ContainerType) specification.getSerialisationSpecification());
 
-    ArrayList<Task> tasks = digUpTaskList();
+    ArrayList<Task> tasks = deseriadeserializeAndGetList();
 
-    for (var updatedTask : updatedTasks.getList()) {
+    for (var updatedTask : updatedTasks) {
       putTaskIn(updatedTask, tasks);
     }
 
-    digInTaskList(tasks);
+    serializeAndSaveList(tasks);
 
     resetPath();
   }
 
   @Override
-  public List<Task> getList(ContainerType containerType) {
-    setUpPath(containerType);
+  public List<Task> getList(Specification specification) {
+    setUpPath( (ContainerType) specification.getSerialisationSpecification());
 
     ArrayList<Task> tasks = new ArrayList<>();
 
@@ -150,7 +135,7 @@ public class TaskSerializator implements TaskRepository {
     }
   }
 
-  private ArrayList<Task> digUpTaskList() {
+  private ArrayList<Task> deseriadeserializeAndGetList() {
     ArrayList<Task> tasks = new ArrayList<>();
     try {
       File file = new File(directory);
@@ -171,7 +156,7 @@ public class TaskSerializator implements TaskRepository {
     return tasks;
   }
 
-  private void digInTaskList(List<Task> tasks) {
+  private void serializeAndSaveList(List<Task> tasks) {
     File file = new File(directory);
 
     try {

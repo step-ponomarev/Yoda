@@ -1,5 +1,6 @@
 package edu.ponomarev.step.MVC.model.repository.task;
 
+import edu.ponomarev.step.MVC.model.repository.Repository;
 import edu.ponomarev.step.component.task.InformatedTask;
 import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable;
@@ -14,10 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
-public class sqlTaskRepository implements TaskRepository {
+public class sqlRepository implements Repository {
   private Connection connection;
 
-  public sqlTaskRepository(Connection connection) {
+  public sqlRepository(Connection connection) {
     this.connection = connection;
   }
 
