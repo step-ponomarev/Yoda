@@ -1,7 +1,8 @@
 package edu.ponomarev.step.MVC.model.repository;
 
 import edu.ponomarev.step.MVC.model.repository.task.TaskSerializator;
-import edu.ponomarev.step.MVC.model.repository.task.sqlRepository;
+import edu.ponomarev.step.MVC.model.repository.task.TaskSqlRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -38,11 +39,11 @@ public class RepositoryFactory {
   public Repository getSqlTaskRepository() {
     try {
       if (!connection.isClosed()) {
-        return (new sqlRepository(connection));
+        return (new TaskSqlRepository(connection));
       } else {
         setConnection();
 
-        return (new sqlRepository(connection));
+        return (new TaskSqlRepository(connection));
       }
     } catch (Exception e) {
       System.err.println(e.getMessage());

@@ -1,11 +1,8 @@
 package edu.ponomarev.step.MVC.model.repository.task;
 
 import edu.ponomarev.step.MVC.model.repository.Repository;
-import edu.ponomarev.step.component.task.InformatedTask;
+import edu.ponomarev.step.MVC.model.repository.Specification;
 import edu.ponomarev.step.component.task.Task;
-import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable;
-import edu.ponomarev.step.component.taskContainer.termContainer.TermTaskContainer;
-import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable.ContainerType;
 import edu.ponomarev.step.system.TimeManager;
 
 import java.sql.*;
@@ -15,18 +12,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
-public class sqlRepository implements Repository {
+public class TaskSqlRepository implements Repository<Task> {
   private Connection connection;
 
-  public sqlRepository(Connection connection) {
+  public TaskSqlRepository(Connection connection) {
     this.connection = connection;
   }
 
   @Override
-  public void add(InformatedTask task) {
+  public void add(Task task, Specification specification) {
     final String insertRequest = "INSERT INTO task_box (time_of_creation, time_of_last_change, statement, type) " +
         "VALUES (?, ?, ?, ?);";
-    String boxType = ContainerVariable.getBoxName(task.getContainerType());
 
     try {
       PreparedStatement statement = connection.prepareStatement(insertRequest);
@@ -34,7 +30,7 @@ public class sqlRepository implements Repository {
       statement.setObject(1, task.getTimeOfCreation());
       statement.setObject(2, task.getTimeOfLastChange());
       statement.setString(3, task.getStatement());
-      statement.setString(4, boxType);
+      statement.setString(4, specification.getSqlSpecification());
 
       statement.execute();
       statement.close();
@@ -44,15 +40,14 @@ public class sqlRepository implements Repository {
   }
 
   @Override
-  public void add(TermTaskContainer container) {
+  public void add(List<Task> tasks, Specification specification) {
     final String selectRequest = "SELECT * FROM task_box where type = ?";
     final String insertRequest = "INSERT INTO task_box (time_of_creation, time_of_last_change, statement, type) " +
         "VALUES (?, ?, ?, ?);";
 
+    final String boxType = specification.getSqlSpecification();
     try {
       PreparedStatement statement = connection.prepareStatement(selectRequest);
-
-      String boxType = ContainerVariable.getBoxName(container.getContainerType());
 
       statement.setString(1, boxType);
 
@@ -69,10 +64,10 @@ public class sqlRepository implements Repository {
 
       statement = connection.prepareStatement(insertRequest);
 
-      TermTaskContainer updateContainer = new TermTaskContainer(container.getContainerType());
+      List<Task> updateContainer = new ArrayList<Task>();
 
       statement.setString(4, boxType);
-      for (Task clientTask : container.getList()) {
+      for (Task clientTask : tasks) {
         if (!BDlist.contains(clientTask)) {
           statement.setObject(1, clientTask.getTimeOfCreation());
           statement.setObject(2, clientTask.getTimeOfLastChange());
@@ -89,9 +84,7 @@ public class sqlRepository implements Repository {
         }
       }
 
-      if (!updateContainer.isEmpty()) {
-        update(updateContainer);
-      }
+      update(updateContainer, specification);
 
       statement.close();
     } catch (Exception e) {
@@ -100,7 +93,7 @@ public class sqlRepository implements Repository {
   }
 
   @Override
-  public void remove(InformatedTask tasks) {
+  public void remove(Task tasks, Specification specification) {
     final String removeRequest = "DELETE FROM task_box WHERE time_of_creation = ?";
 
     try {
@@ -117,7 +110,7 @@ public class sqlRepository implements Repository {
   }
 
   @Override
-  public void remove(Queue<InformatedTask> tasks) {
+  public void remove(Queue<Task> tasks) {
     if (tasks.isEmpty()) {
       return;
     }
@@ -139,16 +132,16 @@ public class sqlRepository implements Repository {
   }
 
   @Override
-  public void update(InformatedTask informatedTask) {
-    final String updateRequest = "UPDATE task_box SET statement = ?, time_of_last_change = ? WHERE time_of_creation " +
-        "= ?";
+  public void update(Task updatedTask, Specification specification) {
+    final String updateRequest =
+        "UPDATE task_box SET statement = ?, time_of_last_change = ? WHERE time_of_creation = ?";
 
     try {
       PreparedStatement statement = connection.prepareStatement(updateRequest);
 
-      statement.setString(1, informatedTask.getStatement());
-      statement.setObject(2, informatedTask.getTimeOfLastChange());
-      statement.setObject(3, informatedTask.getTimeOfCreation());
+      statement.setString(1, updatedTask.getStatement());
+      statement.setObject(2, updatedTask.getTimeOfLastChange());
+      statement.setObject(3, updatedTask.getTimeOfCreation());
 
       statement.execute();
 
@@ -160,30 +153,14 @@ public class sqlRepository implements Repository {
   }
 
   @Override
-  public void update(TermTaskContainer container) {
-    final String updateRequest = "UPDATE task_box SET statement = ?, time_of_last_change = ? WHERE time_of_creation " +
-        "= ?";
-
-    try {
-      PreparedStatement statement = connection.prepareStatement(updateRequest);
-
-
-      for (Task updatedTask : container.getList()) {
-        statement.setString(1, updatedTask.getStatement());
-        statement.setObject(2, updatedTask.getTimeOfLastChange());
-        statement.setObject(3, updatedTask.getTimeOfCreation());
-        statement.execute();
-      }
-
-      statement.close();
-
-    } catch (Exception e) {
-      e.printStackTrace();
+  public void update(List<Task> tasks, Specification specification) {
+    for (Task task : tasks) {
+      update(task, specification);
     }
   }
 
   @Override
-  public List<Task> getList(ContainerType containerType) {
+  public List<Task> getList(Specification specification) {
     final String sqlRequest = "SELECT * FROM task_box where type = ?";
 
     ArrayList<Task> tasks = new ArrayList<>();
@@ -191,7 +168,7 @@ public class sqlRepository implements Repository {
     try {
       PreparedStatement statement = connection.prepareStatement(sqlRequest);
 
-      String boxType = ContainerVariable.getBoxName(containerType);
+      final String boxType = specification.getSqlSpecification();
 
       statement.setString(1, boxType);
 

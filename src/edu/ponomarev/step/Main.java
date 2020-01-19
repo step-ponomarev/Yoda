@@ -1,8 +1,6 @@
 package edu.ponomarev.step;
 
 import edu.ponomarev.step.MVC.controller.Controller;
-import edu.ponomarev.step.MVC.model.Worker;
-import edu.ponomarev.step.MVC.view.Window;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class Main {
@@ -12,11 +10,7 @@ public class Main {
     try {
       context = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
 
-      var window = context.getBean("window", Window.class);
-      var taskWorker = new Worker();
-
-      var controller = new Controller(window, taskWorker);
-      controller.initView();
+      var controller = context.getBean("controller", Controller.class);
 
     } catch (Exception e) {
       System.err.println(e.getMessage());

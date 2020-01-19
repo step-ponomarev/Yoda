@@ -1,53 +1,62 @@
 package edu.ponomarev.step.MVC.model;
 
 import edu.ponomarev.step.MVC.model.repository.task.TaskSerializator;
-import edu.ponomarev.step.MVC.model.repository.task.sqlTaskRepository;
+import edu.ponomarev.step.MVC.model.repository.task.BoxTypeSpecification;
+import edu.ponomarev.step.MVC.model.repository.task.TaskSqlRepository;
 import edu.ponomarev.step.component.project.Project;
 import edu.ponomarev.step.component.task.InformatedTask;
 import edu.ponomarev.step.MVC.model.repository.RepositoryFactory;
-import edu.ponomarev.step.component.taskContainer.termContainer.TermTaskContainer;
-import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable.ContainerType;
+import edu.ponomarev.step.component.task.Task;
+import edu.ponomarev.step.component.BoxType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 
-import static edu.ponomarev.step.Main.context;
-
+@Component
 public class Worker {
+  @Autowired
+  @Qualifier("repositoryFactory")
   private RepositoryFactory repositoryFactory;
 
   private TaskSerializator taskSerializator;
-  private sqlTaskRepository taskSqlRepository;
+  private TaskSqlRepository taskSqlRepository;
 
-  private HashMap<ContainerType, TermTaskContainer> taskContainers;
+  private HashMap<BoxType, List<Task>> boxes;
   private ArrayList<Project> projectList;
 
-  private Queue<InformatedTask> removeQueueOfTasks;
+  private Queue<Task> removeQueueOfTasks;
 
   public Worker() {
-    taskContainers = new HashMap<>() {{
-      put(ContainerType.INBOX, new TermTaskContainer(ContainerType.INBOX));
-      put(ContainerType.DAY, new TermTaskContainer(ContainerType.DAY));
-      put(ContainerType.WEEK, new TermTaskContainer(ContainerType.WEEK));
-      put(ContainerType.LATE, new TermTaskContainer(ContainerType.LATE));
+    boxes = new HashMap<>() {{
+      put(BoxType.INBOX, new ArrayList<>());
+      put(BoxType.DAY, new ArrayList<>());
+      put(BoxType.WEEK, new ArrayList<>());
+      put(BoxType.LATE, new ArrayList<>());
     }};
 
     projectList = new ArrayList<>();
-
     removeQueueOfTasks = new LinkedList<>();
+  }
 
-    repositoryFactory = context.getBean("repositoryFactory", RepositoryFactory.class);
-
+  @PostConstruct
+  public void postConstruct() {
     taskSerializator = (TaskSerializator) repositoryFactory.getTaskSerializator();
-    taskSqlRepository = (sqlTaskRepository) repositoryFactory.getSqlTaskRepository();
+    taskSqlRepository = (TaskSqlRepository) repositoryFactory.getSqlTaskRepository();
   }
 
   public void addTask(InformatedTask informatedTask) {
-    taskContainers.get(informatedTask.getContainerType()).add(informatedTask);
+    final var boxType = informatedTask.getBoxType();
+    final var boxTypeSpecification = new BoxTypeSpecification(boxType);
 
-    taskSerializator.add(informatedTask);
+    boxes.get(boxType).add(informatedTask);
+
+    taskSerializator.add(informatedTask, boxTypeSpecification);
 
     if (repositoryFactory.isOnline()) {
-      taskSqlRepository.add(informatedTask);
+      taskSqlRepository.add(informatedTask, boxTypeSpecification);
     } else {
       System.err.println("No connection");
       return;
@@ -56,13 +65,16 @@ public class Worker {
   }
 
   public void removeTask(InformatedTask informatedTask) {
-    removeQueueOfTasks.add(informatedTask);
-    taskContainers.get(informatedTask.getContainerType()).remove(informatedTask);
+    final var boxType = informatedTask.getBoxType();
+    final var boxTypeSpecification = new BoxTypeSpecification(boxType);
 
-    taskSerializator.remove(informatedTask);
+    removeQueueOfTasks.add(informatedTask);
+    boxes.get(boxType).remove(informatedTask);
+
+    taskSerializator.remove(informatedTask, boxTypeSpecification);
 
     if (repositoryFactory.isOnline()) {
-      taskSqlRepository.remove(informatedTask);
+      taskSqlRepository.remove(informatedTask, boxTypeSpecification);
     } else {
       System.err.println("No connection");
       return;
@@ -70,9 +82,7 @@ public class Worker {
     }
   }
 
-  public void cleanQueueToDelete() {
-    taskSerializator.remove(removeQueueOfTasks);
-
+  public void utilizeQueueToRemove() {
     if (repositoryFactory.isOnline()) {
       taskSqlRepository.remove(removeQueueOfTasks);
     } else {
@@ -85,12 +95,13 @@ public class Worker {
   }
 
   public void pushAll() {
-    for (var box : taskContainers.entrySet()) {
-      TermTaskContainer container = box.getValue();
+    for (var box : boxes.entrySet()) {
+      final var boxTypeSpecification = new BoxTypeSpecification(box.getKey());
+      List<Task> tasks = box.getValue();
 
-      taskSerializator.add(container);
+      taskSerializator.add(tasks, boxTypeSpecification);
       if (repositoryFactory.isOnline()) {
-        taskSqlRepository.add(container);
+        taskSqlRepository.add(tasks, boxTypeSpecification);
       } else {
         System.err.println("No connection");
         return;
@@ -100,10 +111,11 @@ public class Worker {
   }
 
   public void updateTask(InformatedTask task) {
-    taskSerializator.update(task);
+    final var boxType = task.getBoxType();
+    taskSerializator.update(task, new BoxTypeSpecification(boxType));
 
     if (repositoryFactory.isOnline()) {
-      taskSqlRepository.update(task);
+      taskSqlRepository.update(task, new BoxTypeSpecification(boxType));
     } else {
       System.err.println("No connection");
       return;
@@ -116,9 +128,9 @@ public class Worker {
     return;
   }
 
-  public HashMap<ContainerType, TermTaskContainer> getTaskContainer() { return taskContainers; }
+  public HashMap<BoxType, List<Task>> getTaskBoxes() { return boxes; }
 
-  public TermTaskContainer getTaskContainer(ContainerType containerType) { return taskContainers.get(containerType); }
+  public List<Task> getTaskBox(BoxType boxType) { return boxes.get(boxType); }
 
   public ArrayList<Project> getProjectList() {
     return projectList;

@@ -3,13 +3,14 @@ package edu.ponomarev.step.MVC.model.repository.task;
 import edu.ponomarev.step.MVC.model.repository.Repository;
 import edu.ponomarev.step.MVC.model.repository.Specification;
 import edu.ponomarev.step.component.task.Task;
-import edu.ponomarev.step.component.taskContainer.termContainer.ContainerType;
+import edu.ponomarev.step.component.BoxType;
 
 import java.io.*;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 public class TaskSerializator implements Repository<Task> {
   private String directory;
@@ -20,7 +21,7 @@ public class TaskSerializator implements Repository<Task> {
 
   @Override
   public void add(Task task, Specification specification) {
-    setUpPath( (ContainerType) specification.getSerialisationSpecification());
+    setUpPath( (BoxType) specification.getSerialisationSpecification());
 
     ArrayList<Task> tasks = deseriadeserializeAndGetList();
     tasks.add(task);
@@ -32,7 +33,7 @@ public class TaskSerializator implements Repository<Task> {
 
   @Override
   public void add(List<Task> tasks, Specification specification) {
-    setUpPath( (ContainerType) specification.getSerialisationSpecification());
+    setUpPath( (BoxType) specification.getSerialisationSpecification());
 
     try {
       File file = new File(directory);
@@ -50,7 +51,7 @@ public class TaskSerializator implements Repository<Task> {
 
   @Override
   public void remove(Task task, Specification specification) {
-    setUpPath( (ContainerType) specification.getSerialisationSpecification());
+    setUpPath( (BoxType) specification.getSerialisationSpecification());
 
     ArrayList<Task> tasks = deseriadeserializeAndGetList();
     tasks.remove(task);
@@ -62,11 +63,11 @@ public class TaskSerializator implements Repository<Task> {
 
   @Override
   // Never used.
-  public void remove(List<Task> removedTasks, Specification specification) {}
+  public void remove(Queue<Task> removedTasks) {}
 
   @Override
   public void update(Task updatedTask, Specification specification) {
-    setUpPath( (ContainerType) specification.getSerialisationSpecification());
+    setUpPath( (BoxType) specification.getSerialisationSpecification());
 
     ArrayList<Task> tasks = deseriadeserializeAndGetList();
 
@@ -79,7 +80,7 @@ public class TaskSerializator implements Repository<Task> {
 
   @Override
   public void update(List<Task> updatedTasks, Specification specification) {
-    setUpPath( (ContainerType) specification.getSerialisationSpecification());
+    setUpPath( (BoxType) specification.getSerialisationSpecification());
 
     ArrayList<Task> tasks = deseriadeserializeAndGetList();
 
@@ -94,7 +95,7 @@ public class TaskSerializator implements Repository<Task> {
 
   @Override
   public List<Task> getList(Specification specification) {
-    setUpPath( (ContainerType) specification.getSerialisationSpecification());
+    setUpPath( (BoxType) specification.getSerialisationSpecification());
 
     ArrayList<Task> tasks = new ArrayList<>();
 
@@ -172,21 +173,21 @@ public class TaskSerializator implements Repository<Task> {
     }
   }
 
-  private void setUpPath(ContainerType containerType) {
+  private void setUpPath(BoxType boxType) {
     File file = new File(directory);
     if (!file.exists()) {
       file.mkdir();
     }
 
-    addFileNameToPath(containerType);
+    addFileNameToPath(boxType);
   }
 
   private void resetPath() {
     directory = Paths.get("data").toAbsolutePath().toString();
   }
 
-  private void addFileNameToPath(ContainerType containerType) {
-    switch (containerType) {
+  private void addFileNameToPath(BoxType boxType) {
+    switch (boxType) {
       case DAY:
         directory = Paths.get(directory + "/box_today.ser").toAbsolutePath().toString();
         break;

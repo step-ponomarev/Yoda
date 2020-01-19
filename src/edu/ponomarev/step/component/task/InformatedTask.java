@@ -1,30 +1,29 @@
 package edu.ponomarev.step.component.task;
 
 import edu.ponomarev.step.component.project.Project;
-import edu.ponomarev.step.component.taskContainer.termContainer.ContainerVariable.ContainerType;
+import edu.ponomarev.step.component.BoxType;
 
-public class InformatedTask extends TaskDecorator {
-  private ContainerType containerType;
+public class InformatedTask extends Task {
+  private BoxType boxType;
   private Project project;
 
-  public InformatedTask(Task task, ContainerType containerType) {
+  public InformatedTask(Task task, BoxType boxType) {
     super(task);
-    this.containerType = containerType;
+    this.boxType = boxType;
+    this.project = null;
   }
 
-  public ContainerType getContainerType() {
-    return containerType;
+  public InformatedTask(Task task, BoxType boxType, Project projectOwner) {
+    super(task);
+    this.boxType = boxType;
+    this.project = projectOwner;
   }
 
-  public void setContainerType(ContainerType containerType) {
-    this.containerType = containerType;
+  public BoxType getBoxType() {
+    return boxType;
   }
 
   public Project getProject() {
     return project;
-  }
-
-  public void setProject(Project project) {
-    this.project = project;
   }
 }
