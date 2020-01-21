@@ -16,8 +16,6 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.util.*;
 
-
-// TODO Допилить остальные течты
 public class TaskSqlRepositoryTest {
   private static RepositoryFactory repositoryFactory;
 
@@ -47,131 +45,144 @@ public class TaskSqlRepositoryTest {
 
   @Test
   public void taskShouldBeAddedAndRemovedCorrect() {
-    for (var boxType : BoxType.values()) {
-      final var taskRelations = new TaskRelations(boxType);
-      final var taskSpecification = new TaskSpecification(taskRelations);
+    try {
+      for (var boxType : BoxType.values()) {
+        final var taskRelations = new TaskRelations(boxType);
+        final var taskSpecification = new TaskSpecification(taskRelations);
 
-      final int SIZE_BEFORE_MANIPULATIONS = sqlTaskRepository.getList(taskSpecification).size();
+        final int SIZE_BEFORE_MANIPULATIONS = sqlTaskRepository.getList(taskSpecification).size();
 
-      //push task to bd.
-      final var statement = boxType.toString();
-      Task newTask = new Task(statement);
+        //push task to bd.
+        final var statement = boxType.toString();
+        Task newTask = new Task(statement);
 
-      sqlTaskRepository.add(newTask, taskSpecification);
+        sqlTaskRepository.add(newTask, taskSpecification);
 
-      //Check task adding
-      List<Task> sqlTasks = sqlTaskRepository.getList(taskSpecification);
+        //Check task adding
+        List<Task> sqlTasks = sqlTaskRepository.getList(taskSpecification);
 
-      final int SIZE_AFTER_TASK_ADDING = sqlTasks.size();
-      final boolean CONTAINER_CONTAINS_ADDED_TASK = sqlTasks.contains(newTask);
-      final boolean ONLY_ONE_TASK_WAS_ADDED = ( SIZE_AFTER_TASK_ADDING - SIZE_BEFORE_MANIPULATIONS ) == 1;
+        final int SIZE_AFTER_TASK_ADDING = sqlTasks.size();
+        final boolean CONTAINER_CONTAINS_ADDED_TASK = sqlTasks.contains(newTask);
+        final boolean ONLY_ONE_TASK_WAS_ADDED = ( SIZE_AFTER_TASK_ADDING - SIZE_BEFORE_MANIPULATIONS ) == 1;
 
-      Assert.assertTrue(CONTAINER_CONTAINS_ADDED_TASK);
-      Assert.assertTrue(ONLY_ONE_TASK_WAS_ADDED);
+        Assert.assertTrue(CONTAINER_CONTAINS_ADDED_TASK);
+        Assert.assertTrue(ONLY_ONE_TASK_WAS_ADDED);
 
-      //Check removing
-      sqlTaskRepository.remove(newTask, taskSpecification);
-      sqlTasks = sqlTaskRepository.getList(taskSpecification);
+        //Check removing
+        sqlTaskRepository.remove(newTask, taskSpecification);
+        sqlTasks = sqlTaskRepository.getList(taskSpecification);
 
-      final boolean CONTAINER_CONTAINS_REMOVED_TASK = sqlTasks.contains(newTask);
-      final int SIZE_AFTER_MANIPULATIONS = sqlTasks.size();
+        final boolean CONTAINER_CONTAINS_REMOVED_TASK = sqlTasks.contains(newTask);
+        final int SIZE_AFTER_MANIPULATIONS = sqlTasks.size();
 
-      Assert.assertFalse(CONTAINER_CONTAINS_REMOVED_TASK);
-      Assert.assertEquals(SIZE_BEFORE_MANIPULATIONS, SIZE_AFTER_MANIPULATIONS);
+        Assert.assertFalse(CONTAINER_CONTAINS_REMOVED_TASK);
+        Assert.assertEquals(SIZE_BEFORE_MANIPULATIONS, SIZE_AFTER_MANIPULATIONS);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 
   @Test
   public void singleTaskShouldBeUpdated() {
-    for (var boxType : BoxType.values()) {
-      final String newStatement = "New statement";
+    try {
+      for (var boxType : BoxType.values()) {
+        final String newStatement = "New statement";
 
-      final var taskRelations = new TaskRelations(boxType);
-      final var taskSpecification = new TaskSpecification(taskRelations);
+        final var taskRelations = new TaskRelations(boxType);
+        final var taskSpecification = new TaskSpecification(taskRelations);
 
-      //Add new task
-      Task newTask = new Task(exampleTasks.get(boxType));
-      sqlTaskRepository.add(newTask, taskSpecification);
+        //Add new task
+        Task newTask = new Task(exampleTasks.get(boxType));
+        sqlTaskRepository.add(newTask, taskSpecification);
 
-      //Save tasks before update
-      List<Task> beforeUpdate = sqlTaskRepository.getList(taskSpecification);
-      Task taskBeforeUpdate = beforeUpdate.get(beforeUpdate.indexOf(newTask));
+        //Save tasks before update
+        List<Task> beforeUpdate = sqlTaskRepository.getList(taskSpecification);
+        Task taskBeforeUpdate = beforeUpdate.get(beforeUpdate.indexOf(newTask));
 
-      //Update task
-      newTask.setStatement(newStatement);
-      sqlTaskRepository.update(newTask, taskSpecification);
+        //Update task
+        newTask.setStatement(newStatement);
+        newTask.updateTimeOfLastChange();
+        sqlTaskRepository.update(newTask, taskSpecification);
 
-      //Save tasks after update
-      List<Task> afterUpdate = sqlTaskRepository.getList(taskSpecification);
-      Task taskAfterUpdate = afterUpdate.get(afterUpdate.indexOf(newTask));
+        //Save tasks after update
+        List<Task> afterUpdate = sqlTaskRepository.getList(taskSpecification);
+        Task taskAfterUpdate = afterUpdate.get(afterUpdate.indexOf(newTask));
 
-      //Tasks equals but not statements
-      final boolean SIZE_BEFORE_AND_AFTER_UPDATE_EQUAL = beforeUpdate.size() == afterUpdate.size();
-      final boolean TASK_BEFORE_AND_AFTER_UPDATE_THE_SAME = taskBeforeUpdate.equals(taskAfterUpdate);
-      final boolean TASK_INFOT_BEFORE_AND_AFTER_UPDATE_EQUAL =
-          taskBeforeUpdate.getStatement().equals(taskAfterUpdate.getStatement());
+        //Tasks equals but not statements
+        final boolean SIZE_BEFORE_AND_AFTER_UPDATE_EQUAL = beforeUpdate.size() == afterUpdate.size();
+        final boolean TASK_BEFORE_AND_AFTER_UPDATE_THE_SAME = taskBeforeUpdate.equals(taskAfterUpdate);
+        final boolean TASK_INFOT_BEFORE_AND_AFTER_UPDATE_EQUAL =
+            taskBeforeUpdate.getStatement().equals(taskAfterUpdate.getStatement());
 
-      Assert.assertTrue(SIZE_BEFORE_AND_AFTER_UPDATE_EQUAL);
-      Assert.assertTrue(TASK_BEFORE_AND_AFTER_UPDATE_THE_SAME);
-      Assert.assertFalse(TASK_INFOT_BEFORE_AND_AFTER_UPDATE_EQUAL);
+        Assert.assertTrue(SIZE_BEFORE_AND_AFTER_UPDATE_EQUAL);
+        Assert.assertTrue(TASK_BEFORE_AND_AFTER_UPDATE_THE_SAME);
+        Assert.assertFalse(TASK_INFOT_BEFORE_AND_AFTER_UPDATE_EQUAL);
 
-      sqlTaskRepository.remove(newTask, taskSpecification);
+        sqlTaskRepository.remove(newTask, taskSpecification);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 
   @Test
   public void taskListShouldBeAddedAndRemovedCorrect() {
-    for (var boxType : BoxType.values()) {
-      final var taskRelations = new TaskRelations(boxType);
-      final var taskSpecification = new TaskSpecification(taskRelations);
+    try {
+      for (var boxType : BoxType.values()) {
+        final var taskRelations = new TaskRelations(boxType);
+        final var taskSpecification = new TaskSpecification(taskRelations);
 
-      //Set up list to adding.
-      final int AMOUNT_OF_CREATED_TASKS = 10;
+        //Set up list to adding.
+        final int AMOUNT_OF_CREATED_TASKS = 10;
 
-      List<Task> createdTasks = new ArrayList<>(AMOUNT_OF_CREATED_TASKS);
+        List<Task> createdTasks = new ArrayList<>(AMOUNT_OF_CREATED_TASKS);
 
-      String statement;
-      for (int i = 0; i < AMOUNT_OF_CREATED_TASKS; ++i) {
-        statement = Integer.toString(i);
-        createdTasks.add(new Task(statement));
+        String statement;
+        for (int i = 0; i < AMOUNT_OF_CREATED_TASKS; ++i) {
+          statement = Integer.toString(i);
+          createdTasks.add(new Task(statement));
+        }
+
+        //Add task list
+        final int SIZE_BEFORE_ADDING = sqlTaskRepository.getList(taskSpecification).size();
+
+        sqlTaskRepository.add(createdTasks, taskSpecification);
+
+        var sqlTasks = sqlTaskRepository.getList(taskSpecification);
+
+        final int SIZE_AFTER_ADDING = sqlTasks.size();
+
+        final boolean SIZE_WAS_INCREASED_CORRECT = (SIZE_AFTER_ADDING - SIZE_BEFORE_ADDING) == AMOUNT_OF_CREATED_TASKS;
+
+        boolean EVERY_TASK_WAS_ADDED = true;
+        for (var task : createdTasks) {
+          EVERY_TASK_WAS_ADDED &= sqlTasks.contains(task);
+        }
+
+        Assert.assertTrue(SIZE_WAS_INCREASED_CORRECT);
+        Assert.assertTrue(EVERY_TASK_WAS_ADDED);
+
+        //Create queue to removing
+        Queue<Task> removingTasks = new LinkedList<>(createdTasks);
+
+        //Remove tasks
+        sqlTaskRepository.remove(removingTasks);
+
+        sqlTasks = sqlTaskRepository.getList(taskSpecification);
+        boolean EVERY_TASK_WAS_REMOVED = true;
+        for (var task : createdTasks) {
+          EVERY_TASK_WAS_ADDED &= !sqlTasks.contains(task);
+        }
+
+        final int SIZE_AFTER_REMOVING = sqlTaskRepository.getList(taskSpecification).size();
+
+
+        Assert.assertEquals(SIZE_BEFORE_ADDING, SIZE_AFTER_REMOVING);
+        Assert.assertTrue(EVERY_TASK_WAS_REMOVED);
       }
-
-      //Add task list
-      final int SIZE_BEFORE_ADDING = sqlTaskRepository.getList(taskSpecification).size();
-
-      sqlTaskRepository.add(createdTasks, taskSpecification);
-
-      var sqlTasks = sqlTaskRepository.getList(taskSpecification);
-
-      final int SIZE_AFTER_ADDING = sqlTasks.size();
-
-      final boolean SIZE_WAS_INCREASED_CORRECT = (SIZE_AFTER_ADDING - SIZE_BEFORE_ADDING) == AMOUNT_OF_CREATED_TASKS;
-
-      boolean EVERY_TASK_WAS_ADDED = true;
-      for (var task : createdTasks) {
-        EVERY_TASK_WAS_ADDED &= sqlTasks.contains(task);
-      }
-
-      Assert.assertTrue(SIZE_WAS_INCREASED_CORRECT);
-      Assert.assertTrue(EVERY_TASK_WAS_ADDED);
-
-      //Create queue to removing
-      Queue<Task> removingTasks = new LinkedList<>(createdTasks);
-
-      //Remove tasks
-      sqlTaskRepository.remove(removingTasks);
-
-      sqlTasks = sqlTaskRepository.getList(taskSpecification);
-      boolean EVERY_TASK_WAS_REMOVED = true;
-      for (var task : createdTasks) {
-        EVERY_TASK_WAS_ADDED &= !sqlTasks.contains(task);
-      }
-
-      final int SIZE_AFTER_REMOVING = sqlTaskRepository.getList(taskSpecification).size();
-
-
-      Assert.assertEquals(SIZE_BEFORE_ADDING, SIZE_AFTER_REMOVING);
-      Assert.assertTrue(EVERY_TASK_WAS_REMOVED);
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 }

@@ -9,13 +9,9 @@ public class Main {
   public static ApplicationContext context;
 
   public static void main(String[] args) {
-    try {
-      context = new AnnotationConfigApplicationContext(ApplicationConfigure.class);
+    context = new AnnotationConfigApplicationContext(ApplicationConfigure.class);
 
-      var controller = context.getBean("controller", Controller.class);
-
-    } catch (Exception e) {
-      System.err.println(e.getMessage());
-    }
+    var controller = context.getBean("controller", Controller.class);
+    controller.start();
   }
 }

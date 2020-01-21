@@ -11,12 +11,11 @@ import edu.ponomarev.step.component.BoxType;
 import edu.ponomarev.step.component.task.TaskRelations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.sql.SQLException;
 import java.util.*;
 
-@Component
 public class Worker {
   @Autowired
   @Qualifier("repositoryFactory")
@@ -26,7 +25,7 @@ public class Worker {
   private TaskSqlRepository taskSqlRepository;
 
   private HashMap<BoxType, List<Task>> boxes;
-  private ArrayList<Project> projectList;
+  private List<Project> projects;
 
   private Queue<Task> removeQueueOfTasks;
 
@@ -38,7 +37,7 @@ public class Worker {
       put(BoxType.LATE, new ArrayList<>());
     }};
 
-    projectList = new ArrayList<>();
+    projects = new ArrayList<>();
     removeQueueOfTasks = new LinkedList<>();
   }
 
@@ -52,16 +51,17 @@ public class Worker {
     final var boxType = taskRelations.getBoxOwnerType();
     final var taskSpecification = new TaskSpecification(taskRelations);
 
-    boxes.get(boxType).add(task);
+    try {
+      boxes.get(boxType).add(task);
 
-    taskSerializator.add(task, taskSpecification);
+      taskSerializator.add(task, taskSpecification);
 
-    if (repositoryFactory.isOnline()) {
       taskSqlRepository.add(task, taskSpecification);
-    } else {
-      System.err.println("No connection");
-      return;
-      //TODO пытаемся восстановить коннекшен
+
+    } catch (SQLException e) {
+      // TODO восстанавливаем коннекшен, задачу в список на добавление сохраняем???
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 
@@ -69,72 +69,85 @@ public class Worker {
     final var boxType = taskRelations.getBoxOwnerType();
     final var taskSpecification = new TaskSpecification(taskRelations);
 
-    removeQueueOfTasks.add(task);
-    boxes.get(boxType).remove(task);
+    try {
+      removeQueueOfTasks.add(task);
 
-    taskSerializator.remove(task, taskSpecification);
+      boxes.get(boxType).remove(task);
 
-    if (repositoryFactory.isOnline()) {
+      taskSerializator.remove(task, taskSpecification);
+
       taskSqlRepository.remove(task, taskSpecification);
-    } else {
-      System.err.println("No connection");
-      return;
-      // TODO Пытаемся восстановить коннекшен
+    } catch (SQLException e) {
+      // TODO восстанавливаем коннекшен, задачу в список на удаление сохраняем???
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 
   public void utilizeQueueToRemove() {
-    if (repositoryFactory.isOnline()) {
+    try {
       taskSqlRepository.remove(removeQueueOfTasks);
       removeQueueOfTasks.clear();
-    } else {
-      System.err.println("No connection");
-      return;
-      // TODO пытаесчя восстановить коннекшен
+    } catch (SQLException e) {
+      e.printStackTrace();
+      // TODO Ничо не делать ((((?
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 
   public void pushAll() {
-    for (var box : boxes.entrySet()) {
-      final var taskReletions = new TaskRelations(box.getKey());
-      final var boxTypeSpecification = new TaskSpecification(taskReletions);
-      List<Task> tasks = box.getValue();
+    try {
+      // Add tasks offline
+      for (var box : boxes.entrySet()) {
+        final var taskReletions = new TaskRelations(box.getKey());
+        final var boxTypeSpecification = new TaskSpecification(taskReletions);
+        List<Task> tasks = box.getValue();
 
-      taskSerializator.add(tasks, boxTypeSpecification);
-      if (repositoryFactory.isOnline()) {
-        taskSqlRepository.add(tasks, boxTypeSpecification);
-      } else {
-        System.err.println("No connection");
-        return;
-        // TODO Востсанавливаем коннекшен в другом потоке....
+        taskSerializator.add(tasks, boxTypeSpecification);
       }
+
+      for (var box : boxes.entrySet()) {
+        final var taskReletions = new TaskRelations(box.getKey());
+        final var boxTypeSpecification = new TaskSpecification(taskReletions);
+        List<Task> tasks = box.getValue();
+
+        taskSqlRepository.add(tasks, boxTypeSpecification);
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 
   public void updateTask(Task task, TaskRelations taskRelations) {
     final var taskSpecification = new TaskSpecification(taskRelations);
-
-    taskSerializator.update(task, taskSpecification);
-
-    if (repositoryFactory.isOnline()) {
+    try {
+      taskSerializator.update(task, taskSpecification);
       taskSqlRepository.update(task, taskSpecification);
-    } else {
-      System.err.println("No connection");
-      return;
-      // TODO Востсанавливаем коннекшен в другом потоке....
+    } catch (SQLException e) {
+      e.printStackTrace();
+      //TODO Добавить в лист на обновление.
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 
-  // TODO Добавить синхронизацию задач
-  public void synchronizeTasks() {
-    return;
+  public void addProject(Project project) {
+    projects.add(project);
   }
 
-  public HashMap<BoxType, List<Task>> getTaskBoxes() { return boxes; }
+  public void removeProject(Project project) {
+    projects.remove(project);
+  }
+
+  // TODO Добавить синхронизацию задач
+  public void synchronizeTasks() { return; }
 
   public List<Task> getTaskBox(BoxType boxType) { return boxes.get(boxType); }
 
-  public ArrayList<Project> getProjectList() {
-    return projectList;
+  public List<Project> getProjects() {
+    return projects;
   }
 }

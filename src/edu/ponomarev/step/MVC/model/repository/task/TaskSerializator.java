@@ -21,7 +21,7 @@ public class TaskSerializator implements Repository<Task> {
   }
 
   @Override
-  public void add(Task task, Specification specification) {
+  public void add(Task task, Specification specification) throws Exception {
     defineTaskRelationsAndSetUpPath(specification);
 
     List<Task> tasks = deseriadeserializeAndGetList();
@@ -33,25 +33,21 @@ public class TaskSerializator implements Repository<Task> {
   }
 
   @Override
-  public void add(List<Task> tasks, Specification specification) {
+  public void add(List<Task> tasks, Specification specification) throws Exception {
     defineTaskRelationsAndSetUpPath(specification);
 
-    try {
-      File file = new File(directory);
-      if (!file.exists()) {
-        file.createNewFile();
-      }
-
-      serializeAndSaveList(tasks);
-    } catch (Exception e) {
-      e.printStackTrace();
+    File file = new File(directory);
+    if (!file.exists()) {
+      file.createNewFile();
     }
+
+    serializeAndSaveList(tasks);
 
     resetPathAndCreateDirIfNotExists();
   }
 
   @Override
-  public void remove(Task task, Specification specification) {
+  public void remove(Task task, Specification specification) throws Exception {
     defineTaskRelationsAndSetUpPath(specification);
 
     List<Task> tasks = deseriadeserializeAndGetList();
@@ -64,7 +60,7 @@ public class TaskSerializator implements Repository<Task> {
   }
 
   @Override
-  public void remove(Queue<Task> removedTasks) {
+  public void remove(Queue<Task> removedTasks) throws Exception {
     if (removedTasks.isEmpty()) {
       return;
     }
@@ -86,7 +82,7 @@ public class TaskSerializator implements Repository<Task> {
   }
 
   @Override
-  public void update(Task updatedTask, Specification specification) {
+  public void update(Task updatedTask, Specification specification) throws Exception {
     defineTaskRelationsAndSetUpPath(specification);
 
     List<Task> tasks = deseriadeserializeAndGetList();
@@ -99,7 +95,7 @@ public class TaskSerializator implements Repository<Task> {
   }
 
   @Override
-  public void update(List<Task> updatedTasks, Specification specification) {
+  public void update(List<Task> updatedTasks, Specification specification) throws Exception {
     defineTaskRelationsAndSetUpPath(specification);
 
     List<Task> tasks = deseriadeserializeAndGetList();
@@ -114,24 +110,20 @@ public class TaskSerializator implements Repository<Task> {
   }
 
   @Override
-  public List<Task> getList(Specification specification) {
+  public List<Task> getList(Specification specification) throws Exception {
     defineTaskRelationsAndSetUpPath(specification);
 
     List<Task> tasks = new ArrayList<>();
 
     File file = new File(directory);
     if (file.exists()) {
-      try {
-        FileInputStream is = new FileInputStream(file);
-        ObjectInputStream isObj = new ObjectInputStream(is);
+      FileInputStream is = new FileInputStream(file);
+      ObjectInputStream isObj = new ObjectInputStream(is);
 
-        tasks = (List<Task>) isObj.readObject();
+      tasks = (List<Task>) isObj.readObject();
 
-        isObj.close();
-        is.close();
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
+      isObj.close();
+      is.close();
     }
 
     resetPathAndCreateDirIfNotExists();
@@ -154,41 +146,34 @@ public class TaskSerializator implements Repository<Task> {
     }
   }
 
-  private List<Task> deseriadeserializeAndGetList() {
+  private List<Task> deseriadeserializeAndGetList() throws Exception {
     List<Task> tasks = new ArrayList<>();
-    try {
-      File file = new File(directory);
-      if (!file.exists()) {
-        file.createNewFile();
-        return tasks;
-      } else {
-        FileInputStream is = new FileInputStream(file);
-        ObjectInputStream isObj = new ObjectInputStream(is);
 
-        tasks = (List<Task>) isObj.readObject();
-        is.close();
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
+    File file = new File(directory);
+    if (!file.exists()) {
+      file.createNewFile();
+      return tasks;
+    } else {
+      FileInputStream is = new FileInputStream(file);
+      ObjectInputStream isObj = new ObjectInputStream(is);
+
+      tasks = (List<Task>) isObj.readObject();
+      is.close();
     }
 
     return tasks;
   }
 
-  private void serializeAndSaveList(List<Task> tasks) {
+  private void serializeAndSaveList(List<Task> tasks) throws Exception {
     File file = new File(directory);
 
-    try {
-      FileOutputStream fostream = new FileOutputStream(file);
-      ObjectOutputStream objOstream = new ObjectOutputStream(fostream);
+    FileOutputStream fostream = new FileOutputStream(file);
+    ObjectOutputStream objOstream = new ObjectOutputStream(fostream);
 
-      objOstream.writeObject(tasks);
+    objOstream.writeObject(tasks);
 
-      objOstream.close();
-      fostream.close();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    objOstream.close();
+    fostream.close();
   }
 
   private void defineTaskRelationsAndSetUpPath(Specification specification) {

@@ -43,92 +43,100 @@ public class TaskSerializatorTest {
 
   @Test
   public void taskShouldBeAddedAndRemovedCorrect() {
-    for (var boxType : BoxType.values()) {
-      final var taskRelations = new TaskRelations(boxType);
-      final var taskSpecification = new TaskSpecification(taskRelations);
+    try {
+      for (var boxType : BoxType.values()) {
+        final var taskRelations = new TaskRelations(boxType);
+        final var taskSpecification = new TaskSpecification(taskRelations);
 
-      final int SIZE_BEFORE_MANIPULATIONS = taskSerializator.getList(taskSpecification).size();
+        final int SIZE_BEFORE_MANIPULATIONS = taskSerializator.getList(taskSpecification).size();
 
-      //push task to bd.
-      final var statement = boxType.toString();
-      Task newTask = new Task(statement);
+        //push task to bd.
+        final var statement = boxType.toString();
+        Task newTask = new Task(statement);
 
-      taskSerializator.add(newTask, taskSpecification);
+        taskSerializator.add(newTask, taskSpecification);
 
-      //Check task adding
-      List<Task> sqlTasks = taskSerializator.getList(taskSpecification);
+        //Check task adding
+        List<Task> sqlTasks = taskSerializator.getList(taskSpecification);
 
-      final int SIZE_AFTER_TASK_ADDING = sqlTasks.size();
-      final boolean CONTAINER_CONTAINS_ADDED_TASK = sqlTasks.contains(newTask);
-      final boolean ONLY_ONE_TASK_WAS_ADDED = ( SIZE_AFTER_TASK_ADDING - SIZE_BEFORE_MANIPULATIONS ) == 1;
+        final int SIZE_AFTER_TASK_ADDING = sqlTasks.size();
+        final boolean CONTAINER_CONTAINS_ADDED_TASK = sqlTasks.contains(newTask);
+        final boolean ONLY_ONE_TASK_WAS_ADDED = ( SIZE_AFTER_TASK_ADDING - SIZE_BEFORE_MANIPULATIONS ) == 1;
 
-      Assert.assertTrue(CONTAINER_CONTAINS_ADDED_TASK);
-      Assert.assertTrue(ONLY_ONE_TASK_WAS_ADDED);
+        Assert.assertTrue(CONTAINER_CONTAINS_ADDED_TASK);
+        Assert.assertTrue(ONLY_ONE_TASK_WAS_ADDED);
 
-      //Check removing
-      taskSerializator.remove(newTask, taskSpecification);
-      sqlTasks = taskSerializator.getList(taskSpecification);
+        //Check removing
+        taskSerializator.remove(newTask, taskSpecification);
+        sqlTasks = taskSerializator.getList(taskSpecification);
 
-      final boolean CONTAINER_CONTAINS_REMOVED_TASK = sqlTasks.contains(newTask);
-      final int SIZE_AFTER_MANIPULATIONS = sqlTasks.size();
+        final boolean CONTAINER_CONTAINS_REMOVED_TASK = sqlTasks.contains(newTask);
+        final int SIZE_AFTER_MANIPULATIONS = sqlTasks.size();
 
-      Assert.assertFalse(CONTAINER_CONTAINS_REMOVED_TASK);
-      Assert.assertEquals(SIZE_BEFORE_MANIPULATIONS, SIZE_AFTER_MANIPULATIONS);
+        Assert.assertFalse(CONTAINER_CONTAINS_REMOVED_TASK);
+        Assert.assertEquals(SIZE_BEFORE_MANIPULATIONS, SIZE_AFTER_MANIPULATIONS);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 
   @Test
   public void taskListShouldBeAddedAndRemovedCorrect() {
-    for (var boxType : BoxType.values()) {
-      final var taskRelations = new TaskRelations(boxType);
-      final var taskSpecification = new TaskSpecification(taskRelations);
+    try {
+      for (var boxType : BoxType.values()) {
+        final var taskRelations = new TaskRelations(boxType);
+        final var taskSpecification = new TaskSpecification(taskRelations);
 
-      //Set up list to adding.
-      final int AMOUNT_OF_CREATED_TASKS = 10;
+        //Set up list to adding.
+        final int AMOUNT_OF_CREATED_TASKS = 10;
 
-      List<Task> createdTasks = new ArrayList<>(AMOUNT_OF_CREATED_TASKS);
+        List<Task> createdTasks = new ArrayList<>(AMOUNT_OF_CREATED_TASKS);
 
-      String statement;
-      for (int i = 0; i < AMOUNT_OF_CREATED_TASKS; ++i) {
-        statement = Integer.toString(i);
-        createdTasks.add(new Task(statement));
+        String statement;
+        for (int i = 0; i < AMOUNT_OF_CREATED_TASKS; ++i) {
+          statement = Integer.toString(i);
+          createdTasks.add(new Task(statement));
+        }
+
+        //Add task list
+        final int SIZE_BEFORE_ADDING = taskSerializator.getList(taskSpecification).size();
+
+        taskSerializator.add(createdTasks, taskSpecification);
+
+        var sqlTasks = taskSerializator.getList(taskSpecification);
+
+        final int SIZE_AFTER_ADDING = sqlTasks.size();
+
+        final boolean SIZE_WAS_INCREASED_CORRECT = (SIZE_AFTER_ADDING - SIZE_BEFORE_ADDING) == AMOUNT_OF_CREATED_TASKS;
+
+        boolean EVERY_TASK_WAS_ADDED = true;
+        for (var task : createdTasks) {
+          EVERY_TASK_WAS_ADDED &= sqlTasks.contains(task);
+        }
+
+        Assert.assertTrue(SIZE_WAS_INCREASED_CORRECT);
+        Assert.assertTrue(EVERY_TASK_WAS_ADDED);
+
+        //Remove
+        Queue<Task> removingTasks = new LinkedList<>(createdTasks);
+        taskSerializator.remove(removingTasks);
+
+        //Check removing
+        sqlTasks = taskSerializator.getList(taskSpecification);
+
+        final int SIZE_AFTER_REMOVING = sqlTasks.size();
+        boolean EVERY_TASK_WAS_REMOVED = true;
+        for (var task : createdTasks) {
+          EVERY_TASK_WAS_ADDED &= !sqlTasks.contains(task);
+        }
+
+
+        Assert.assertEquals(SIZE_BEFORE_ADDING, SIZE_AFTER_REMOVING);
+        Assert.assertTrue(EVERY_TASK_WAS_REMOVED);
       }
-
-      //Add task list
-      final int SIZE_BEFORE_ADDING = taskSerializator.getList(taskSpecification).size();
-
-      taskSerializator.add(createdTasks, taskSpecification);
-
-      var sqlTasks = taskSerializator.getList(taskSpecification);
-
-      final int SIZE_AFTER_ADDING = sqlTasks.size();
-
-      final boolean SIZE_WAS_INCREASED_CORRECT = (SIZE_AFTER_ADDING - SIZE_BEFORE_ADDING) == AMOUNT_OF_CREATED_TASKS;
-
-      boolean EVERY_TASK_WAS_ADDED = true;
-      for (var task : createdTasks) {
-        EVERY_TASK_WAS_ADDED &= sqlTasks.contains(task);
-      }
-
-      Assert.assertTrue(SIZE_WAS_INCREASED_CORRECT);
-      Assert.assertTrue(EVERY_TASK_WAS_ADDED);
-
-      //Remove
-      Queue<Task> removingTasks = new LinkedList<>(createdTasks);
-      taskSerializator.remove(removingTasks);
-
-      //Check removing
-      sqlTasks = taskSerializator.getList(taskSpecification);
-
-      final int SIZE_AFTER_REMOVING = sqlTasks.size();
-      boolean EVERY_TASK_WAS_REMOVED = true;
-      for (var task : createdTasks) {
-        EVERY_TASK_WAS_ADDED &= !sqlTasks.contains(task);
-      }
-
-
-      Assert.assertEquals(SIZE_BEFORE_ADDING, SIZE_AFTER_REMOVING);
-      Assert.assertTrue(EVERY_TASK_WAS_REMOVED);
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 }

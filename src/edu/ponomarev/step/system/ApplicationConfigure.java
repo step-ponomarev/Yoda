@@ -1,6 +1,7 @@
 package edu.ponomarev.step.system;
 
 import edu.ponomarev.step.MVC.controller.Controller;
+import edu.ponomarev.step.MVC.model.Worker;
 import edu.ponomarev.step.MVC.model.repository.RepositoryFactory;
 import org.springframework.context.annotation.*;
 
@@ -19,4 +20,8 @@ public class ApplicationConfigure {
   public Controller controller() {
     return ( new Controller() );
   }
+
+  @Bean
+  @Scope("singleton")
+  public Worker worker() { return ( new Worker()); }
 }

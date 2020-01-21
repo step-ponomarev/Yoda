@@ -1,11 +1,12 @@
 package edu.ponomarev.step.component.project;
 
+import edu.ponomarev.step.component.BoxType;
+import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.system.TimeManager;
 
 import java.time.LocalDateTime;
 
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class Project {
   private String uuid;
@@ -13,11 +14,15 @@ public class Project {
   private LocalDateTime timeOfCreation;
   private LocalDateTime timeOfLastChange;
 
+  private HashMap<BoxType, List<Task>> boxes;
+
   public Project(String name) {
     this.name = name;
     timeOfCreation = TimeManager.getLocalDateTimeOf(LocalDateTime.now());
     timeOfLastChange = timeOfCreation;
+    boxes = new HashMap<>();
 
+    setUpBoxes();
     generateUUID();
   }
 
@@ -26,6 +31,26 @@ public class Project {
     this.name = name;
     this.timeOfLastChange = timeOfCreation;
     this.timeOfCreation = TimeManager.getLocalDateTimeOf(LocalDateTime.now());
+    boxes = new HashMap<>();
+    setUpBoxes();
+  }
+
+  public void addTask(Task task, BoxType boxType) {
+    var box = boxes.get(boxType);
+    box.add(task);
+  }
+
+  public void removeTask(Task task) {
+    for (var taskBox : boxes.entrySet()) {
+      var box = taskBox.getValue();
+      box.remove(task);
+    }
+  }
+
+  public List<Task> getTaskBox(BoxType boxType) {
+    var box = boxes.get(boxType);
+
+    return box;
   }
 
   public String getUuid() {
@@ -54,6 +79,12 @@ public class Project {
 
   public void updateTimeOfLastChange() {
     this.timeOfLastChange = TimeManager.getLocalDateTimeOf(LocalDateTime.now());
+  }
+
+  private void setUpBoxes() {
+    boxes.put(BoxType.DAY, new ArrayList<>());
+    boxes.put(BoxType.WEEK, new ArrayList<>());
+    boxes.put(BoxType.LATE, new ArrayList<>());
   }
 
   private void generateUUID() {
