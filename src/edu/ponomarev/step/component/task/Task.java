@@ -4,10 +4,12 @@ import edu.ponomarev.step.system.TimeManager;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.UUID;
 
 import java.io.Serializable;
 
 public class Task implements Comparable<Task>, Serializable {
+  private String uuid;
   private String statement;
   private LocalDateTime timeOfCreation;
   private LocalDateTime timeOfLastChange;
@@ -16,15 +18,19 @@ public class Task implements Comparable<Task>, Serializable {
     this.statement = task.getStatement();
     this.timeOfCreation = TimeManager.getLocalDateTimeOf(task.getTimeOfCreation());
     this.timeOfLastChange =  TimeManager.getLocalDateTimeOf(task.getTimeOfLastChange());
+    this.uuid = task.getUUID();
   }
 
   public Task(String statement) {
     this.statement = statement;
     this.timeOfCreation = TimeManager.getLocalDateTimeOf(LocalDateTime.now());
     this.timeOfLastChange = this.timeOfCreation;
+
+    generateUUID();
   }
 
-  public Task(String statement, LocalDateTime timeOfCreation, LocalDateTime timeOfLastChange) {
+  public Task(String uuid, String statement, LocalDateTime timeOfCreation, LocalDateTime timeOfLastChange) {
+    this.uuid = uuid;
     this.statement = statement;
     this.timeOfCreation = TimeManager.getLocalDateTimeOf(timeOfCreation);
     this.timeOfLastChange = TimeManager.getLocalDateTimeOf(timeOfLastChange);
@@ -50,8 +56,17 @@ public class Task implements Comparable<Task>, Serializable {
     this.timeOfLastChange = TimeManager.getLocalDateTimeOf(time_of_last_change);
   }
 
+  public String getUUID() {
+    return uuid;
+  }
+
   public void updateTimeOfLastChange() {
     this.timeOfLastChange = TimeManager.getLocalDateTimeOf(LocalDateTime.now());
+  }
+
+  private void generateUUID() {
+    UUID uuid = UUID.randomUUID();
+    this.uuid =  uuid.toString();
   }
 
   @Override
@@ -64,12 +79,14 @@ public class Task implements Comparable<Task>, Serializable {
     if (this == o) return true;
     if (!(o instanceof Task)) return false;
     Task task = (Task) o;
-    return (this.timeOfCreation.equals(task.timeOfCreation));
+
+    return this.timeOfCreation.equals(task.timeOfCreation)
+        && this.uuid.equals(task.uuid);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.timeOfCreation);
+    return Objects.hash(this.timeOfCreation, this.uuid);
   }
 
   @Override

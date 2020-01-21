@@ -4,6 +4,7 @@ import edu.ponomarev.step.MVC.model.repository.Repository;
 import edu.ponomarev.step.MVC.model.repository.Specification;
 import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.component.BoxType;
+import edu.ponomarev.step.component.task.TaskRelations;
 
 import java.io.*;
 
@@ -16,24 +17,24 @@ public class TaskSerializator implements Repository<Task> {
   private String directory;
 
   public TaskSerializator() {
-    resetPath();
+    resetPathAndCreateDirIfNotExists();
   }
 
   @Override
   public void add(Task task, Specification specification) {
-    setUpPath( (BoxType) specification.getSerialisationSpecification());
+    defineTaskRelationsAndSetUpPath(specification);
 
-    ArrayList<Task> tasks = deseriadeserializeAndGetList();
+    List<Task> tasks = deseriadeserializeAndGetList();
     tasks.add(task);
 
     serializeAndSaveList(tasks);
 
-    resetPath();
+    resetPathAndCreateDirIfNotExists();
   }
 
   @Override
   public void add(List<Task> tasks, Specification specification) {
-    setUpPath( (BoxType) specification.getSerialisationSpecification());
+    defineTaskRelationsAndSetUpPath(specification);
 
     try {
       File file = new File(directory);
@@ -46,43 +47,62 @@ public class TaskSerializator implements Repository<Task> {
       e.printStackTrace();
     }
 
-    resetPath();
+    resetPathAndCreateDirIfNotExists();
   }
 
   @Override
   public void remove(Task task, Specification specification) {
-    setUpPath( (BoxType) specification.getSerialisationSpecification());
+    defineTaskRelationsAndSetUpPath(specification);
 
-    ArrayList<Task> tasks = deseriadeserializeAndGetList();
+    List<Task> tasks = deseriadeserializeAndGetList();
+
     tasks.remove(task);
 
     serializeAndSaveList(tasks);
 
-    resetPath();
+    resetPathAndCreateDirIfNotExists();
   }
 
   @Override
-  // Never used.
-  public void remove(Queue<Task> removedTasks) {}
+  public void remove(Queue<Task> removedTasks) {
+    if (removedTasks.isEmpty()) {
+      return;
+    }
+
+    for (var boxType : BoxType.values()) {
+      addFileNameToPath(boxType);
+
+      List<Task> tasks = deseriadeserializeAndGetList();
+      if (!tasks.isEmpty()) {
+        for (var task : removedTasks) {
+          tasks.remove(task);
+        }
+      }
+
+      serializeAndSaveList(tasks);
+
+      resetPathAndCreateDirIfNotExists();
+    }
+  }
 
   @Override
   public void update(Task updatedTask, Specification specification) {
-    setUpPath( (BoxType) specification.getSerialisationSpecification());
+    defineTaskRelationsAndSetUpPath(specification);
 
-    ArrayList<Task> tasks = deseriadeserializeAndGetList();
+    List<Task> tasks = deseriadeserializeAndGetList();
 
     putTaskIn(updatedTask, tasks);
 
     serializeAndSaveList(tasks);
 
-    resetPath();
+    resetPathAndCreateDirIfNotExists();
   }
 
   @Override
   public void update(List<Task> updatedTasks, Specification specification) {
-    setUpPath( (BoxType) specification.getSerialisationSpecification());
+    defineTaskRelationsAndSetUpPath(specification);
 
-    ArrayList<Task> tasks = deseriadeserializeAndGetList();
+    List<Task> tasks = deseriadeserializeAndGetList();
 
     for (var updatedTask : updatedTasks) {
       putTaskIn(updatedTask, tasks);
@@ -90,38 +110,36 @@ public class TaskSerializator implements Repository<Task> {
 
     serializeAndSaveList(tasks);
 
-    resetPath();
+    resetPathAndCreateDirIfNotExists();
   }
 
   @Override
   public List<Task> getList(Specification specification) {
-    setUpPath( (BoxType) specification.getSerialisationSpecification());
+    defineTaskRelationsAndSetUpPath(specification);
 
-    ArrayList<Task> tasks = new ArrayList<>();
+    List<Task> tasks = new ArrayList<>();
 
     File file = new File(directory);
-    if (!file.exists()) {
-      return tasks;
+    if (file.exists()) {
+      try {
+        FileInputStream is = new FileInputStream(file);
+        ObjectInputStream isObj = new ObjectInputStream(is);
+
+        tasks = (List<Task>) isObj.readObject();
+
+        isObj.close();
+        is.close();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
 
-    try {
-      FileInputStream is = new FileInputStream(file);
-      ObjectInputStream isObj = new ObjectInputStream(is);
-
-      tasks = (ArrayList<Task>) isObj.readObject();
-
-      isObj.close();
-      is.close();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
-    resetPath();
+    resetPathAndCreateDirIfNotExists();
 
     return tasks;
   }
 
-  private void putTaskIn(Task updatedTask, ArrayList<Task> tasks) {
+  private void putTaskIn(Task updatedTask, List<Task> tasks) {
     if (!tasks.contains(updatedTask)) {
       tasks.add(updatedTask);
     } else {
@@ -136,8 +154,8 @@ public class TaskSerializator implements Repository<Task> {
     }
   }
 
-  private ArrayList<Task> deseriadeserializeAndGetList() {
-    ArrayList<Task> tasks = new ArrayList<>();
+  private List<Task> deseriadeserializeAndGetList() {
+    List<Task> tasks = new ArrayList<>();
     try {
       File file = new File(directory);
       if (!file.exists()) {
@@ -147,7 +165,7 @@ public class TaskSerializator implements Repository<Task> {
         FileInputStream is = new FileInputStream(file);
         ObjectInputStream isObj = new ObjectInputStream(is);
 
-        tasks = (ArrayList<Task>) isObj.readObject();
+        tasks = (List<Task>) isObj.readObject();
         is.close();
       }
     } catch (Exception e) {
@@ -173,17 +191,19 @@ public class TaskSerializator implements Repository<Task> {
     }
   }
 
-  private void setUpPath(BoxType boxType) {
+  private void defineTaskRelationsAndSetUpPath(Specification specification) {
+    final var taskRelations = (TaskRelations) specification.getSpecification();
+
+    addFileNameToPath(taskRelations.getBoxOwnerType());
+  }
+
+  private void resetPathAndCreateDirIfNotExists() {
+    directory = Paths.get("data").toAbsolutePath().toString();
+
     File file = new File(directory);
     if (!file.exists()) {
       file.mkdir();
     }
-
-    addFileNameToPath(boxType);
-  }
-
-  private void resetPath() {
-    directory = Paths.get("data").toAbsolutePath().toString();
   }
 
   private void addFileNameToPath(BoxType boxType) {

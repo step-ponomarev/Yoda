@@ -2,7 +2,6 @@ package edu.ponomarev.step.MVC.model.repository;
 
 import edu.ponomarev.step.MVC.model.repository.task.TaskSerializator;
 import edu.ponomarev.step.MVC.model.repository.task.TaskSqlRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -15,6 +14,11 @@ import java.sql.DriverManager;
 @Component
 @Scope("singleton")
 public class RepositoryFactory {
+  public enum RepositoryType {
+    TASK_OFFLINE,
+    TASK_SQL,
+  }
+
   @Value("${url}")
   private String url;
 
@@ -36,23 +40,17 @@ public class RepositoryFactory {
     }
   }
 
-  public Repository getSqlTaskRepository() {
-    try {
-      if (!connection.isClosed()) {
-        return (new TaskSqlRepository(connection));
-      } else {
-        setConnection();
+  public Repository getRepository(RepositoryType repositoryType) {
+    switch (repositoryType) {
+      case TASK_OFFLINE:
+        return ( new TaskSerializator() );
 
-        return (new TaskSqlRepository(connection));
-      }
-    } catch (Exception e) {
-      System.err.println(e.getMessage());
-      return null;
+      case TASK_SQL:
+        return getSqlTaskRepository();
+      default:
+        //TODO Сделать строгую ошибку
+        throw new RuntimeException("Invalid Type");
     }
-  }
-
-  public Repository getTaskSerializator() {
-    return (new TaskSerializator());
   }
 
   public boolean isOnline() {
@@ -64,6 +62,22 @@ public class RepositoryFactory {
     }
 
     return status;
+  }
+
+  private Repository getSqlTaskRepository() {
+    try {
+      if (!connection.isClosed()) {
+        return (new TaskSqlRepository(connection));
+      } else {
+        //TODO Наладить коннекшен (Эксепшен)
+        setConnection();
+
+        return (new TaskSqlRepository(connection));
+      }
+    } catch (Exception e) {
+      System.err.println(e.getMessage());
+      return null;
+    }
   }
 
   @PreDestroy

@@ -1,13 +1,14 @@
 package edu.ponomarev.step.MVC.model;
 
 import edu.ponomarev.step.MVC.model.repository.task.TaskSerializator;
-import edu.ponomarev.step.MVC.model.repository.task.BoxTypeSpecification;
+import edu.ponomarev.step.MVC.model.repository.task.TaskSpecification;
 import edu.ponomarev.step.MVC.model.repository.task.TaskSqlRepository;
 import edu.ponomarev.step.component.project.Project;
-import edu.ponomarev.step.component.task.InformatedTask;
 import edu.ponomarev.step.MVC.model.repository.RepositoryFactory;
+import edu.ponomarev.step.MVC.model.repository.RepositoryFactory.RepositoryType;
 import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.component.BoxType;
+import edu.ponomarev.step.component.task.TaskRelations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -43,20 +44,20 @@ public class Worker {
 
   @PostConstruct
   public void postConstruct() {
-    taskSerializator = (TaskSerializator) repositoryFactory.getTaskSerializator();
-    taskSqlRepository = (TaskSqlRepository) repositoryFactory.getSqlTaskRepository();
+    taskSerializator = (TaskSerializator) repositoryFactory.getRepository(RepositoryType.TASK_OFFLINE);
+    taskSqlRepository = (TaskSqlRepository) repositoryFactory.getRepository(RepositoryType.TASK_SQL);
   }
 
-  public void addTask(InformatedTask informatedTask) {
-    final var boxType = informatedTask.getBoxType();
-    final var boxTypeSpecification = new BoxTypeSpecification(boxType);
+  public void addTask(Task task, TaskRelations taskRelations) {
+    final var boxType = taskRelations.getBoxOwnerType();
+    final var taskSpecification = new TaskSpecification(taskRelations);
 
-    boxes.get(boxType).add(informatedTask);
+    boxes.get(boxType).add(task);
 
-    taskSerializator.add(informatedTask, boxTypeSpecification);
+    taskSerializator.add(task, taskSpecification);
 
     if (repositoryFactory.isOnline()) {
-      taskSqlRepository.add(informatedTask, boxTypeSpecification);
+      taskSqlRepository.add(task, taskSpecification);
     } else {
       System.err.println("No connection");
       return;
@@ -64,17 +65,17 @@ public class Worker {
     }
   }
 
-  public void removeTask(InformatedTask informatedTask) {
-    final var boxType = informatedTask.getBoxType();
-    final var boxTypeSpecification = new BoxTypeSpecification(boxType);
+  public void removeTask(Task task, TaskRelations taskRelations) {
+    final var boxType = taskRelations.getBoxOwnerType();
+    final var taskSpecification = new TaskSpecification(taskRelations);
 
-    removeQueueOfTasks.add(informatedTask);
-    boxes.get(boxType).remove(informatedTask);
+    removeQueueOfTasks.add(task);
+    boxes.get(boxType).remove(task);
 
-    taskSerializator.remove(informatedTask, boxTypeSpecification);
+    taskSerializator.remove(task, taskSpecification);
 
     if (repositoryFactory.isOnline()) {
-      taskSqlRepository.remove(informatedTask, boxTypeSpecification);
+      taskSqlRepository.remove(task, taskSpecification);
     } else {
       System.err.println("No connection");
       return;
@@ -85,18 +86,18 @@ public class Worker {
   public void utilizeQueueToRemove() {
     if (repositoryFactory.isOnline()) {
       taskSqlRepository.remove(removeQueueOfTasks);
+      removeQueueOfTasks.clear();
     } else {
       System.err.println("No connection");
       return;
       // TODO пытаесчя восстановить коннекшен
     }
-
-    removeQueueOfTasks.clear();
   }
 
   public void pushAll() {
     for (var box : boxes.entrySet()) {
-      final var boxTypeSpecification = new BoxTypeSpecification(box.getKey());
+      final var taskReletions = new TaskRelations(box.getKey());
+      final var boxTypeSpecification = new TaskSpecification(taskReletions);
       List<Task> tasks = box.getValue();
 
       taskSerializator.add(tasks, boxTypeSpecification);
@@ -110,12 +111,13 @@ public class Worker {
     }
   }
 
-  public void updateTask(InformatedTask task) {
-    final var boxType = task.getBoxType();
-    taskSerializator.update(task, new BoxTypeSpecification(boxType));
+  public void updateTask(Task task, TaskRelations taskRelations) {
+    final var taskSpecification = new TaskSpecification(taskRelations);
+
+    taskSerializator.update(task, taskSpecification);
 
     if (repositoryFactory.isOnline()) {
-      taskSqlRepository.update(task, new BoxTypeSpecification(boxType));
+      taskSqlRepository.update(task, taskSpecification);
     } else {
       System.err.println("No connection");
       return;

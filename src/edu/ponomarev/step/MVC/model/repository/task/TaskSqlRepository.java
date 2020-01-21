@@ -3,6 +3,7 @@ package edu.ponomarev.step.MVC.model.repository.task;
 import edu.ponomarev.step.MVC.model.repository.Repository;
 import edu.ponomarev.step.MVC.model.repository.Specification;
 import edu.ponomarev.step.component.task.Task;
+import edu.ponomarev.step.component.task.TaskRelations;
 import edu.ponomarev.step.system.TimeManager;
 
 import java.sql.*;
@@ -21,16 +22,20 @@ public class TaskSqlRepository implements Repository<Task> {
 
   @Override
   public void add(Task task, Specification specification) {
-    final String insertRequest = "INSERT INTO task_box (time_of_creation, time_of_last_change, statement, type) " +
-        "VALUES (?, ?, ?, ?);";
+    final String insertRequest = "INSERT INTO task_box (id, type, statement, time_of_creation, time_of_last_change) VALUES (?, ?, ?, ?, ?);";
+
+    final var taskRelations = (TaskRelations) specification.getSpecification();
+
+    final var boxType = taskRelations.getBoxOwnerType().toString();
 
     try {
       PreparedStatement statement = connection.prepareStatement(insertRequest);
 
-      statement.setObject(1, task.getTimeOfCreation());
-      statement.setObject(2, task.getTimeOfLastChange());
+      statement.setObject(1, task.getUUID());
+      statement.setString(2, boxType);
       statement.setString(3, task.getStatement());
-      statement.setString(4, specification.getSqlSpecification());
+      statement.setObject(4, task.getTimeOfCreation());
+      statement.setObject(5, task.getTimeOfLastChange());
 
       statement.execute();
       statement.close();
@@ -42,10 +47,13 @@ public class TaskSqlRepository implements Repository<Task> {
   @Override
   public void add(List<Task> tasks, Specification specification) {
     final String selectRequest = "SELECT * FROM task_box where type = ?";
-    final String insertRequest = "INSERT INTO task_box (time_of_creation, time_of_last_change, statement, type) " +
-        "VALUES (?, ?, ?, ?);";
+    final String insertRequest = "INSERT INTO task_box (id, type, statement, time_of_creation, time_of_last_change)" +
+        " " +
+        "VALUES (?, ?, ?, ?, ?);";
 
-    final String boxType = specification.getSqlSpecification();
+    final var taskRelations = (TaskRelations) specification.getSpecification();
+
+    final var boxType = taskRelations.getBoxOwnerType().toString();
     try {
       PreparedStatement statement = connection.prepareStatement(selectRequest);
 
@@ -55,6 +63,7 @@ public class TaskSqlRepository implements Repository<Task> {
       ResultSet resultSet = statement.executeQuery();
       while (resultSet.next()) {
         BDlist.add(new Task(
+            resultSet.getString("id"),
             resultSet.getString("statement"),
             TimeManager.convertToLocalTimeZone(resultSet.getObject("time_of_creation", LocalDateTime.class)),
             TimeManager.convertToLocalTimeZone(resultSet.getObject("time_of_last_change", LocalDateTime.class))
@@ -66,12 +75,13 @@ public class TaskSqlRepository implements Repository<Task> {
 
       List<Task> updateContainer = new ArrayList<Task>();
 
-      statement.setString(4, boxType);
+      statement.setString(2, boxType);
       for (Task clientTask : tasks) {
         if (!BDlist.contains(clientTask)) {
-          statement.setObject(1, clientTask.getTimeOfCreation());
-          statement.setObject(2, clientTask.getTimeOfLastChange());
+          statement.setString(1, clientTask.getUUID());
           statement.setString(3, clientTask.getStatement());
+          statement.setObject(4, clientTask.getTimeOfCreation());
+          statement.setObject(5, clientTask.getTimeOfLastChange());
           statement.execute();
         } else {
           Task taskOnBD = BDlist.get(BDlist.indexOf(clientTask)); // The elements equal only by dates_of_creation
@@ -93,14 +103,14 @@ public class TaskSqlRepository implements Repository<Task> {
   }
 
   @Override
-  public void remove(Task tasks, Specification specification) {
-    final String removeRequest = "DELETE FROM task_box WHERE time_of_creation = ?";
+  public void remove(Task task, Specification specification) {
+    final String removeRequest = "DELETE FROM task_box WHERE ( time_of_creation = ? ) AND ( id = ? )";
 
     try {
       PreparedStatement statement = connection.prepareStatement(removeRequest);
 
-      statement.setObject(1, tasks.getTimeOfCreation());
-
+      statement.setObject(1, task.getTimeOfCreation());
+      statement.setString(2, task.getUUID());
       statement.execute();
 
       statement.close();
@@ -115,13 +125,14 @@ public class TaskSqlRepository implements Repository<Task> {
       return;
     }
 
-    final String removeRequest = "DELETE FROM task_box WHERE time_of_creation = ?";
+    final String removeRequest = "DELETE FROM task_box WHERE ( time_of_creation = ? ) AND ( id = ? )";
 
     try {
       PreparedStatement statement = connection.prepareStatement(removeRequest);
 
       for (Task task : tasks) {
         statement.setObject(1, task.getTimeOfCreation());
+        statement.setString(2, task.getUUID());
         statement.execute();
       }
 
@@ -134,7 +145,7 @@ public class TaskSqlRepository implements Repository<Task> {
   @Override
   public void update(Task updatedTask, Specification specification) {
     final String updateRequest =
-        "UPDATE task_box SET statement = ?, time_of_last_change = ? WHERE time_of_creation = ?";
+        "UPDATE task_box SET statement = ?, time_of_last_change = ? WHERE ( time_of_creation = ? ) AND ( id = ? )";
 
     try {
       PreparedStatement statement = connection.prepareStatement(updateRequest);
@@ -142,6 +153,7 @@ public class TaskSqlRepository implements Repository<Task> {
       statement.setString(1, updatedTask.getStatement());
       statement.setObject(2, updatedTask.getTimeOfLastChange());
       statement.setObject(3, updatedTask.getTimeOfCreation());
+      statement.setString(4, updatedTask.getUUID());
 
       statement.execute();
 
@@ -163,24 +175,27 @@ public class TaskSqlRepository implements Repository<Task> {
   public List<Task> getList(Specification specification) {
     final String sqlRequest = "SELECT * FROM task_box where type = ?";
 
+    final var taskRelations = (TaskRelations) specification.getSpecification();
+
+    final var boxType = taskRelations.getBoxOwnerType().toString();
+
     ArrayList<Task> tasks = new ArrayList<>();
 
     try {
       PreparedStatement statement = connection.prepareStatement(sqlRequest);
 
-      final String boxType = specification.getSqlSpecification();
-
       statement.setString(1, boxType);
 
-      ResultSet rs = statement.executeQuery();
-      while (rs.next()) {
+      ResultSet resultSet = statement.executeQuery();
+      while (resultSet.next()) {
         tasks.add(new Task(
-            rs.getString("statement"),
-            TimeManager.convertToLocalTimeZone(rs.getObject("time_of_creation", LocalDateTime.class)),
-            TimeManager.convertToLocalTimeZone(rs.getObject("time_of_last_change", LocalDateTime.class))
+            resultSet.getString("id"),
+            resultSet.getString("statement"),
+            TimeManager.convertToLocalTimeZone(resultSet.getObject("time_of_creation", LocalDateTime.class)),
+            TimeManager.convertToLocalTimeZone(resultSet.getObject("time_of_last_change", LocalDateTime.class))
         ));
       }
-      rs.close();
+      resultSet.close();
       statement.close();
     } catch (Exception e) {
       e.printStackTrace();

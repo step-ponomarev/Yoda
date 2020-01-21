@@ -20,6 +20,6 @@ public class Controller {
 
   @PostConstruct
   public void start() {
-    System.out.println("Application is started");
+    return;
   }
 }
