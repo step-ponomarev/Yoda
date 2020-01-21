@@ -7,11 +7,12 @@ import edu.ponomarev.step.MVC.model.repository.task.TaskSqlRepository;
 import edu.ponomarev.step.component.BoxType;
 import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.component.task.TaskRelations;
+import edu.ponomarev.step.system.ApplicationConfigure;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.*;
 
@@ -26,7 +27,7 @@ public class TaskSqlRepositoryTest {
 
   @BeforeClass
   public static void setConnection() {
-    var context = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
+    var context = new AnnotationConfigApplicationContext(ApplicationConfigure.class);
 
     repositoryFactory = context.getBean("repositoryFactory", RepositoryFactory.class);
   }

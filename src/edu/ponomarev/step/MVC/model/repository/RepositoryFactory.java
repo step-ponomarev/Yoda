@@ -3,16 +3,12 @@ package edu.ponomarev.step.MVC.model.repository;
 import edu.ponomarev.step.MVC.model.repository.task.TaskSerializator;
 import edu.ponomarev.step.MVC.model.repository.task.TaskSqlRepository;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
-@Component
-@Scope("singleton")
 public class RepositoryFactory {
   public enum RepositoryType {
     TASK_OFFLINE,

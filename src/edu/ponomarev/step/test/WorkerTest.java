@@ -5,14 +5,16 @@ import edu.ponomarev.step.component.BoxType;
 import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.component.task.TaskRelations;
 
+import edu.ponomarev.step.system.ApplicationConfigure;
 import org.junit.*;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.HashMap;
 import java.util.List;
 
 public class WorkerTest {
-  private static ClassPathXmlApplicationContext context;
+  private static ApplicationContext context;
 
   private Worker worker;
   private HashMap<BoxType, Task> exampleTasks;
@@ -20,12 +22,7 @@ public class WorkerTest {
 
   @BeforeClass
   public static void beforeTestClass() {
-    context = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
-  }
-
-  @AfterClass
-  public static void afterTestClass() {
-    context.close();
+    context = new AnnotationConfigApplicationContext(ApplicationConfigure.class);
   }
 
   @Before

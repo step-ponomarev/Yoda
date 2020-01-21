@@ -1,14 +1,16 @@
 package edu.ponomarev.step;
 
 import edu.ponomarev.step.MVC.controller.Controller;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import edu.ponomarev.step.system.ApplicationConfigure;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class Main {
-  public static ClassPathXmlApplicationContext context;
+  public static ApplicationContext context;
 
   public static void main(String[] args) {
     try {
-      context = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
+      context = new AnnotationConfigApplicationContext(ApplicationConfigure.class);
 
       var controller = context.getBean("controller", Controller.class);
 
