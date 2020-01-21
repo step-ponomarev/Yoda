@@ -27,7 +27,9 @@ public class Worker {
   private HashMap<BoxType, List<Task>> boxes;
   private List<Project> projects;
 
-  private Queue<Task> removeQueueOfTasks;
+  private List<Task> tasksToRemove;
+  private HashMap<Task, TaskRelations> tasksToAdd;
+  private HashMap<Task, TaskRelations> tasksToUpdate;
 
   public Worker() {
     boxes = new HashMap<>() {{
@@ -38,7 +40,10 @@ public class Worker {
     }};
 
     projects = new ArrayList<>();
-    removeQueueOfTasks = new LinkedList<>();
+
+    tasksToRemove = new ArrayList<>();
+    tasksToAdd = new HashMap<>();
+    tasksToUpdate = new HashMap<>();
   }
 
   @PostConstruct
@@ -57,9 +62,9 @@ public class Worker {
       taskSerializator.add(task, taskSpecification);
 
       taskSqlRepository.add(task, taskSpecification);
-
     } catch (SQLException e) {
       // TODO восстанавливаем коннекшен, задачу в список на добавление сохраняем???
+      tasksToAdd.put(task, taskRelations);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -70,8 +75,6 @@ public class Worker {
     final var taskSpecification = new TaskSpecification(taskRelations);
 
     try {
-      removeQueueOfTasks.add(task);
-
       boxes.get(boxType).remove(task);
 
       taskSerializator.remove(task, taskSpecification);
@@ -79,15 +82,65 @@ public class Worker {
       taskSqlRepository.remove(task, taskSpecification);
     } catch (SQLException e) {
       // TODO восстанавливаем коннекшен, задачу в список на удаление сохраняем???
+      tasksToRemove.add(task);
     } catch (Exception e) {
       e.printStackTrace();
     }
   }
 
-  public void utilizeQueueToRemove() {
+  public void updateTask(Task task, TaskRelations taskRelations) {
+    final var taskSpecification = new TaskSpecification(taskRelations);
+
     try {
-      taskSqlRepository.remove(removeQueueOfTasks);
-      removeQueueOfTasks.clear();
+      taskSerializator.update(task, taskSpecification);
+      taskSqlRepository.update(task, taskSpecification);
+    } catch (SQLException e) {
+      e.printStackTrace();
+      //TODO Добавить в лист на обновление.
+      tasksToUpdate.put(task, taskRelations);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  //TODO Написать тесты для методов очистки очередей
+
+  public void clearAddList() {
+    try {
+      for (var taskEntry : tasksToAdd.entrySet()) {
+        final var task = taskEntry.getKey();
+        final var taskSpecification = new TaskSpecification(taskEntry.getValue());
+        taskSqlRepository.remove(task, taskSpecification);
+      }
+      tasksToAdd.clear();
+    } catch (SQLException e) {
+      e.printStackTrace();
+      // TODO Ничо не делать ((((?
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  public void clearRemoveList() {
+    try {
+      taskSqlRepository.remove(tasksToRemove);
+      tasksToRemove.clear();
+    } catch (SQLException e) {
+      e.printStackTrace();
+      // TODO Ничо не делать ((((?
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  public void clearUpdateList() {
+    try {
+      for (var taskEntry : tasksToUpdate.entrySet()) {
+        final var task = taskEntry.getKey();
+        final var taskSpecification = new TaskSpecification(taskEntry.getValue());
+        taskSqlRepository.update(task, taskSpecification);
+      }
+      tasksToUpdate.clear();
     } catch (SQLException e) {
       e.printStackTrace();
       // TODO Ничо не делать ((((?
@@ -97,6 +150,7 @@ public class Worker {
   }
 
   public void pushAll() {
+    // TODO возможно этот метод не нужен.
     try {
       // Add tasks offline
       for (var box : boxes.entrySet()) {
@@ -116,19 +170,6 @@ public class Worker {
       }
     } catch (SQLException e) {
       e.printStackTrace();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-
-  public void updateTask(Task task, TaskRelations taskRelations) {
-    final var taskSpecification = new TaskSpecification(taskRelations);
-    try {
-      taskSerializator.update(task, taskSpecification);
-      taskSqlRepository.update(task, taskSpecification);
-    } catch (SQLException e) {
-      e.printStackTrace();
-      //TODO Добавить в лист на обновление.
     } catch (Exception e) {
       e.printStackTrace();
     }

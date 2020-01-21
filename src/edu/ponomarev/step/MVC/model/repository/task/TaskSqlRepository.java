@@ -109,12 +109,12 @@ public class TaskSqlRepository implements Repository<Task> {
   }
 
   @Override
-  public void remove(Queue<Task> tasks) throws Exception {
+  public void remove(List<Task> tasks) throws Exception {
     if (tasks.isEmpty()) {
       return;
     }
 
-    final String removeRequest = "DELETE FROM task_box WHERE ( time_of_creation = ? ) AND ( id = ? )";
+    final String removeRequest = "DELETE FROM task_box WHERE ( id = ? ) AND ( time_of_creation = ? )";
 
     PreparedStatement statement = connection.prepareStatement(removeRequest);
 

@@ -60,7 +60,7 @@ public class TaskSerializator implements Repository<Task> {
   }
 
   @Override
-  public void remove(Queue<Task> removedTasks) throws Exception {
+  public void remove(List<Task> removedTasks) throws Exception {
     if (removedTasks.isEmpty()) {
       return;
     }

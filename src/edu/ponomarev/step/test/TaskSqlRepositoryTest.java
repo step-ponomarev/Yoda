@@ -164,7 +164,7 @@ public class TaskSqlRepositoryTest {
         Assert.assertTrue(EVERY_TASK_WAS_ADDED);
 
         //Create queue to removing
-        Queue<Task> removingTasks = new LinkedList<>(createdTasks);
+        List<Task> removingTasks = new ArrayList<>(createdTasks);
 
         //Remove tasks
         sqlTaskRepository.remove(removingTasks);

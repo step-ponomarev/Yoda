@@ -119,7 +119,7 @@ public class TaskSerializatorTest {
         Assert.assertTrue(EVERY_TASK_WAS_ADDED);
 
         //Remove
-        Queue<Task> removingTasks = new LinkedList<>(createdTasks);
+        List<Task> removingTasks = new ArrayList<>(createdTasks);
         taskSerializator.remove(removingTasks);
 
         //Check removing
