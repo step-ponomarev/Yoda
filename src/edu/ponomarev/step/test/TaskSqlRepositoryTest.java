@@ -177,7 +177,6 @@ public class TaskSqlRepositoryTest {
 
         final int SIZE_AFTER_REMOVING = sqlTaskRepository.getList(taskSpecification).size();
 
-
         Assert.assertEquals(SIZE_BEFORE_ADDING, SIZE_AFTER_REMOVING);
         Assert.assertTrue(EVERY_TASK_WAS_REMOVED);
       }
