@@ -11,7 +11,6 @@ import java.io.*;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 
 public class TaskSerializator implements Repository<Task> {
   private String directory;
@@ -179,7 +178,7 @@ public class TaskSerializator implements Repository<Task> {
   private void defineTaskRelationsAndSetUpPath(Specification specification) {
     final var taskRelations = (TaskRelations) specification.getSpecification();
 
-    addFileNameToPath(taskRelations.getBoxOwnerType());
+    addFileNameToPath(taskRelations.getBoxType());
   }
 
   private void resetPathAndCreateDirIfNotExists() {

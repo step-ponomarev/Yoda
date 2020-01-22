@@ -53,7 +53,7 @@ public class Worker {
   }
 
   public void addTask(Task task, TaskRelations taskRelations) {
-    final var boxType = taskRelations.getBoxOwnerType();
+    final var boxType = taskRelations.getBoxType();
     final var taskSpecification = new TaskSpecification(taskRelations);
 
     try {
@@ -71,7 +71,7 @@ public class Worker {
   }
 
   public void removeTask(Task task, TaskRelations taskRelations) {
-    final var boxType = taskRelations.getBoxOwnerType();
+    final var boxType = taskRelations.getBoxType();
     final var taskSpecification = new TaskSpecification(taskRelations);
 
     try {

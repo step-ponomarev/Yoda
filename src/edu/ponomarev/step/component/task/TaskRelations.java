@@ -5,23 +5,23 @@ import edu.ponomarev.step.component.project.Project;
 
 public class TaskRelations {
   private BoxType boxOwnerType;
-  private Project projectOwner;
+  private String projectID;
 
   public TaskRelations(BoxType boxType, Project project) {
     this.boxOwnerType = boxType;
-    this.projectOwner = project;
+    this.projectID = project.getUuid();
   }
 
   public TaskRelations(BoxType boxType) {
     this.boxOwnerType = boxType;
-    this.projectOwner = null;
+    this.projectID = null;
   }
 
-  public Project getProjectOwner() {
-    return projectOwner;
+  public String getProjectID() {
+    return projectID;
   }
 
-  public BoxType getBoxOwnerType() {
+  public BoxType getBoxType() {
     return boxOwnerType;
   }
 }

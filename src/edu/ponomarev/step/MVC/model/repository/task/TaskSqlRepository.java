@@ -16,7 +16,8 @@ public class TaskSqlRepository implements Repository<Task> {
   private Connection connection;
 
   private static final String SELECT = "SELECT * FROM task_box where type = ?";
-  private static final String INSERT = "INSERT INTO task_box (id, type, statement, time_of_creation, time_of_last_change) VALUES (?, ?, ?, ?, ?)";
+  private static final String INSERT = "INSERT INTO task_box (id, projectID, type, statement, time_of_creation, " +
+      "time_of_last_change) VALUES (?, ?, ?, ?, ?, ?)";
   private static final String DELETE = "DELETE FROM task_box WHERE ( id = ? ) AND ( time_of_creation = ? )";
   private static final String UPDATE = "UPDATE task_box SET statement = ?, time_of_last_change = ? WHERE ( id = ? ) AND ( time_of_creation = ? ) AND ( time_of_last_change <= ? )";
 
@@ -29,16 +30,17 @@ public class TaskSqlRepository implements Repository<Task> {
   @Override
   public void add(Task task, Specification specification) throws Exception {
     final var taskRelations = (TaskRelations) specification.getSpecification();
-
-    final var boxType = taskRelations.getBoxOwnerType().toString();
+    final String projectID = taskRelations.getProjectID();
+    final var boxType = taskRelations.getBoxType().toString();
 
     PreparedStatement statement = connection.prepareStatement(INSERT);
 
     statement.setObject(1, task.getUUID());
-    statement.setString(2, boxType);
-    statement.setString(3, task.getStatement());
-    statement.setObject(4, task.getTimeOfCreation());
-    statement.setObject(5, task.getTimeOfLastChange());
+    statement.setString(2, projectID);
+    statement.setString(3, boxType);
+    statement.setString(4, task.getStatement());
+    statement.setObject(5, task.getTimeOfCreation());
+    statement.setObject(6, task.getTimeOfLastChange());
 
     statement.execute();
 
@@ -48,8 +50,8 @@ public class TaskSqlRepository implements Repository<Task> {
   @Override
   public void add(List<Task> tasks, Specification specification) throws Exception {
     final var taskRelations = (TaskRelations) specification.getSpecification();
-
-    final var boxType = taskRelations.getBoxOwnerType().toString();
+    final String projectID = taskRelations.getProjectID();
+    final var boxType = taskRelations.getBoxType().toString();
     PreparedStatement statement = connection.prepareStatement(SELECT);
 
     statement.setString(1, boxType);
@@ -68,16 +70,17 @@ public class TaskSqlRepository implements Repository<Task> {
     resultSet.close();
 
     statement = connection.prepareStatement(INSERT);
-
+// TODO решить, как записывать проект.
     List<Task> tasksToUpdate = new ArrayList<Task>();
     for (Task clientTask : tasks) {
       final boolean TASK_NOT_EXISTS_IN_DATABASE = !sqlTasks.contains(clientTask);
       if (TASK_NOT_EXISTS_IN_DATABASE) {
         statement.setString(1, clientTask.getUUID());
-        statement.setString(2, boxType);
-        statement.setString(3, clientTask.getStatement());
-        statement.setObject(4, clientTask.getTimeOfCreation());
-        statement.setObject(5, clientTask.getTimeOfLastChange());
+        statement.setString(2, projectID);
+        statement.setString(3, boxType);
+        statement.setString(4, clientTask.getStatement());
+        statement.setObject(5, clientTask.getTimeOfCreation());
+        statement.setObject(6, clientTask.getTimeOfLastChange());
 
         statement.execute();
       } else {
@@ -152,7 +155,7 @@ public class TaskSqlRepository implements Repository<Task> {
   public List<Task> getList(Specification specification) throws Exception {
     final var taskRelations = (TaskRelations) specification.getSpecification();
 
-    final var boxType = taskRelations.getBoxOwnerType().toString();
+    final var boxType = taskRelations.getBoxType().toString();
 
     List<Task> tasks = new ArrayList<>();
 
@@ -171,7 +174,6 @@ public class TaskSqlRepository implements Repository<Task> {
     }
     resultSet.close();
     statement.close();
-
 
     return tasks;
   }
