@@ -29,9 +29,10 @@ public class Project {
   public Project(String uuid, String name, LocalDateTime timeOfCreation, LocalDateTime timeOfLastChange) {
     this.uuid = uuid;
     this.name = name;
-    this.timeOfLastChange = timeOfCreation;
-    this.timeOfCreation = TimeManager.getLocalDateTimeOf(LocalDateTime.now());
+    this.timeOfCreation = TimeManager.getLocalDateTimeOf(timeOfCreation);
+    this.timeOfLastChange = TimeManager.getLocalDateTimeOf(timeOfLastChange);
     boxes = new HashMap<>();
+
     setUpBoxes();
   }
 

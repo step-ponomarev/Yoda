@@ -1,5 +1,6 @@
 package edu.ponomarev.step.MVC.model.repository;
 
+import edu.ponomarev.step.MVC.model.repository.project.ProjectSqlRepository;
 import edu.ponomarev.step.MVC.model.repository.task.TaskSerializator;
 import edu.ponomarev.step.MVC.model.repository.task.TaskSqlRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,7 @@ public class RepositoryFactory {
   public enum RepositoryType {
     TASK_OFFLINE,
     TASK_SQL,
+    PROJECT_SQL,
   }
 
   @Value("${url}")
@@ -42,37 +44,14 @@ public class RepositoryFactory {
         return ( new TaskSerializator() );
 
       case TASK_SQL:
-        return getSqlTaskRepository();
+        return ( new TaskSqlRepository(connection) );
+
+      case PROJECT_SQL:
+        return ( new ProjectSqlRepository(connection) );
+
       default:
         //TODO Сделать строгую ошибку
         throw new RuntimeException("Invalid Type");
-    }
-  }
-
-  public boolean isOnline() {
-    boolean status = false;
-    try {
-      status = !connection.isClosed();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
-    return status;
-  }
-
-  private Repository getSqlTaskRepository() {
-    try {
-      if (!connection.isClosed()) {
-        return (new TaskSqlRepository(connection));
-      } else {
-        //TODO Наладить коннекшен (Эксепшен)
-        setConnection();
-
-        return (new TaskSqlRepository(connection));
-      }
-    } catch (Exception e) {
-      System.err.println(e.getMessage());
-      return null;
     }
   }
 

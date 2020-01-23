@@ -9,7 +9,7 @@ public class TaskRelations {
 
   public TaskRelations(BoxType boxType, Project project) {
     this.boxOwnerType = boxType;
-    this.projectID = project.getUuid();
+    this.projectID = (project == null) ? null : project.getUuid();
   }
 
   public TaskRelations(BoxType boxType) {

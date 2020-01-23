@@ -25,9 +25,10 @@ public class Worker {
   private TaskSqlRepository taskSqlRepository;
 
   private HashMap<BoxType, List<Task>> boxes;
-  private List<Project> projects;
+  private HashMap<String, Project> projects;
 
   private List<Task> tasksToRemove;
+  private List<Project> projectsToRemove;
   private HashMap<Task, TaskRelations> tasksToAdd;
   private HashMap<Task, TaskRelations> tasksToUpdate;
 
@@ -39,9 +40,10 @@ public class Worker {
       put(BoxType.LATE, new ArrayList<>());
     }};
 
-    projects = new ArrayList<>();
+    projects = new HashMap<>();
 
     tasksToRemove = new ArrayList<>();
+    projectsToRemove = new ArrayList<>();
     tasksToAdd = new HashMap<>();
     tasksToUpdate = new HashMap<>();
   }
@@ -56,8 +58,19 @@ public class Worker {
     final var boxType = taskRelations.getBoxType();
     final var taskSpecification = new TaskSpecification(taskRelations);
 
+    final var projectUUID = taskRelations.getProjectID();
+    final var project = (projectUUID == null) ? null : projects.get(projectUUID);
+
+    final var taskBox = boxes.get(boxType);
+
+    // TODO Запушить проект в бд/на диск
+
     try {
-      boxes.get(boxType).add(task);
+      taskBox.add(task);
+
+      if (project != null) {
+        project.addTask(task, boxType);
+      }
 
       taskSerializator.add(task, taskSpecification);
 
@@ -74,8 +87,17 @@ public class Worker {
     final var boxType = taskRelations.getBoxType();
     final var taskSpecification = new TaskSpecification(taskRelations);
 
+    final var projectUUID = taskRelations.getProjectID();
+    final var project = (projectUUID == null) ? null : projects.get(projectUUID);
+
+    final var taskBox = boxes.get(boxType);
+
     try {
-      boxes.get(boxType).remove(task);
+      taskBox.remove(task);
+
+      if (project != null) {
+        project.removeTask(task);
+      }
 
       taskSerializator.remove(task, taskSpecification);
 
@@ -176,7 +198,12 @@ public class Worker {
   }
 
   public void addProject(Project project) {
-    projects.add(project);
+    final var UUID = project.getUuid();
+    projects.put(UUID, project);
+  }
+
+  public Project getProject(String UUID) {
+    return projects.get(UUID);
   }
 
   public void removeProject(Project project) {
@@ -189,6 +216,12 @@ public class Worker {
   public List<Task> getTaskBox(BoxType boxType) { return boxes.get(boxType); }
 
   public List<Project> getProjects() {
+    List<Project> projects = new ArrayList<>(this.projects.size());
+
+    for (var project : this.projects.entrySet()) {
+      projects.add(project.getValue());
+    }
+
     return projects;
   }
 }

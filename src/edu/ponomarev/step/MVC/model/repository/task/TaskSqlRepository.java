@@ -13,15 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TaskSqlRepository implements Repository<Task> {
-  private Connection connection;
-
   private static final String SELECT = "SELECT * FROM task_box where type = ?";
   private static final String INSERT = "INSERT INTO task_box (id, projectID, type, statement, time_of_creation, " +
       "time_of_last_change) VALUES (?, ?, ?, ?, ?, ?)";
   private static final String DELETE = "DELETE FROM task_box WHERE ( id = ? ) AND ( time_of_creation = ? )";
   private static final String UPDATE = "UPDATE task_box SET statement = ?, time_of_last_change = ? WHERE ( id = ? ) AND ( time_of_creation = ? ) AND ( time_of_last_change <= ? )";
 
-
+  private Connection connection;
 
   public TaskSqlRepository(Connection connection) {
     this.connection = connection;
@@ -71,7 +69,7 @@ public class TaskSqlRepository implements Repository<Task> {
 
     statement = connection.prepareStatement(INSERT);
 // TODO решить, как записывать проект.
-    List<Task> tasksToUpdate = new ArrayList<Task>();
+    List<Task> tasksToUpdate = new ArrayList<>();
     for (Task clientTask : tasks) {
       final boolean TASK_NOT_EXISTS_IN_DATABASE = !sqlTasks.contains(clientTask);
       if (TASK_NOT_EXISTS_IN_DATABASE) {
