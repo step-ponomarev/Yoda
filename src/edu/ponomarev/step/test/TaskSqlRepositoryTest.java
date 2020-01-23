@@ -24,7 +24,7 @@ public class TaskSqlRepositoryTest {
   private HashMap<BoxType, Task> exampleTasks;
 
   @BeforeClass
-  public static void setConnection() {
+  public static void setRepository() {
     var context = new AnnotationConfigApplicationContext(ApplicationConfigure.class);
 
     repositoryFactory = context.getBean("repositoryFactory", RepositoryFactory.class);

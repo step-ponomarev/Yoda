@@ -15,10 +15,9 @@ import java.util.List;
 
 public class ProjectSqlRepository implements Repository<Project> {
   private static final String INSERT = "INSERT INTO project_list (id, name, time_of_creation, time_of_last_change) " +
-      "VALUES (?, ?, " +
-      "?, ?)";
-  private static final String SELECT = "SELECT * FROM project_list where ?";
-  private static final String DELETE = "DELETE FROM project_list where (id = ? ) AND ( time_of_creation = ? )";
+      "VALUES (?, ?, ?, ?)";
+  private static final String SELECT = "SELECT * FROM project_list";
+  private static final String DELETE = "DELETE FROM project_list where ( id = ? ) AND ( time_of_creation = ? )";
   private static final String UPDATE = "UPDATE project_list SET name = ?, time_of_last_change = ? WHERE ( id" +
       " = ? ) AND ( time_of_creation = ? ) AND ( time_of_last_change <= ? )";
 
@@ -86,7 +85,6 @@ public class ProjectSqlRepository implements Repository<Project> {
     }
 
     preparedStatement.close();
-
   }
 
   @Override
@@ -124,10 +122,7 @@ public class ProjectSqlRepository implements Repository<Project> {
   @Override
   public List<Project> getList(Specification specification) throws Exception {
     final var preparedStatement = connection.prepareStatement(SELECT);
-    final String specific = (String) specification.getSpecification();
     final List<Project> projects = new ArrayList<>();
-
-    preparedStatement.setString(1, specific);
 
     ResultSet resultSet = preparedStatement.executeQuery();
     while (resultSet.next()) {
