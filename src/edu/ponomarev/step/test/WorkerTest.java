@@ -2,6 +2,7 @@ package edu.ponomarev.step.test;
 
 import edu.ponomarev.step.MVC.model.Worker;
 import edu.ponomarev.step.component.BoxType;
+import edu.ponomarev.step.component.project.Project;
 import edu.ponomarev.step.component.task.Task;
 import edu.ponomarev.step.component.task.TaskRelations;
 
@@ -10,14 +11,17 @@ import org.junit.*;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class WorkerTest {
   private static ApplicationContext context;
+  private final static int PROJECT_AMOUNT = 10;
 
   private Worker worker;
   private HashMap<BoxType, Task> exampleTasks;
+  private List<Project> projects;
 
 
   @BeforeClass
@@ -33,6 +37,13 @@ public class WorkerTest {
     for (var boxType : BoxType.values()) {
       String statement = boxType.toString();
       exampleTasks.put(boxType, new Task(statement));
+    }
+
+
+    projects = new ArrayList<>(PROJECT_AMOUNT);
+    for (int i = 0; i < PROJECT_AMOUNT; ++i) {
+      Project project = new Project(Integer.toString(i));
+      projects.add(project);
     }
   }
 
@@ -105,4 +116,38 @@ public class WorkerTest {
       worker.removeTask(task, taskRelations);
     }
   }
-}
+
+  @Test
+  public void projectShouldBeAddedAndRemovedCorrect() {
+    final int SIZE_BEFORE_ADDING = worker.getProjects().size();
+
+    for (var project : projects) {
+      worker.addProject(project);
+    }
+
+    final int SIZE_AFTER_ADDING = worker.getProjects().size();
+
+    boolean SIZE_AFTER_ADDING_IS_CORRECT = (SIZE_AFTER_ADDING - SIZE_BEFORE_ADDING) == PROJECT_AMOUNT;
+    boolean EVERY_PROJECT_WAS_ADDED = true;
+    for (var project : projects) {
+      EVERY_PROJECT_WAS_ADDED &= worker.getProjects().contains(project);
+    }
+
+    Assert.assertTrue(EVERY_PROJECT_WAS_ADDED);
+    Assert.assertTrue(SIZE_AFTER_ADDING_IS_CORRECT);
+
+    for (var project : projects) {
+      worker.removeProject(project);
+    }
+
+    final int SIZE_AFTER_REMOVING = worker.getProjects().size();
+
+    boolean EVERY_PROJECT_WAS_REMOVED = true;
+    for (var project : projects) {
+      EVERY_PROJECT_WAS_ADDED &= !worker.getProjects().contains(project);
+    }
+
+    Assert.assertEquals(SIZE_BEFORE_ADDING, SIZE_AFTER_REMOVING);
+    Assert.assertTrue(EVERY_PROJECT_WAS_REMOVED);
+  }
+ }

@@ -1,5 +1,6 @@
 package edu.ponomarev.step.MVC.model;
 
+import edu.ponomarev.step.MVC.model.repository.project.ProjectSqlRepository;
 import edu.ponomarev.step.MVC.model.repository.task.TaskSerializator;
 import edu.ponomarev.step.MVC.model.repository.task.TaskSpecification;
 import edu.ponomarev.step.MVC.model.repository.task.TaskSqlRepository;
@@ -23,6 +24,8 @@ public class Worker {
 
   private TaskSerializator taskSerializator;
   private TaskSqlRepository taskSqlRepository;
+
+  private ProjectSqlRepository projectSqlRepository;
 
   private HashMap<BoxType, List<Task>> boxes;
   private HashMap<String, Project> projects;
@@ -52,6 +55,10 @@ public class Worker {
   public void postConstruct() {
     taskSerializator = (TaskSerializator) repositoryFactory.getRepository(RepositoryType.TASK_OFFLINE);
     taskSqlRepository = (TaskSqlRepository) repositoryFactory.getRepository(RepositoryType.TASK_SQL);
+    projectSqlRepository = (ProjectSqlRepository) repositoryFactory.getRepository(RepositoryType.PROJECT_SQL);
+
+    // TODO Загрузка с диска
+    // TODO Синхронизация с sql
   }
 
   public void addTask(Task task, TaskRelations taskRelations) {
@@ -207,11 +214,36 @@ public class Worker {
   }
 
   public void removeProject(Project project) {
-    projects.remove(project);
+    projects.remove(project.getUuid());
   }
 
-  // TODO Добавить синхронизацию задач
-  public void synchronizeTasks() { return; }
+  public void synchronize() {
+    try {
+      synchronizeTasks();
+      synchronizeProject();
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  // TODO Добавить синхронизацию
+  public void synchronizeTasks() throws Exception {
+    // Для каждого бокса:
+    // Загрузить задачи с бд
+    // если задача отсутвует на клиенте - загружаем
+    // сравнить 2 задачи и обновить, если что
+
+    // Добавить отсутсвующие задачи в БД
+    //
+  }
+
+  public void synchronizeProject() throws Exception{
+    // Загрузить проекты с бд
+    //
+  }
+
+  // TODO Написать функцию для сравнения даты обновления и обновления таска
 
   public List<Task> getTaskBox(BoxType boxType) { return boxes.get(boxType); }
 

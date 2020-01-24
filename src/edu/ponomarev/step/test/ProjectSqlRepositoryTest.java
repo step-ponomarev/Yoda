@@ -1,7 +1,9 @@
 package edu.ponomarev.step.test;
 
+import edu.ponomarev.step.MVC.model.repository.NoSpecification;
 import edu.ponomarev.step.MVC.model.repository.RepositoryFactory;
 import edu.ponomarev.step.MVC.model.repository.RepositoryFactory.RepositoryType;
+import edu.ponomarev.step.MVC.model.repository.Specification;
 import edu.ponomarev.step.MVC.model.repository.project.ProjectSqlRepository;
 
 import edu.ponomarev.step.component.project.Project;
@@ -46,16 +48,17 @@ public class ProjectSqlRepositoryTest {
   public void projectShouldBeAddedAndRemovedCorrect() {
     try {
       final int SIZE_BEFORE_ADDING = projectSqlRepository.getList(null).size();
+      final Specification noSpecification = new NoSpecification();
 
       for (var projectEntry : projects.entrySet()) {
         Project project = projectEntry.getValue();
 
-        projectSqlRepository.add(project, null);
+        projectSqlRepository.add(project, noSpecification);
       }
 
-      final int SIZE_AFTER_ADDING = projectSqlRepository.getList(null).size();
+      final int SIZE_AFTER_ADDING = projectSqlRepository.getList(noSpecification).size();
 
-      var listAfterAdding = projectSqlRepository.getList(null);
+      var listAfterAdding = projectSqlRepository.getList(noSpecification);
       boolean EVERY_TASK_WAS_ADDED = true;
       for (var projectEntry : projects.entrySet()) {
         Project project = projectEntry.getValue();
@@ -66,14 +69,14 @@ public class ProjectSqlRepositoryTest {
       Assert.assertTrue( (SIZE_AFTER_ADDING - SIZE_BEFORE_ADDING) == PROJECT_AMOUNT );
 
       for (var project : projects.entrySet()) {
-        projectSqlRepository.remove(project.getValue(), null);
+        projectSqlRepository.remove(project.getValue(), noSpecification);
       }
 
-      final int SIZE_AFTER_REMOVING = projectSqlRepository.getList(null).size();
+      final int SIZE_AFTER_REMOVING = projectSqlRepository.getList(noSpecification).size();
 
       boolean EVERY_TASK_WAS_REMOVED = true;
       for (var project : projects.entrySet()) {
-        EVERY_TASK_WAS_REMOVED &= !projectSqlRepository.getList(null).contains(project.getValue());
+        EVERY_TASK_WAS_REMOVED &= !projectSqlRepository.getList(noSpecification).contains(project.getValue());
       }
 
       Assert.assertTrue(EVERY_TASK_WAS_REMOVED);
@@ -87,6 +90,7 @@ public class ProjectSqlRepositoryTest {
   public void projectListShouldBeAddedAndRemovedCorrect() {
     try {
       final int SIZE_BEFORE_ADDING = projectSqlRepository.getList(null).size();
+      final Specification noSpecification = new NoSpecification();
 
       List<Project> projects = new ArrayList<>();
       for (var projectEntry : this.projects.entrySet()) {
@@ -95,9 +99,9 @@ public class ProjectSqlRepositoryTest {
         projects.add(project);
       }
 
-      projectSqlRepository.add(projects, null);
+      projectSqlRepository.add(projects, noSpecification);
 
-      var projectsAfterAdding = projectSqlRepository.getList(null);
+      var projectsAfterAdding = projectSqlRepository.getList(noSpecification);
 
       final int SIZE_AFTER_ADDING = projectsAfterAdding.size();
 
@@ -111,7 +115,7 @@ public class ProjectSqlRepositoryTest {
 
       projectSqlRepository.remove(projects);
 
-      List<Project> projectsAfterRemoving = projectSqlRepository.getList(null);
+      List<Project> projectsAfterRemoving = projectSqlRepository.getList(noSpecification);
       final int SIZE_AFTER_REMOVING = projectsAfterRemoving.size();
 
       boolean EVERY_TASK_WAS_REMOVED = true;
@@ -129,24 +133,25 @@ public class ProjectSqlRepositoryTest {
   @Test
   public void projectShouldBeUpdatedCorrect() {
     try {
-      String name = "New Project";
-      String newName = "New Statement";
+      final String name = "New Project";
+      final String newName = "New Statement";
+      final Specification noSpecification = new NoSpecification();
 
       Project project = new Project(name);
 
-      projectSqlRepository.add(project, null);
+      projectSqlRepository.add(project, noSpecification);
 
       Project projectBeforeUpdate =
-          projectSqlRepository.getList(null).get(projectSqlRepository.getList(null).indexOf(project));
+          projectSqlRepository.getList(noSpecification).get(projectSqlRepository.getList(noSpecification).indexOf(project));
 
       project.setName(newName);
       project.updateTimeOfLastChange();
 
-      projectSqlRepository.update(project, null);
+      projectSqlRepository.update(project, noSpecification);
 
-      Project projectAfterUpdate = projectSqlRepository.getList(null).get(projectSqlRepository.getList(null).indexOf(project));
+      Project projectAfterUpdate = projectSqlRepository.getList(noSpecification).get(projectSqlRepository.getList(noSpecification).indexOf(project));
 
-      projectSqlRepository.remove(project, null);
+      projectSqlRepository.remove(project, noSpecification);
 
       Assert.assertEquals(projectBeforeUpdate, projectAfterUpdate);
       Assert.assertEquals(projectBeforeUpdate.getName(), name);

@@ -68,7 +68,7 @@ public class TaskSqlRepository implements Repository<Task> {
     resultSet.close();
 
     statement = connection.prepareStatement(INSERT);
-// TODO решить, как записывать проект.
+
     List<Task> tasksToUpdate = new ArrayList<>();
     for (Task clientTask : tasks) {
       final boolean TASK_NOT_EXISTS_IN_DATABASE = !sqlTasks.contains(clientTask);

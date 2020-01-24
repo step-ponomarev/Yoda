@@ -11,8 +11,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO Написать тесты для класса
-
 public class ProjectSqlRepository implements Repository<Project> {
   private static final String INSERT = "INSERT INTO project_list (id, name, time_of_creation, time_of_last_change) " +
       "VALUES (?, ?, ?, ?)";
