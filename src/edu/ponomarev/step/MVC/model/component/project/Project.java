@@ -4,11 +4,12 @@ import edu.ponomarev.step.MVC.model.component.BoxType;
 import edu.ponomarev.step.MVC.model.component.task.Task;
 import edu.ponomarev.step.system.TimeManager;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import java.util.*;
 
-public class Project {
+public class Project implements Serializable {
   private String uuid;
   private String name;
   private LocalDateTime timeOfCreation;

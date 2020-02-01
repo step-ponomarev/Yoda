@@ -134,7 +134,8 @@ public class ProjectSerializator implements Repository<Project> {
   private void updateProjectInListIfOutdated(Project updatedProject, List<Project> listToUpdate) {
     Project projectToUpdate = listToUpdate.get(listToUpdate.indexOf(updatedProject));
 
-    final boolean PROJECT_IS_OUTDATED = updatedProject.getTimeOfLastChange().isAfter(projectToUpdate.getTimeOfLastChange());
+    final boolean PROJECT_IS_OUTDATED =
+        !updatedProject.getTimeOfLastChange().isAfter(projectToUpdate.getTimeOfLastChange());
 
     if (PROJECT_IS_OUTDATED) {
       projectToUpdate.setName(updatedProject.getName());

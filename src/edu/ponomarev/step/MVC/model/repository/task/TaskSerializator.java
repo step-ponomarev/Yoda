@@ -141,7 +141,7 @@ public class TaskSerializator implements Repository<Task> {
   private void updateTaskInListIfOutdated(Task updatedTask, List<Task> listToUpdate) {
     Task taskToUpdate = listToUpdate.get(listToUpdate.indexOf(updatedTask));
 
-    final boolean TASK_WAS_UPDATED = updatedTask.getTimeOfLastChange().isAfter(taskToUpdate.getTimeOfLastChange());
+    final boolean TASK_WAS_UPDATED = !updatedTask.getTimeOfLastChange().isAfter(taskToUpdate.getTimeOfLastChange());
 
     if (TASK_WAS_UPDATED) {
       taskToUpdate.setStatement(updatedTask.getStatement());

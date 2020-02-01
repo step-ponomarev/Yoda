@@ -61,7 +61,7 @@ public class TaskSerializatorTest {
 
         final int SIZE_AFTER_TASK_ADDING = sqlTasks.size();
         final boolean CONTAINER_CONTAINS_ADDED_TASK = sqlTasks.contains(newTask);
-        final boolean ONLY_ONE_TASK_WAS_ADDED = ( SIZE_AFTER_TASK_ADDING - SIZE_BEFORE_MANIPULATIONS ) == 1;
+        final boolean ONLY_ONE_TASK_WAS_ADDED = (SIZE_AFTER_TASK_ADDING - SIZE_BEFORE_MANIPULATIONS) == 1;
 
         Assert.assertTrue(CONTAINER_CONTAINS_ADDED_TASK);
         Assert.assertTrue(ONLY_ONE_TASK_WAS_ADDED);
@@ -83,13 +83,12 @@ public class TaskSerializatorTest {
 
   @Test
   public void taskListShouldBeAddedAndRemovedCorrect() {
+    final int AMOUNT_OF_CREATED_TASKS = 10;
+
     try {
       for (var boxType : BoxType.values()) {
         final var taskRelations = new TaskRelations(boxType);
         final var taskSpecification = new TaskSpecification(taskRelations);
-
-        //Set up list to adding.
-        final int AMOUNT_OF_CREATED_TASKS = 10;
 
         List<Task> createdTasks = new ArrayList<>(AMOUNT_OF_CREATED_TASKS);
 
@@ -134,6 +133,94 @@ public class TaskSerializatorTest {
 
         Assert.assertEquals(SIZE_BEFORE_ADDING, SIZE_AFTER_REMOVING);
         Assert.assertTrue(EVERY_TASK_WAS_REMOVED);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Test
+  public void taskShouldBeUpdatedCorrect() {
+    final String statement = "New task";
+    final String updatedStatement = "Updated Task";
+
+    try {
+      for (var boxType : BoxType.values()) {
+        final var taskRelations = new TaskRelations(boxType);
+        final var taskSpecification = new TaskSpecification(taskRelations);
+
+        var newTask = new Task(statement);
+
+        taskSerializator.add(newTask, taskSpecification);
+
+        var tasksBeforeUpdating = taskSerializator.getList(taskSpecification);
+
+        var taskBeforeUpdate = tasksBeforeUpdating.get(tasksBeforeUpdating.indexOf(newTask));
+
+        newTask.setStatement(updatedStatement);
+        newTask.updateTimeOfLastChange();
+
+        taskSerializator.update(newTask, taskSpecification);
+
+        var tasksAfterUpdating = taskSerializator.getList(taskSpecification);
+
+        var updatedTask = tasksAfterUpdating.get(tasksAfterUpdating.indexOf(newTask));
+
+        final boolean SIZE_WAS_NOT_CHANGED = tasksBeforeUpdating.size() == tasksAfterUpdating.size();
+        final boolean TASK_WAS_UPDATED = updatedTask.equals(taskBeforeUpdate)
+            && !updatedTask.getStatement().equals(taskBeforeUpdate.getStatement());
+
+        taskSerializator.remove(newTask, taskSpecification);
+
+        Assert.assertTrue(SIZE_WAS_NOT_CHANGED);
+        Assert.assertTrue(TASK_WAS_UPDATED);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Test
+  public void taskListShouldBeUpdatedCorrect() {
+    final int TASK_AMOUNT = 200;
+
+    try {
+      for (var boxType : BoxType.values()) {
+        List<Task> newTasks = new ArrayList(TASK_AMOUNT);
+        for (int i = 0; i < TASK_AMOUNT; ++i) {
+          Task newTask = new Task(Integer.toString(i));
+          newTasks.add(newTask);
+        }
+
+        final var taskRelations = new TaskRelations(boxType);
+        final var taskSpecification = new TaskSpecification(taskRelations);
+
+        taskSerializator.add(newTasks, taskSpecification);
+
+        var tasksBeforeUpdating = taskSerializator.getList(taskSpecification);
+
+        for (var taskToUpdate : newTasks) {
+          taskToUpdate.setStatement(taskToUpdate.getUUID() + " Updated");
+          taskToUpdate.updateTimeOfLastChange();
+        }
+
+        taskSerializator.update(newTasks, taskSpecification);
+
+        var tasksAfterUpdating = taskSerializator.getList(taskSpecification);
+
+        final boolean SIZE_WAS_NOT_CHANGED = tasksAfterUpdating.size() == tasksBeforeUpdating.size();
+        boolean EVERY_TASK_WAS_UPDATED = true;
+        for (var task : tasksBeforeUpdating) {
+          Task updatedTask = tasksAfterUpdating.get(tasksAfterUpdating.indexOf(task));
+
+          EVERY_TASK_WAS_UPDATED &= updatedTask.equals(task)
+              && !updatedTask.getStatement().equals(task.getStatement());
+        }
+
+        taskSerializator.remove(newTasks);
+
+        Assert.assertTrue(SIZE_WAS_NOT_CHANGED);
+        Assert.assertTrue(EVERY_TASK_WAS_UPDATED);
       }
     } catch (Exception e) {
       e.printStackTrace();
