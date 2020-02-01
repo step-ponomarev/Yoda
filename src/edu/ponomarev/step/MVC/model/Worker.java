@@ -1,5 +1,7 @@
 package edu.ponomarev.step.MVC.model;
 
+import edu.ponomarev.step.MVC.model.repository.NoSpecification;
+import edu.ponomarev.step.MVC.model.repository.project.ProjectSerializator;
 import edu.ponomarev.step.MVC.model.repository.project.ProjectSqlRepository;
 import edu.ponomarev.step.MVC.model.repository.task.TaskSerializator;
 import edu.ponomarev.step.MVC.model.repository.task.TaskSpecification;
@@ -26,14 +28,21 @@ public class Worker {
   private TaskSqlRepository taskSqlRepository;
 
   private ProjectSqlRepository projectSqlRepository;
+  private ProjectSerializator projectSerializator;
+
 
   private HashMap<BoxType, List<Task>> boxes;
   private HashMap<String, Project> projects;
 
-  private List<Task> tasksToRemove;
+  // TODO Добваить сохранение изменненых списокв...
   private List<Project> projectsToRemove;
+  private List<Project> projectsToAdd;
+  private List<Project> projectsToUpdate;
+
+  private List<Task> tasksToRemove;
   private HashMap<Task, TaskRelations> tasksToAdd;
   private HashMap<Task, TaskRelations> tasksToUpdate;
+  // ___________________________________________________
 
   public Worker() {
     boxes = new HashMap<>() {{
@@ -46,15 +55,19 @@ public class Worker {
     projects = new HashMap<>();
 
     tasksToRemove = new ArrayList<>();
-    projectsToRemove = new ArrayList<>();
     tasksToAdd = new HashMap<>();
     tasksToUpdate = new HashMap<>();
+
+    projectsToRemove = new ArrayList<>();
+    projectsToAdd = new ArrayList<>();
+    projectsToUpdate = new ArrayList<>();
   }
 
   @PostConstruct
   public void postConstruct() {
     taskSerializator = (TaskSerializator) repositoryFactory.getRepository(RepositoryType.TASK_OFFLINE);
     taskSqlRepository = (TaskSqlRepository) repositoryFactory.getRepository(RepositoryType.TASK_SQL);
+    projectSerializator = (ProjectSerializator) repositoryFactory.getRepository(RepositoryType.TASK_OFFLINE);
     projectSqlRepository = (ProjectSqlRepository) repositoryFactory.getRepository(RepositoryType.PROJECT_SQL);
 
     // TODO Загрузка с диска
@@ -132,9 +145,70 @@ public class Worker {
     }
   }
 
+  public void addProject(Project project) {
+    final var UUID = project.getUuid();
+    final var noSpecification = new NoSpecification();
+
+    projects.put(UUID, project);
+
+    try {
+      projectSerializator.add(project, noSpecification);
+
+      projectSqlRepository.add(project, noSpecification);
+    } catch (SQLException e) {
+      projectsToAdd.add(project);
+
+      e.printStackTrace();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  public void removeProject(Project project) {
+    final var UUID = project.getUuid();
+    final var noSpecification = new NoSpecification();
+
+    projects.remove(UUID);
+
+    try {
+      projectSerializator.remove(project, noSpecification);
+
+      projectSqlRepository.remove(project, noSpecification);
+    } catch (SQLException e) {
+      projectsToRemove.add(project);
+
+      e.printStackTrace();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  public void updateProject(Project project) {
+    final var UUID = project.getUuid();
+    final var noSpecification = new NoSpecification();
+
+    projects.put(UUID, project);
+
+    try {
+      projectSerializator.update(project, noSpecification);
+
+      projectSqlRepository.update(project, noSpecification);
+    } catch (SQLException e) {
+      projectsToUpdate.add(project);
+
+      e.printStackTrace();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  public Project getProject(String UUID) {
+    return projects.get(UUID);
+  }
+
   //TODO Написать тесты для методов очистки очередей
 
-  public void clearAddList() {
+  public void clearAddLists() {
     try {
       for (var taskEntry : tasksToAdd.entrySet()) {
         final var task = taskEntry.getKey();
@@ -142,6 +216,10 @@ public class Worker {
         taskSqlRepository.remove(task, taskSpecification);
       }
       tasksToAdd.clear();
+
+      final var noSpecification = new NoSpecification();
+      projectSqlRepository.add(projectsToAdd, noSpecification);
+      projectsToAdd.clear();
     } catch (SQLException e) {
       e.printStackTrace();
       // TODO Ничо не делать ((((?
@@ -150,10 +228,13 @@ public class Worker {
     }
   }
 
-  public void clearRemoveList() {
+  public void clearRemoveLists() {
     try {
       taskSqlRepository.remove(tasksToRemove);
       tasksToRemove.clear();
+
+      projectSqlRepository.remove(projectsToRemove);
+      projectsToRemove.clear();
     } catch (SQLException e) {
       e.printStackTrace();
       // TODO Ничо не делать ((((?
@@ -170,6 +251,11 @@ public class Worker {
         taskSqlRepository.update(task, taskSpecification);
       }
       tasksToUpdate.clear();
+
+      final var noSpecification = new NoSpecification();
+
+      projectSqlRepository.update(projectsToUpdate, noSpecification);
+      projectsToUpdate.clear();
     } catch (SQLException e) {
       e.printStackTrace();
       // TODO Ничо не делать ((((?
@@ -204,19 +290,6 @@ public class Worker {
     }
   }
 
-  public void addProject(Project project) {
-    final var UUID = project.getUuid();
-    projects.put(UUID, project);
-  }
-
-  public Project getProject(String UUID) {
-    return projects.get(UUID);
-  }
-
-  public void removeProject(Project project) {
-    projects.remove(project.getUuid());
-  }
-
   public void synchronize() {
     try {
       synchronizeTasks();
@@ -239,8 +312,7 @@ public class Worker {
   }
 
   public void synchronizeProject() throws Exception{
-    // Загрузить проекты с бд
-    //
+
   }
 
   // TODO Написать функцию для сравнения даты обновления и обновления таска
