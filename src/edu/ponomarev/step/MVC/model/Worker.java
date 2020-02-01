@@ -4,12 +4,12 @@ import edu.ponomarev.step.MVC.model.repository.project.ProjectSqlRepository;
 import edu.ponomarev.step.MVC.model.repository.task.TaskSerializator;
 import edu.ponomarev.step.MVC.model.repository.task.TaskSpecification;
 import edu.ponomarev.step.MVC.model.repository.task.TaskSqlRepository;
-import edu.ponomarev.step.component.project.Project;
+import edu.ponomarev.step.MVC.model.component.project.Project;
 import edu.ponomarev.step.MVC.model.repository.RepositoryFactory;
 import edu.ponomarev.step.MVC.model.repository.RepositoryFactory.RepositoryType;
-import edu.ponomarev.step.component.task.Task;
-import edu.ponomarev.step.component.BoxType;
-import edu.ponomarev.step.component.task.TaskRelations;
+import edu.ponomarev.step.MVC.model.component.task.Task;
+import edu.ponomarev.step.MVC.model.component.BoxType;
+import edu.ponomarev.step.MVC.model.component.task.TaskRelations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 

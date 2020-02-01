@@ -1,4 +1,4 @@
-package edu.ponomarev.step.component;
+package edu.ponomarev.step.MVC.model.component;
 
 public enum BoxType {
   INBOX(0, "Inbox"),

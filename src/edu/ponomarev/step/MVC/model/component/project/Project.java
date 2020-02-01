@@ -1,7 +1,7 @@
-package edu.ponomarev.step.component.project;
+package edu.ponomarev.step.MVC.model.component.project;
 
-import edu.ponomarev.step.component.BoxType;
-import edu.ponomarev.step.component.task.Task;
+import edu.ponomarev.step.MVC.model.component.BoxType;
+import edu.ponomarev.step.MVC.model.component.task.Task;
 import edu.ponomarev.step.system.TimeManager;
 
 import java.time.LocalDateTime;

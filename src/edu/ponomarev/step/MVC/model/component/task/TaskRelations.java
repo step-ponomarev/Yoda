@@ -1,7 +1,7 @@
-package edu.ponomarev.step.component.task;
+package edu.ponomarev.step.MVC.model.component.task;
 
-import edu.ponomarev.step.component.BoxType;
-import edu.ponomarev.step.component.project.Project;
+import edu.ponomarev.step.MVC.model.component.BoxType;
+import edu.ponomarev.step.MVC.model.component.project.Project;
 
 public class TaskRelations {
   private BoxType boxOwnerType;

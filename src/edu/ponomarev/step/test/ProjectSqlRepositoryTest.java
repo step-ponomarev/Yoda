@@ -6,7 +6,7 @@ import edu.ponomarev.step.MVC.model.repository.RepositoryFactory.RepositoryType;
 import edu.ponomarev.step.MVC.model.repository.Specification;
 import edu.ponomarev.step.MVC.model.repository.project.ProjectSqlRepository;
 
-import edu.ponomarev.step.component.project.Project;
+import edu.ponomarev.step.MVC.model.component.project.Project;
 import edu.ponomarev.step.system.ApplicationConfigure;
 import org.junit.Assert;
 import org.junit.Before;

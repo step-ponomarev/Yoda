@@ -1,10 +1,10 @@
 package edu.ponomarev.step.test;
 
 import edu.ponomarev.step.MVC.model.Worker;
-import edu.ponomarev.step.component.BoxType;
-import edu.ponomarev.step.component.project.Project;
-import edu.ponomarev.step.component.task.Task;
-import edu.ponomarev.step.component.task.TaskRelations;
+import edu.ponomarev.step.MVC.model.component.BoxType;
+import edu.ponomarev.step.MVC.model.component.project.Project;
+import edu.ponomarev.step.MVC.model.component.task.Task;
+import edu.ponomarev.step.MVC.model.component.task.TaskRelations;
 
 import edu.ponomarev.step.system.ApplicationConfigure;
 import org.junit.*;

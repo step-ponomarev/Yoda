@@ -1,4 +1,4 @@
-package edu.ponomarev.step.component.task;
+package edu.ponomarev.step.MVC.model.component.task;
 
 import edu.ponomarev.step.system.TimeManager;
 

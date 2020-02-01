@@ -2,8 +2,8 @@ package edu.ponomarev.step.MVC.model.repository.task;
 
 import edu.ponomarev.step.MVC.model.repository.Repository;
 import edu.ponomarev.step.MVC.model.repository.Specification;
-import edu.ponomarev.step.component.task.Task;
-import edu.ponomarev.step.component.task.TaskRelations;
+import edu.ponomarev.step.MVC.model.component.task.Task;
+import edu.ponomarev.step.MVC.model.component.task.TaskRelations;
 import edu.ponomarev.step.system.TimeManager;
 
 import java.sql.*;

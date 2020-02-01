@@ -23,5 +23,5 @@ public class ApplicationConfigure {
 
   @Bean
   @Scope("singleton")
-  public Worker worker() { return ( new Worker()); }
+  public Worker worker() { return ( new Worker() ); }
 }

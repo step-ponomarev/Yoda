@@ -2,7 +2,7 @@ package edu.ponomarev.step.MVC.model.repository.project;
 
 import edu.ponomarev.step.MVC.model.repository.Repository;
 import edu.ponomarev.step.MVC.model.repository.Specification;
-import edu.ponomarev.step.component.project.Project;
+import edu.ponomarev.step.MVC.model.component.project.Project;
 import edu.ponomarev.step.system.TimeManager;
 
 import java.sql.Connection;

@@ -1,5 +1,6 @@
 package edu.ponomarev.step.MVC.model.repository;
 
+import edu.ponomarev.step.MVC.model.repository.project.ProjectSerializator;
 import edu.ponomarev.step.MVC.model.repository.project.ProjectSqlRepository;
 import edu.ponomarev.step.MVC.model.repository.task.TaskSerializator;
 import edu.ponomarev.step.MVC.model.repository.task.TaskSqlRepository;
@@ -14,7 +15,8 @@ public class RepositoryFactory {
   public enum RepositoryType {
     TASK_OFFLINE,
     TASK_SQL,
-    PROJECT_SQL,
+    PROJECT_OFFLINE,
+    PROJECT_SQL;
   }
 
   @Value("${url}")
@@ -48,6 +50,9 @@ public class RepositoryFactory {
 
       case PROJECT_SQL:
         return ( new ProjectSqlRepository(connection) );
+
+      case PROJECT_OFFLINE:
+        return ( new ProjectSerializator() );
 
       default:
         //TODO Сделать строгую ошибку

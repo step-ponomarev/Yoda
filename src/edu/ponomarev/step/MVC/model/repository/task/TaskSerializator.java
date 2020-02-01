@@ -2,9 +2,9 @@ package edu.ponomarev.step.MVC.model.repository.task;
 
 import edu.ponomarev.step.MVC.model.repository.Repository;
 import edu.ponomarev.step.MVC.model.repository.Specification;
-import edu.ponomarev.step.component.task.Task;
-import edu.ponomarev.step.component.BoxType;
-import edu.ponomarev.step.component.task.TaskRelations;
+import edu.ponomarev.step.MVC.model.component.task.Task;
+import edu.ponomarev.step.MVC.model.component.BoxType;
+import edu.ponomarev.step.MVC.model.component.task.TaskRelations;
 
 import java.io.*;
 
@@ -36,9 +36,7 @@ public class TaskSerializator implements Repository<Task> {
     defineTaskRelationsAndSetUpPath(specification);
 
     File file = new File(directory);
-    if (!file.exists()) {
-      file.createNewFile();
-    }
+    createFileIfNotExists(file);
 
     serializeAndSaveList(tasks);
 
@@ -59,8 +57,8 @@ public class TaskSerializator implements Repository<Task> {
   }
 
   @Override
-  public void remove(List<Task> removedTasks) throws Exception {
-    if (removedTasks.isEmpty()) {
+  public void remove(List<Task> tasksToRemove) throws Exception {
+    if (tasksToRemove.isEmpty()) {
       return;
     }
 
@@ -69,7 +67,7 @@ public class TaskSerializator implements Repository<Task> {
 
       List<Task> tasks = deseriadeserializeAndGetList();
       if (!tasks.isEmpty()) {
-        for (var task : removedTasks) {
+        for (var task : tasksToRemove) {
           tasks.remove(task);
         }
       }
@@ -86,7 +84,11 @@ public class TaskSerializator implements Repository<Task> {
 
     List<Task> tasks = deseriadeserializeAndGetList();
 
-    putTaskIn(updatedTask, tasks);
+    if (!tasks.contains(updatedTask)) {
+      tasks.add(updatedTask);
+    } else {
+      updateTaskInListIfOutdated(updatedTask, tasks);
+    }
 
     serializeAndSaveList(tasks);
 
@@ -100,7 +102,11 @@ public class TaskSerializator implements Repository<Task> {
     List<Task> tasks = deseriadeserializeAndGetList();
 
     for (var updatedTask : updatedTasks) {
-      putTaskIn(updatedTask, tasks);
+      if (!tasks.contains(updatedTask)) {
+        tasks.add(updatedTask);
+      } else {
+        updateTaskInListIfOutdated(updatedTask, tasks);
+      }
     }
 
     serializeAndSaveList(tasks);
@@ -115,7 +121,9 @@ public class TaskSerializator implements Repository<Task> {
     List<Task> tasks = new ArrayList<>();
 
     File file = new File(directory);
-    if (file.exists()) {
+    createFileIfNotExists(file);
+
+    if (file.length() != 0) {
       FileInputStream is = new FileInputStream(file);
       ObjectInputStream isObj = new ObjectInputStream(is);
 
@@ -130,18 +138,14 @@ public class TaskSerializator implements Repository<Task> {
     return tasks;
   }
 
-  private void putTaskIn(Task updatedTask, List<Task> tasks) {
-    if (!tasks.contains(updatedTask)) {
-      tasks.add(updatedTask);
-    } else {
-      Task taskToUpdate = tasks.get(tasks.indexOf(updatedTask));
+  private void updateTaskInListIfOutdated(Task updatedTask, List<Task> listToUpdate) {
+    Task taskToUpdate = listToUpdate.get(listToUpdate.indexOf(updatedTask));
 
-      final boolean TASK_WAS_UPDATED = updatedTask.getTimeOfLastChange().isAfter(taskToUpdate.getTimeOfLastChange());
+    final boolean TASK_WAS_UPDATED = updatedTask.getTimeOfLastChange().isAfter(taskToUpdate.getTimeOfLastChange());
 
-      if (TASK_WAS_UPDATED) {
-        taskToUpdate.setStatement(updatedTask.getStatement());
-        taskToUpdate.setTTimeOfLastChange(updatedTask.getTimeOfLastChange());
-      }
+    if (TASK_WAS_UPDATED) {
+      taskToUpdate.setStatement(updatedTask.getStatement());
+      taskToUpdate.setTTimeOfLastChange(updatedTask.getTimeOfLastChange());
     }
   }
 
@@ -149,14 +153,14 @@ public class TaskSerializator implements Repository<Task> {
     List<Task> tasks = new ArrayList<>();
 
     File file = new File(directory);
-    if (!file.exists()) {
-      file.createNewFile();
-      return tasks;
-    } else {
+    createFileIfNotExists(file);
+
+    if (file.length() != 0) {
       FileInputStream is = new FileInputStream(file);
       ObjectInputStream isObj = new ObjectInputStream(is);
 
       tasks = (List<Task>) isObj.readObject();
+      isObj.close();
       is.close();
     }
 
@@ -181,8 +185,14 @@ public class TaskSerializator implements Repository<Task> {
     addFileNameToPath(taskRelations.getBoxType());
   }
 
+  private void createFileIfNotExists(File file) throws Exception {
+    if (!file.exists()) {
+      file.createNewFile();
+    }
+  }
+
   private void resetPathAndCreateDirIfNotExists() {
-    directory = Paths.get("data").toAbsolutePath().toString();
+    directory = Paths.get("tasks").toAbsolutePath().toString();
 
     File file = new File(directory);
     if (!file.exists()) {
@@ -193,19 +203,19 @@ public class TaskSerializator implements Repository<Task> {
   private void addFileNameToPath(BoxType boxType) {
     switch (boxType) {
       case DAY:
-        directory = Paths.get(directory + "/box_today.ser").toAbsolutePath().toString();
+        directory += File.separator + "box_today.ser";
         break;
 
       case WEEK:
-        directory = Paths.get(directory + "/box_week.ser").toAbsolutePath().toString();
+        directory +=  File.separator + "box_week.ser";
         break;
 
       case LATE:
-        directory = Paths.get(directory + "/box_late.ser").toAbsolutePath().toString();
+        directory += File.separator + "box_late.ser";
         break;
 
       default:
-        directory = Paths.get(directory + "/box_inbox.ser").toAbsolutePath().toString();
+        directory += File.separator + "box_inbox.ser";
         break;
     }
   }

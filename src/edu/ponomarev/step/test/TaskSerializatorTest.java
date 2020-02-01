@@ -4,10 +4,10 @@ import edu.ponomarev.step.MVC.model.repository.RepositoryFactory;
 import edu.ponomarev.step.MVC.model.repository.task.TaskSerializator;
 
 import edu.ponomarev.step.MVC.model.repository.task.TaskSpecification;
-import edu.ponomarev.step.component.BoxType;
-import edu.ponomarev.step.component.task.Task;
+import edu.ponomarev.step.MVC.model.component.BoxType;
+import edu.ponomarev.step.MVC.model.component.task.Task;
 
-import edu.ponomarev.step.component.task.TaskRelations;
+import edu.ponomarev.step.MVC.model.component.task.TaskRelations;
 import edu.ponomarev.step.system.ApplicationConfigure;
 import org.junit.*;
 
@@ -30,7 +30,7 @@ public class TaskSerializatorTest {
   }
 
   @Before
-  public void setState() {
+  public void beforeTest() {
     exampleTasks = new HashMap<>();
 
     taskSerializator = (TaskSerializator) repositoryFactory.getRepository(RepositoryFactory.RepositoryType.TASK_OFFLINE);
