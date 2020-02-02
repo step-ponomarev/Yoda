@@ -2,11 +2,10 @@ package edu.ponomarev.step;
 
 import edu.ponomarev.step.MVC.controller.Controller;
 import edu.ponomarev.step.system.ApplicationConfigure;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class Main {
-  public static ApplicationContext context;
+  public static AnnotationConfigApplicationContext context;
 
   public static void main(String[] args) {
     context = new AnnotationConfigApplicationContext(ApplicationConfigure.class);

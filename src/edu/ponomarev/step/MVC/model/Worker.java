@@ -1,10 +1,10 @@
 package edu.ponomarev.step.MVC.model;
 
-import edu.ponomarev.step.MVC.model.repository.NoSpecification;
+import edu.ponomarev.step.MVC.model.repository.specification.NoSpecification;
 import edu.ponomarev.step.MVC.model.repository.project.ProjectSerializator;
 import edu.ponomarev.step.MVC.model.repository.project.ProjectSqlRepository;
 import edu.ponomarev.step.MVC.model.repository.task.TaskSerializator;
-import edu.ponomarev.step.MVC.model.repository.task.TaskSpecification;
+import edu.ponomarev.step.MVC.model.repository.specification.TaskSpecification;
 import edu.ponomarev.step.MVC.model.repository.task.TaskSqlRepository;
 import edu.ponomarev.step.MVC.model.component.project.Project;
 import edu.ponomarev.step.MVC.model.repository.RepositoryFactory;
@@ -67,7 +67,7 @@ public class Worker {
   public void postConstruct() {
     taskSerializator = (TaskSerializator) repositoryFactory.getRepository(RepositoryType.TASK_OFFLINE);
     taskSqlRepository = (TaskSqlRepository) repositoryFactory.getRepository(RepositoryType.TASK_SQL);
-    projectSerializator = (ProjectSerializator) repositoryFactory.getRepository(RepositoryType.TASK_OFFLINE);
+    projectSerializator = (ProjectSerializator) repositoryFactory.getRepository(RepositoryType.PROJECT_OFFLINE);
     projectSqlRepository = (ProjectSqlRepository) repositoryFactory.getRepository(RepositoryType.PROJECT_SQL);
 
     // TODO Загрузка с диска

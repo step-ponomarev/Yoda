@@ -1,7 +1,7 @@
 package edu.ponomarev.step.test;
 
 import edu.ponomarev.step.MVC.model.component.project.Project;
-import edu.ponomarev.step.MVC.model.repository.NoSpecification;
+import edu.ponomarev.step.MVC.model.repository.specification.NoSpecification;
 import edu.ponomarev.step.MVC.model.repository.RepositoryFactory;
 import edu.ponomarev.step.MVC.model.repository.project.ProjectSerializator;
 import edu.ponomarev.step.system.ApplicationConfigure;

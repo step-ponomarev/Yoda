@@ -2,7 +2,7 @@ package edu.ponomarev.step.test;
 
 import edu.ponomarev.step.MVC.model.repository.RepositoryFactory;
 import edu.ponomarev.step.MVC.model.repository.RepositoryFactory.RepositoryType;
-import edu.ponomarev.step.MVC.model.repository.task.TaskSpecification;
+import edu.ponomarev.step.MVC.model.repository.specification.TaskSpecification;
 import edu.ponomarev.step.MVC.model.repository.task.TaskSqlRepository;
 import edu.ponomarev.step.MVC.model.component.BoxType;
 import edu.ponomarev.step.MVC.model.component.task.Task;

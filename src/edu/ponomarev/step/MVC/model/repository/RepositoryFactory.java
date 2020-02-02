@@ -5,12 +5,14 @@ import edu.ponomarev.step.MVC.model.repository.project.ProjectSqlRepository;
 import edu.ponomarev.step.MVC.model.repository.task.TaskSerializator;
 import edu.ponomarev.step.MVC.model.repository.task.TaskSqlRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
+@Service
 public class RepositoryFactory {
   public enum RepositoryType {
     TASK_OFFLINE,
