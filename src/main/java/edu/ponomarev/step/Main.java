@@ -13,8 +13,12 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.awt.*;
 
-public class Main {
-
+public class Main extends Application {
+  @Override
+  public void start(Stage stage) throws Exception {
+    WindowFactory factory = new WindowFactory();
+    factory.start();
+  }
 
   private static Scene scene;
 
@@ -27,10 +31,20 @@ public class Main {
     controller.start();*/
 
     try {
-      WindowFactory factory = new WindowFactory();
-      factory.start();
+      launch();
     } catch (Exception e) {
       e.printStackTrace();
     }
   }
+
+ /* @Override
+  public void start(Stage stage) throws Exception {
+    var load = new FXMLLoader(Main.class.getResource("windowTest.fxml"));
+    Parent parent = load.load();
+    stage =  new Stage();
+    stage.setScene(new Scene(parent));
+    stage.show();
+    WindowFactory factory = new WindowFactory();
+    factory.start();
+  }*/
 }
